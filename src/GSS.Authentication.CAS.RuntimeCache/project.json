@@ -10,7 +10,9 @@
     "frameworks": {
         "net45": {
             "frameworkAssemblies": {
-                "System.Runtime.Caching": "4.0.0.0"
+                "System.Runtime": "4.0.0.0",
+                "System.Runtime.Caching": "4.0.0.0",
+                "System.Threading.Tasks": "4.0.0.0"
             }
         }
     },

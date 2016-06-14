@@ -1,0 +1,16 @@
+﻿{
+  "dependencies": {
+    "Microsoft.AspNet.Mvc": "5.2.3",
+    "Microsoft.CodeDom.Providers.DotNetCompilerPlatform": "1.0.1",
+    "Microsoft.Owin.Diagnostics": "3.0.1",
+    "Microsoft.Owin.Host.SystemWeb": "3.0.1",
+    "Microsoft.Owin.Security.Cookies": "3.0.1",
+    "Owin.OAuthGeneric": "1.0.3"
+  },
+  "frameworks": {
+    "net45": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

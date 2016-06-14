@@ -1,0 +1,34 @@
+{
+    "buildOptions": {
+        "preserveCompilationContext": true,
+        "embed": [ "Resources/*.xml" ]
+    },
+    "dependencies": {
+        "dotnet-test-xunit": "1.0.0-rc3-*",
+        "GSS.Authentication.CAS.Core": {
+            "target": "project"
+        },
+        "GSS.Authentication.CAS.Tests.Shared": {
+            "target": "project"
+        },
+        "moq.netcore": "4.4.0-*",
+        "RichardSzalay.MockHttp": "1.3.0-*",
+        "xunit": "2.1.0"
+    },
+    "frameworks": {
+        "netcoreapp1.0": {
+            "dependencies": {
+                "Microsoft.NETCore.App": {
+                    "version": "1.0.0-rc2-*",
+                    "type": "platform"
+                }
+            },
+            "imports": [
+                "dotnet5.6",
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    },
+    "testRunner": "xunit"
+}

@@ -1,0 +1,17 @@
+{
+    "dependencies": {
+        "Microsoft.Owin.Security.Cookies": "3.*",
+        "GSS.Authentication.CAS.Core": {
+            "version": "",
+            "target": "project"
+        }
+    },
+    "frameworks": {
+        "net46": {
+            "frameworkAssemblies": {
+                "System.Security.Principal": "4.0.0.0",
+                "System.Xml": "4.0.0.0"
+            }
+        }
+    }
+}

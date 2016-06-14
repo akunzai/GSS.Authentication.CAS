@@ -1,0 +1,58 @@
+{
+    "buildOptions": {
+        "emitEntryPoint": true,
+        "preserveCompilationContext": true
+    },
+    "dependencies": {
+        "GSS.Authentication.CAS.AspNetCore": {
+            "target": "project"
+        },
+        "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Authentication.OAuth": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Http.Abstractions": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
+        "Microsoft.Extensions.Logging.Debug": "1.0.0-rc2-final",
+        "Newtonsoft.Json": "8.0.*"
+    },
+    "frameworks": {
+        "netcoreapp1.0": {
+            "dependencies": {
+                "Microsoft.NETCore.App": {
+                    "version": "1.0.0-rc2-3002702",
+                    "type": "platform"
+                }
+            },
+            "imports": [
+                "dotnet5.6",
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    },
+    "publishOptions": {
+        "include": [
+            "wwwroot",
+            "web.config"
+        ]
+    },
+    "runtimeOptions": {
+        "gcServer": true
+    },
+    "scripts": {
+        "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
+    },
+    "tools": {
+        "Microsoft.Extensions.SecretManager.Tools": {
+            "version": "1.0.0-preview1-final",
+            "imports": "portable-net45+win8+dnxcore50"
+        }
+    },
+    "userSecretsId": "GSS.Authentication.CAS"
+}

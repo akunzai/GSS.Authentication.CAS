@@ -1,0 +1,47 @@
+﻿@using System.Security.Claims;
+@model GSS.Authentication.AspNetMvc.Sample.Models.LoginViewModel
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Hello @User.Identity.Name</h1>
+
+    <ul>
+        @foreach (var claim in (User.Identity as ClaimsIdentity)?.Claims)
+        {
+            <li>@claim.Type: @claim.Value</li>
+        }
+    </ul>
+
+    @Html.ActionLink("Logout", "Logout", "Account")
+}
+else
+{
+    <p>Choose an authentication type:</p>
+
+    foreach (var type in Context.GetOwinContext().Authentication.GetAuthenticationTypes())
+    {
+        if (!string.IsNullOrEmpty(type.Caption))
+        {
+            @Html.ActionLink(type.Caption, "Login", "Account", new { authtype = type.AuthenticationType }, null)
+            <br />
+        }
+    }
+
+    <p>Or fill form with "test" to login</p>
+
+    using (Html.BeginForm("Login", "Account"))
+    {
+        @Html.LabelFor(model => model.Username)
+        @Html.TextBoxFor(model => model.Username)
+        @Html.ValidationMessageFor(model => model.Username)
+
+        <br />
+
+        @Html.LabelFor(model => model.Password)
+        @Html.PasswordFor(model => model.Password)
+        @Html.ValidationMessageFor(model => model.Password)
+
+        <br />
+        <input type="submit" value="Login" />
+    }
+}

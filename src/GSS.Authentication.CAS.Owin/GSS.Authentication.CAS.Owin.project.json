@@ -1,0 +1,8 @@
+﻿{
+    "dependencies": {
+        "Microsoft.Owin.Security.Cookies": "3.0.1"
+    },
+    "frameworks": {
+        "net45": { }
+    }
+}

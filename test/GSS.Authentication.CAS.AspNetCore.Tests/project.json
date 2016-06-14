@@ -1,0 +1,39 @@
+{
+    "buildOptions": {
+        "preserveCompilationContext": true
+    },
+    "dependencies": {
+        "dotnet-test-xunit": "1.0.0-rc3-*",
+        "GSS.Authentication.CAS.AspNetCore": {
+            "target": "project"
+        },
+        "GSS.Authentication.CAS.Tests.Shared": {
+            "target": "project"
+        },
+        "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.WebUtilities": "1.0.0-rc2-final",
+        "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-final",
+        "moq.netcore": "4.4.0-*",
+        "System.Diagnostics.TraceSource": "4.0.0-rc2-24027",
+        "System.Net.Primitives": "4.0.11-*",
+        "xunit": "2.1.0"
+    },
+    "frameworks": {
+        "netcoreapp1.0": {
+            "dependencies": {
+                "Microsoft.NETCore.App": {
+                    "version": "1.0.0-rc2-*",
+                    "type": "platform"
+                }
+            },
+            "imports": [
+                "dotnet5.6",
+                "dnxcore50",
+                "portable-net45+win8"
+            ]
+        }
+    },
+    "testRunner": "xunit"
+}

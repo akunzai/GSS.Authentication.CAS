@@ -1,0 +1,16 @@
+﻿{
+    "dependencies": {
+        "Microsoft.AspNetCore.WebUtilities": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",
+        "Moq": "4.5.8",
+        "xunit": "2.1.*",
+        "xunit.runner.console": "2.1.*"
+    },
+    "frameworks": {
+        "net451": { }
+    },
+    "runtimes": {
+        "win": { }
+    }
+}

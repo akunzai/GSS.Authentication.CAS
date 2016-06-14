@@ -1,0 +1,15 @@
+{
+    "dependencies": {
+        "GSS.Authentication.CAS.Core": {
+            "version": "",
+            "target": "project"
+        }
+    },
+    "frameworks": {
+        "net45": {
+            "frameworkAssemblies": {
+                "System.Runtime.Caching": "4.0.0.0"
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
 {
+    "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
         "GSS.Authentication.CAS.Core": {
             "version": "",
@@ -15,9 +16,19 @@
         "System.Xml.XPath": "4.0.0",
         "System.Xml.XPath.XDocument": "4.0.0"
     },
+    "description": "ASP.NET Core Middlewares for CAS Authentication",
     "frameworks": {
-        "netstandard1.5": {
+        "netstandard1.1": {
             "imports": "dnxcore50"
         }
-    }
+    },
+    "packOptions": {
+        "owners": [ "Charley Wu" ],
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
+        },
+        "tags": [ "CAS" ]
+    },
+    "version": "1.0.0-*"
 }

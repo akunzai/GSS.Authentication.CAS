@@ -1,4 +1,5 @@
 ﻿{
+    "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
         "GSS.Authentication.CAS.Core": {
             "version": "",
@@ -6,9 +7,19 @@
         },
         "Microsoft.Extensions.Caching.Memory": "1.0.0-rc2-final"
     },
+    "description": "Distributed cache implementation of the IServiceTicketStore for Single sign-out",
     "frameworks": {
-        "netstandard1.3": {
+        "netstandard1.1": {
             "imports": "dnxcore50"
         }
-    }
+    },
+    "packOptions": {
+        "owners": [ "Charley Wu" ],
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
+        },
+        "tags": [ "CAS" ]
+    },
+    "version": "1.0.0-*"
 }

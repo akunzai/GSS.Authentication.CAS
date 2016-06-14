@@ -44,7 +44,7 @@ namespace GSS.Authentication.CAS.AspNetCore
                     var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
                     if (!string.IsNullOrEmpty(serviceTicket))
                     {
-                        logger.LogInformation($"remove serviceTicket: {serviceTicket} ... from [{context.Connection.RemoteIpAddress}]");
+                        logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
                         await store.RemoveAsync(serviceTicket);
                     }
                 }

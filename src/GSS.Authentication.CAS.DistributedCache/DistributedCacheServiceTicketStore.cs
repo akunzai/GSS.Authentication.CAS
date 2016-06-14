@@ -51,8 +51,8 @@ namespace GSS.Authentication.CAS
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             var value = Serialize(ticket);
             return cache.RemoveAsync(CombindKey(key))
-                .ContinueWith( x => 
-                cache.SetAsync(CombindKey(key), value, new DistributedCacheEntryOptions()));
+                .ContinueWith(x =>
+               cache.SetAsync(CombindKey(key), value, new DistributedCacheEntryOptions()));
         }
 
         public Task RemoveAsync(string key)
@@ -71,9 +71,10 @@ namespace GSS.Authentication.CAS
             return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, SerializerSettings));
         }
 
-        protected virtual T Deserialize<T>(byte[] value){
+        protected virtual T Deserialize<T>(byte[] value)
+        {
             if (value == null) return default(T);
-            var json = Encoding.UTF8.GetString(value);
+            var json = Encoding.UTF8.GetString(value, 0, value.Length);
             return JsonConvert.DeserializeObject<T>(json, SerializerSettings);
         }
     }

@@ -7,4 +7,4 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("GSS.Authentication.CAS.RuntimeCache")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.0")]

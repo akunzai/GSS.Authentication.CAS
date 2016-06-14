@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="GSS.Authentication.CAS.MemoryCache.project.json" />
+    <DnxInvisibleContent Include="GSS.Authentication.CAS.RuntimeCache.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

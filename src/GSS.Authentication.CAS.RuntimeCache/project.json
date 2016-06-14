@@ -1,15 +1,26 @@
 {
+    "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
         "GSS.Authentication.CAS.Core": {
             "version": "",
             "target": "project"
         }
     },
+    "description": "Runtime cache implementation of the IServiceTicketStore for Single sign-out",
     "frameworks": {
         "net45": {
             "frameworkAssemblies": {
                 "System.Runtime.Caching": "4.0.0.0"
             }
         }
-    }
+    },
+    "packOptions": {
+        "owners": [ "Charley Wu" ],
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
+        },
+        "tags": [ "CAS" ]
+    },
+    "version": "1.0.0-*"
 }

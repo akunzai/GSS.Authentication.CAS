@@ -1,17 +1,29 @@
 {
+    "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
-        "Microsoft.Owin.Security.Cookies": "3.*",
         "GSS.Authentication.CAS.Core": {
             "version": "",
             "target": "project"
-        }
+        },
+        "Microsoft.Owin.Security.Cookies": "3.*"
     },
+    "description": "Owin Middlewares for CAS Authentication",
     "frameworks": {
-        "net46": {
+        "net45": {
             "frameworkAssemblies": {
                 "System.Security.Principal": "4.0.0.0",
                 "System.Xml": "4.0.0.0"
             }
         }
-    }
+    },
+    "packOptions": {
+        "owners": [ "Charley Wu" ],
+        "releaseNotes": "use dotnet CLI + project.json to pack nuget package",
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
+        },
+        "tags": [ "CAS" ]
+    },
+    "version": "1.0.1-*"
 }

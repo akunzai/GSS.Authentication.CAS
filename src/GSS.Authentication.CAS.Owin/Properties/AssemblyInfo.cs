@@ -6,4 +6,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("(c) Galaxy Software Services Corporation. All rights reserved.")]
 
 [assembly: AssemblyTitle("GSS.Authentication.CAS.Owin")]
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1")]

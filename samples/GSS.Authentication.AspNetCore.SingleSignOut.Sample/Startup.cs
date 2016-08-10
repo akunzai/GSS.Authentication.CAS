@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -13,10 +14,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
@@ -44,13 +45,45 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
         {
             services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
             services.AddDataProtection();
-            services.AddSingleton<IServiceTicketStore>(new DistributedCacheServiceTicketStore());
-            services.AddSingleton<ITicketStore>(sp => new TicketStoreWrapper(sp.GetRequiredService<IServiceTicketStore>()));
-            services.AddSingleton(Options.Create(new CasAuthenticationOptions
+
+            var servierTicketStore = new DistributedCacheServiceTicketStore();
+            var ticketStore = new TicketStoreWrapper(servierTicketStore);
+
+            services.AddSingleton<IServiceTicketStore>(servierTicketStore);
+            services.AddSingleton<ITicketStore>(ticketStore);
+            services.Configure<CookieAuthenticationOptions>(options =>
             {
-                CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"],
-                UseTicketStore = true,
-                Events = new CasEvents
+                options.AutomaticAuthenticate = true;
+                options.AutomaticChallenge = true;
+                options.LoginPath = new PathString("/login");
+                options.LogoutPath = new PathString("/logout");
+                options.SessionStore = ticketStore;
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnSigningOut = (context) =>
+                    {
+                        // Single Sign-Out
+                        var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                        var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
+
+                        var logoutRedirectContext = new CookieRedirectContext(
+                            context.HttpContext,
+                            context.Options,
+                            redirectUri,
+                            context.Properties
+                            );
+                        context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
+                        context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+            services.Configure<CasAuthenticationOptions>(options=>
+            {
+                options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
+                options.UseTicketStore = true;
+                options.Events = new CasEvents
                 {
                     OnCreatingTicket = (context) =>
                     {
@@ -71,20 +104,20 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                         }
                         return Task.FromResult(0);
                     }
-                }
-            }));
-            services.AddSingleton(Options.Create(new OAuthOptions
+                };
+            });
+            services.Configure<OAuthOptions>( options =>
             {
-                AuthenticationScheme = "OAuth",
-                DisplayName = "OAuth",
-                ClientId = Configuration["Authentication:OAuth:ClientId"],
-                ClientSecret = Configuration["Authentication:OAuth:ClientSecret"],
-                CallbackPath = new PathString("/sign-oauth"),
-                AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"],
-                TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"],
-                SaveTokens = true,
-                UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"],
-                Events = new OAuthEvents
+                options.AuthenticationScheme = "OAuth";
+                options.DisplayName = "OAuth";
+                options.ClientId = Configuration["Authentication:OAuth:ClientId"];
+                options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
+                options.CallbackPath = new PathString("/sign-oauth");
+                options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
+                options.SaveTokens = true;
+                options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
                     {
@@ -114,12 +147,12 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, name));
                         }
                     }
-                }
-            }));
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceTicketStore serviceTicketStore)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -131,14 +164,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
 
             app.UseCasSingleSignOut();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                LoginPath = new PathString("/login"),
-				LogoutPath = new PathString("/logout"),
-                SessionStore = app.ApplicationServices.GetRequiredService<ITicketStore>()
-            });
+            app.UseCookieAuthentication();
 
             app.UseCasAuthentication();
 

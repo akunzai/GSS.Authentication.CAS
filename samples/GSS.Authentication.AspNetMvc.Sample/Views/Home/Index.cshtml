@@ -27,18 +27,18 @@ else
         }
     }
 
-    <p>Or fill form with "test" to login</p>
+    <p>Or fill form to login</p>
 
     using (Html.BeginForm("Login", "Account"))
     {
         @Html.LabelFor(model => model.Username)
-        @Html.TextBoxFor(model => model.Username)
+        @Html.TextBoxFor(model => model.Username, new { @Value = "test" })
         @Html.ValidationMessageFor(model => model.Username)
 
         <br />
 
         @Html.LabelFor(model => model.Password)
-        @Html.PasswordFor(model => model.Password)
+        @Html.PasswordFor(model => model.Password, new { @Value = "test" })
         @Html.ValidationMessageFor(model => model.Password)
 
         <br />

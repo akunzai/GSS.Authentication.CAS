@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -34,7 +35,25 @@ namespace GSS.OAuth.Owin.Sample
             {
                 LoginPath = new PathString("/login"),
                 LogoutPath = new PathString("/logout"),
-                SessionStore = sessionStore
+                SessionStore = sessionStore,
+                Provider = new CookieAuthenticationProvider
+                {
+                    OnResponseSignOut = (context) =>
+                    {
+                        // Single Sign-Out
+                        var casUrl = new Uri(ConfigurationManager.AppSettings["Authentication:CAS:CasServerUrlBase"]);
+                        var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = new UriBuilder(casUrl);
+                        redirectUri.Path += "/logout";
+                        redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
+                        var logoutRedirectContext = new CookieApplyRedirectContext(
+                            context.OwinContext,
+                            context.Options,
+                            redirectUri.Uri.AbsoluteUri
+                            );
+                        context.Options.Provider.ApplyRedirect(logoutRedirectContext);
+                    }
+                }
             });
             
             app.UseCasAuthentication(new CasAuthenticationOptions

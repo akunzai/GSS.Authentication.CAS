@@ -41,15 +41,20 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                 CasServerUrlBase = "http://example.com/cas"
             };
             server = new TestServer(new WebHostBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
+                    services.Configure<CookieAuthenticationOptions>(options =>
+                    {
+                        options.AutomaticAuthenticate = true;
+                        options.AutomaticChallenge = true;
+                        options.LoginPath = new PathString("/login");
+                        options.LogoutPath = new PathString("/logout");
+                    });
+                })
                 .Configure(app =>
                 {
-                    app.UseCookieAuthentication(new CookieAuthenticationOptions
-                    {
-                        AutomaticAuthenticate = true,
-                        AutomaticChallenge = true,
-                        LoginPath = new PathString("/login"),
-                        LogoutPath = new PathString("/logout")
-                    });
+                    app.UseCookieAuthentication();
                     app.UseCasAuthentication(options);
                     app.Use(async (context, next) =>
                     {
@@ -76,9 +81,6 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         // Display authenticated user id
                         await context.Response.WriteAsync((user.Identity as ClaimsIdentity)?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                     });
-                }).ConfigureServices(services =>
-                {
-                    services.AddAuthentication(opts => opts.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
                 }));
             client = server.CreateClient();
         }

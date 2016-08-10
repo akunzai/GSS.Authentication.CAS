@@ -48,6 +48,7 @@
     <Compile Include="Cas20ServiceTicketValidationTest.cs" />
     <Compile Include="Cas30ServiceTicketValidationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceTicketSerializationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GSS.Authentication.CAS.Core.Tests.project.json" />

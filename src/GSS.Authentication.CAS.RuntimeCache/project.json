@@ -2,7 +2,6 @@
     "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
         "GSS.Authentication.CAS.Core": {
-            "version": "",
             "target": "project"
         }
     },

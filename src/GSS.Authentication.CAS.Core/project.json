@@ -1,35 +1,35 @@
 ﻿{
-    "authors": [ "Galaxy Software Services Corporation" ],
-    "dependencies": {
-        "Newtonsoft.Json": "6.*"
+  "authors": [ "Galaxy Software Services Corporation" ],
+  "dependencies": {
+    "Newtonsoft.Json": "9.*"
+  },
+  "description": "Core components for CAS Authentication",
+  "frameworks": {
+    "netstandard1.1": {
+      "dependencies": {
+        "System.Linq": "4.1.0",
+        "System.Net.Http": "4.0.0",
+        "System.Net.Security": "4.0.0",
+        "System.Security.Claims": "4.0.1",
+        "System.Xml.XDocument": "4.0.11"
+      },
+      "imports": [ "dnxcore50" ]
     },
-    "description": "Core components for CAS Authentication",
-    "frameworks": {
-        "netstandard1.1": {
-            "dependencies": {
-                "System.Linq": "4.1.0",
-                "System.Net.Http": "4.0.0",
-                "System.Net.Security": "4.0.0",
-                "System.Security.Claims": "4.0.1",
-                "System.Xml.XDocument": "4.0.0"
-            },
-            "imports": [ "dnxcore50" ]
-        },
-        "net45": {
-            "frameworkAssemblies": {
-                "System.Net.Http": "4.0.0.0",
-                "System.Xml.Linq": "4.0.0.0"
-            }
-        }
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Net.Http": "4.0.0.0",
+        "System.Xml.Linq": "4.0.0.0"
+      }
+    }
+  },
+  "packOptions": {
+    "owners": [ "Charley Wu" ],
+    "releaseNotes": "upgrade dependencies",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/akunzai/GSS.Authentication.CAS"
     },
-    "packOptions": {
-        "owners": [ "Charley Wu" ],
-        "releaseNotes": "change target framework to .NETStandard1.1",
-        "repository": {
-            "type": "git",
-            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
-        },
-        "tags": [ "CAS" ]
-    },
-    "version": "1.0.1-*"
+    "tags": [ "CAS" ]
+  },
+  "version": "1.0.2-*"
 }

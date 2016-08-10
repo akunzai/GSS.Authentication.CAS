@@ -1,16 +1,19 @@
 {
+    "buildOptions": {
+        "preserveCompilationContext": true
+    },
     "dependencies": {
-        "dotnet-test-xunit": "1.0.0-rc3-*",
+        "dotnet-test-xunit": "2.2.0-*",
         "GSS.Authentication.CAS.Owin": {
             "target": "project"
         },
         "GSS.Authentication.CAS.Tests.Shared": {
             "target": "project"
         },
-        "Microsoft.AspNetCore.WebUtilities": "1.0.0-rc2-final",
+        "Microsoft.AspNetCore.WebUtilities": "1.0.0",
         "Microsoft.Owin.Testing": "3.0.1",
-        "moq.netcore": "4.4.0-*",
-        "xunit": "2.1.0"
+        "Moq": "4.6.36-*",
+        "xunit": "2.2.0-*"
     },
     "frameworks": {
         "net451": {
@@ -19,9 +22,6 @@
                 "System.Net.Http": "4.0.0.0"
             }
         }
-    },
-    "buildOptions": {
-        "preserveCompilationContext": true
     },
     "testRunner": "xunit"
 }

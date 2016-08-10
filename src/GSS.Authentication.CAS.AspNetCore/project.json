@@ -2,17 +2,16 @@
     "authors": [ "Galaxy Software Services Corporation" ],
     "dependencies": {
         "GSS.Authentication.CAS.Core": {
-            "version": "",
             "target": "project"
         },
-        "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-final",
-        "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-rc2-final",
-        "Microsoft.AspNetCore.DataProtection.Abstractions": "1.0.0-rc2-final",
-        "Microsoft.AspNetCore.Http.Abstractions": "1.0.0-rc2-final",
-        "Microsoft.AspNetCore.Http.Features": "1.0.0-rc2-final",
-        "Microsoft.Extensions.Options": "1.0.0-rc2-final",
-        "NETStandard.Library": "1.5.0-*",
-        "System.Text.Encodings.Web": "4.0.0-rc2-24027",
+        "Microsoft.AspNetCore.Authentication": "1.0.0",
+        "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
+        "Microsoft.AspNetCore.DataProtection.Abstractions": "1.0.0",
+        "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
+        "Microsoft.AspNetCore.Http.Features": "1.0.0",
+        "Microsoft.Extensions.Options": "1.0.0",
+        "NETStandard.Library": "1.6.0",
+        "System.Text.Encodings.Web": "4.0.0",
         "System.Xml.XPath": "4.0.0",
         "System.Xml.XPath.XDocument": "4.0.0"
     },
@@ -24,11 +23,12 @@
     },
     "packOptions": {
         "owners": [ "Charley Wu" ],
+        "releaseNotes": "upgrade dependencies",
         "repository": {
             "type": "git",
             "url": "https://github.com/akunzai/GSS.Authentication.CAS"
         },
         "tags": [ "CAS" ]
     },
-    "version": "1.0.0-*"
+    "version": "1.0.1-*"
 }

@@ -19,12 +19,12 @@
   },
   "packOptions": {
     "owners": [ "Charley Wu" ],
-    "releaseNotes": "add System.Threading.Tasks into frameworkAssemblies",
+    "releaseNotes": "Optimize Serialization of Claims",
     "repository": {
       "type": "git",
       "url": "https://github.com/akunzai/GSS.Authentication.CAS"
     },
     "tags": [ "CAS" ]
   },
-  "version": "1.0.1-*"
+  "version": "1.1.0-*"
 }

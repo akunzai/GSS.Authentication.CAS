@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS
 {
     public class ServiceTicket
     {
-        public ServiceTicket(string ticketId, Assertion assertion, IDictionary<string, string> claims, string authenticationType)
+        public ServiceTicket(string ticketId, Assertion assertion, IEnumerable<ClaimWrapper> claims, string authenticationType)
         {
             if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType)) throw new ArgumentNullException(nameof(authenticationType));
@@ -17,12 +20,12 @@ namespace GSS.Authentication.CAS
             AuthenticationType = authenticationType;
         }
 
-        public string TicketId { get; protected set; }
+        public string TicketId { get; }
 
-        public string AuthenticationType { get; protected set; }
+        public string AuthenticationType { get; }
 
-        public Assertion Assertion { get; set; }
-
-        public IDictionary<string,string> Claims { get; set; }
+        public Assertion Assertion { get; }
+        
+        public IEnumerable<ClaimWrapper> Claims { get; }
     }
 }

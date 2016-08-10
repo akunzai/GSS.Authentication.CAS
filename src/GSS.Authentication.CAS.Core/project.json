@@ -24,12 +24,12 @@
   },
   "packOptions": {
     "owners": [ "Charley Wu" ],
-    "releaseNotes": "upgrade dependencies",
+    "releaseNotes": "Optimize Serialization of Claims",
     "repository": {
       "type": "git",
       "url": "https://github.com/akunzai/GSS.Authentication.CAS"
     },
     "tags": [ "CAS" ]
   },
-  "version": "1.0.2-*"
+  "version": "1.1.0-*"
 }

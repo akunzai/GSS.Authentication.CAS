@@ -1,34 +1,34 @@
 {
-    "authors": [ "Galaxy Software Services Corporation" ],
-    "dependencies": {
-        "GSS.Authentication.CAS.Core": {
-            "target": "project"
-        },
-        "Microsoft.AspNetCore.Authentication": "1.0.0",
-        "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
-        "Microsoft.AspNetCore.DataProtection.Abstractions": "1.0.0",
-        "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
-        "Microsoft.AspNetCore.Http.Features": "1.0.0",
-        "Microsoft.Extensions.Options": "1.0.0",
-        "NETStandard.Library": "1.6.0",
-        "System.Text.Encodings.Web": "4.0.0",
-        "System.Xml.XPath": "4.0.0",
-        "System.Xml.XPath.XDocument": "4.0.0"
+  "authors": [ "Galaxy Software Services Corporation" ],
+  "dependencies": {
+    "GSS.Authentication.CAS.Core": {
+      "target": "project"
     },
-    "description": "ASP.NET Core Middlewares for CAS Authentication",
-    "frameworks": {
-        "netstandard1.1": {
-            "imports": "dnxcore50"
-        }
+    "Microsoft.AspNetCore.Authentication": "1.0.0",
+    "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
+    "Microsoft.AspNetCore.DataProtection.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.Http.Features": "1.0.0",
+    "Microsoft.Extensions.Options": "1.0.0",
+    "NETStandard.Library": "1.6.0",
+    "System.Text.Encodings.Web": "4.0.0",
+    "System.Xml.XPath": "4.0.0",
+    "System.Xml.XPath.XDocument": "4.0.0"
+  },
+  "description": "ASP.NET Core Middlewares for CAS Authentication",
+  "frameworks": {
+    "netstandard1.1": {
+      "imports": "dnxcore50"
+    }
+  },
+  "packOptions": {
+    "owners": [ "Charley Wu" ],
+    "releaseNotes": "Optimize Serialization of Claims",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/akunzai/GSS.Authentication.CAS"
     },
-    "packOptions": {
-        "owners": [ "Charley Wu" ],
-        "releaseNotes": "upgrade dependencies",
-        "repository": {
-            "type": "git",
-            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
-        },
-        "tags": [ "CAS" ]
-    },
-    "version": "1.0.1-*"
+    "tags": [ "CAS" ]
+  },
+  "version": "1.1.0-*"
 }

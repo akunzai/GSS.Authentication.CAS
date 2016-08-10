@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cookies\ClaimsExtensions.cs" />
+    <Compile Include="Cookies\ClaimWrapper.cs" />
     <Compile Include="ICasOptions.cs" />
     <Compile Include="Cookies\IServiceTicketStore.cs" />
     <Compile Include="Cookies\ServiceTicket.cs" />

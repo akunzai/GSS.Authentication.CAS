@@ -24,7 +24,6 @@ namespace GSS.Authentication.CAS
 
         JsonSerializerSettings SerializerSettings { get; set; } = new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.Auto,
             Formatting = Formatting.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore,

@@ -1,25 +1,25 @@
 ﻿{
-    "authors": [ "Galaxy Software Services Corporation" ],
-    "dependencies": {
-        "GSS.Authentication.CAS.Core": {
-            "target": "project"
-        },
-        "Microsoft.Extensions.Caching.Memory": "1.0.0"
+  "authors": [ "Galaxy Software Services Corporation" ],
+  "dependencies": {
+    "GSS.Authentication.CAS.Core": {
+      "target": "project"
     },
-    "description": "Distributed cache implementation of the IServiceTicketStore for Single sign-out",
-    "frameworks": {
-        "netstandard1.1": {
-            "imports": "dnxcore50"
-        }
+    "Microsoft.Extensions.Caching.Memory": "1.0.0"
+  },
+  "description": "Distributed cache implementation of the IServiceTicketStore for Single sign-out",
+  "frameworks": {
+    "netstandard1.1": {
+      "imports": "dnxcore50"
+    }
+  },
+  "packOptions": {
+    "owners": [ "Charley Wu" ],
+    "releaseNotes": "Optimize Serialization of Claims",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/akunzai/GSS.Authentication.CAS"
     },
-    "packOptions": {
-        "owners": [ "Charley Wu" ],
-        "releaseNotes": "upgrade dependencies",
-        "repository": {
-            "type": "git",
-            "url": "https://github.com/akunzai/GSS.Authentication.CAS"
-        },
-        "tags": [ "CAS" ]
-    },
-    "version": "1.0.1-*"
+    "tags": [ "CAS" ]
+  },
+  "version": "1.1.0-*"
 }

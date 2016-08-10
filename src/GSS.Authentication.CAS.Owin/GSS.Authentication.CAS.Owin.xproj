@@ -16,7 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="GSS.Authentication.CAS.Owin.project.json" />
-    <DnxInvisibleContent Include="GSS.Cas.Client.Owin.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

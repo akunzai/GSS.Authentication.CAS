@@ -25,14 +25,14 @@ namespace GSS.Authentication.CAS
             {
                 policy.AbsoluteExpiration = ticket.Assertion.ValidUntil.Value.ToLocalTime();
             }
-            cache.Add(CombindKey(ticket.TicketId), ticket, policy);
+            cache.Add(CombineKey(ticket.TicketId), ticket, policy);
             return Task.FromResult(ticket.TicketId);
         }
 
         public Task<ServiceTicket> RetrieveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            return Task.FromResult((ServiceTicket)cache.Get(CombindKey(key)));
+            return Task.FromResult((ServiceTicket)cache.Get(CombineKey(key)));
         }
 
         public Task RenewAsync(string key, ServiceTicket ticket)
@@ -43,18 +43,18 @@ namespace GSS.Authentication.CAS
             {
                 policy.AbsoluteExpiration = ticket.Assertion.ValidUntil.Value.ToLocalTime();
             }
-            cache.Set(CombindKey(ticket.TicketId), ticket, policy);
+            cache.Set(CombineKey(ticket.TicketId), ticket, policy);
             return Task.FromResult(0);
         }
 
         public Task RemoveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            cache.Remove(CombindKey(key));
+            cache.Remove(CombineKey(key));
             return Task.FromResult(0);
         }
 
-        protected virtual string CombindKey(string key)
+        protected virtual string CombineKey(string key)
         {
             return $"{Prefix}:{key}";
         }

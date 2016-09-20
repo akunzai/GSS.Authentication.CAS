@@ -4,12 +4,8 @@
         "preserveCompilationContext": true
     },
     "dependencies": {
-        "GSS.Authentication.CAS.AspNetCore": {
-            "target": "project"
-        },
-        "GSS.Authentication.CAS.DistributedCache": {
-            "target": "project"
-        },
+        "GSS.Authentication.CAS.AspNetCore": "1.1.0",
+        "GSS.Authentication.CAS.DistributedCache": "1.1.0",
         "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
         "Microsoft.AspNetCore.Authentication.OAuth": "1.0.0",
         "Microsoft.AspNetCore.Diagnostics": "1.0.0",

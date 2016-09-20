@@ -83,16 +83,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">
-      <Project>{4287B69E-02E9-4852-8968-748B949531DE}</Project>
-      <Name>GSS.Authentication.CAS.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
-      <Project>{D77663F0-EF66-4D76-BFEF-7BC414C5044C}</Project>
-      <Name>GSS.Authentication.CAS.Owin</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="project.json" />
   </ItemGroup>
   <ItemGroup>

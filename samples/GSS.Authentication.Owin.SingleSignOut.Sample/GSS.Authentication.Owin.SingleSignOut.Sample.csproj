@@ -75,20 +75,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">
-      <Project>{4287b69e-02e9-4852-8968-748b949531de}</Project>
-      <Name>GSS.Authentication.CAS.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
-      <Project>{D77663F0-EF66-4D76-BFEF-7BC414C5044C}</Project>
-      <Name>GSS.Authentication.CAS.Owin</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.RuntimeCache\GSS.Authentication.CAS.RuntimeCache.csproj">
-      <Project>{125ea7ab-2497-44b3-a893-2b0292bfc0a9}</Project>
-      <Name>GSS.Authentication.CAS.RuntimeCache</Name>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

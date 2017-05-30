@@ -37,15 +37,17 @@ namespace GSS.Authentication.CAS.AspNetCore
             if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
-                var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value[0];
-                if (!string.IsNullOrEmpty(logOutRequest))
-                {
-                    logger.LogDebug($"logoutRequest: {logOutRequest}");
-                    var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
-                    if (!string.IsNullOrEmpty(serviceTicket))
+                if (formData.ContainsKey("logoutRequest")){
+                    var logOutRequest = formData.First(x => x.Key == "logoutRequest").Value[0];
+                    if (!string.IsNullOrEmpty(logOutRequest))
                     {
-                        logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
-                        await store.RemoveAsync(serviceTicket);
+                        logger.LogDebug($"logoutRequest: {logOutRequest}");
+                        var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                        if (!string.IsNullOrEmpty(serviceTicket))
+                        {
+                            logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
+                            await store.RemoveAsync(serviceTicket);
+                        }
                     }
                 }
             }

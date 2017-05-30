@@ -2,8 +2,7 @@
 
 ## Requirement
 
-- Visual Studio 2015 Update 1 or newer for Development
-- NuGet 3.1 or newer for Build
+- Visual Studio 2017 or newer for Development
 
 ### Owin
 

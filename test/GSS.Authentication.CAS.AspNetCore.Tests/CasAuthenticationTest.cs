@@ -35,7 +35,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             this.fixture = fixture;
             // Arrange
             var principalName = Guid.NewGuid().ToString();
-            principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationScheme);
+            principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationType);
             ticketValidator = Mock.Of<IServiceTicketValidator>();
             server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
@@ -61,7 +61,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         var request = context.Request;
                         if (request.Path.StartsWithSegments(new PathString("/login")))
                         {
-                            await context.ChallengeAsync(CasDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+                            await context.ChallengeAsync(CasDefaults.AuthenticationType, new AuthenticationProperties { RedirectUri = "/" });
                             return;
                         }
                         if (request.Path.StartsWithSegments(new PathString("/logout")))
@@ -76,7 +76,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         // Deny anonymous request beyond this point.
                         if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
                         {
-                            await context.ChallengeAsync(CasDefaults.AuthenticationScheme);
+                            await context.ChallengeAsync(CasDefaults.AuthenticationType);
                             return;
                         }
                         // Display authenticated user id

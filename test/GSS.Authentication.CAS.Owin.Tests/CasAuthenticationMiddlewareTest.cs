@@ -32,7 +32,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             this.fixture = fixture;
             // Arrange
             var principalName = Guid.NewGuid().ToString();
-            principal = new CasPrincipal(new Assertion(principalName), CasAuthenticationDefaults.AuthenticationType);
+            principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationType);
             ticketValidator = Mock.Of<IServiceTicketValidator>();
             server = TestServer.Create(app =>
             {
@@ -53,7 +53,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     var request = context.Request;
                     if (request.Path.StartsWithSegments(new PathString("/login")))
                     {
-                        context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, CasAuthenticationDefaults.AuthenticationType);
+                        context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, CasDefaults.AuthenticationType);
                         return;
                     }
                     if (request.Path.StartsWithSegments(new PathString("/logout")))
@@ -68,7 +68,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     // Deny anonymous request beyond this point.
                     if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
                     {
-                        context.Authentication.Challenge(CasAuthenticationDefaults.AuthenticationType);
+                        context.Authentication.Challenge(CasDefaults.AuthenticationType);
                         return;
                     }
                     // Display authenticated principal name

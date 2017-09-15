@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS
 {
@@ -14,7 +15,7 @@ namespace GSS.Authentication.CAS
 
         public DistributedCacheServiceTicketStore()
         {
-            cache = new MemoryDistributedCache(new MemoryCache(new MemoryCacheOptions()));
+            cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
         }
 
         public DistributedCacheServiceTicketStore(IDistributedCache cacheClient)
@@ -32,9 +33,14 @@ namespace GSS.Authentication.CAS
 
         public async Task<string> StoreAsync(ServiceTicket ticket)
         {
-            var options = new DistributedCacheEntryOptions { AbsoluteExpiration = ticket.Assertion.ValidUntil };
             var value = Serialize(ticket);
-            await cache.SetAsync(CombineKey(ticket.TicketId), value).ConfigureAwait(false);
+            await cache.SetAsync(
+                CombineKey(ticket.TicketId), 
+                value, 
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpiration = ticket.Assertion.ValidUntil
+                }).ConfigureAwait(false);
             return ticket.TicketId;
         }
 

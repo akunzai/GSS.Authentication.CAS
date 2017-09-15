@@ -5,18 +5,12 @@
     <VersionPrefix>1.2.0</VersionPrefix>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>net45</TargetFramework>
-    <AssemblyName>GSS.Authentication.CAS.RuntimeCache</AssemblyName>
-    <PackageId>GSS.Authentication.CAS.RuntimeCache</PackageId>
     <PackageTags>CAS</PackageTags>
     <PackageReleaseNotes>
-      migrate from xproj to new csproj and upgrade dependencies
+      Migrate from xproj to new csproj and upgrade dependencies
     </PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
 
   <ItemGroup>

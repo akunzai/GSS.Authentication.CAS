@@ -1,17 +1,18 @@
 ﻿@using System.Security.Claims;
 @model GSS.Authentication.AspNetMvc.Sample.Models.LoginViewModel
-
 @if (User.Identity.IsAuthenticated)
 {
     <h1>Hello @User.Identity.Name</h1>
-
-    <ul>
-        @foreach (var claim in (User.Identity as ClaimsIdentity)?.Claims)
+    var identity = User.Identity as ClaimsIdentity;
+    if (identity != null)
+    {
+        <ul>
+        @foreach (var claim in identity.Claims)
         {
             <li>@claim.Type: @claim.Value</li>
         }
-    </ul>
-
+        </ul>
+    }
     @Html.ActionLink("Logout", "Logout", "Account")
 }
 else

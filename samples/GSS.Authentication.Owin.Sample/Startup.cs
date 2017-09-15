@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -22,6 +22,12 @@ namespace GSS.Authentication.Owin.Sample
     {
         public void Configuration(IAppBuilder app)
         {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
+            var configuration = builder.Build();
+
             app.UseErrorPage();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
@@ -32,10 +38,10 @@ namespace GSS.Authentication.Owin.Sample
                 LogoutPath = new PathString("/logout"),
                 Provider = new CookieAuthenticationProvider
                 {
-                    OnResponseSignOut = (context) =>
+                    OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
-                        var casUrl = new Uri(ConfigurationManager.AppSettings["Authentication:CAS:CasServerUrlBase"]);
+                        var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
                         var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
@@ -52,14 +58,14 @@ namespace GSS.Authentication.Owin.Sample
 
             app.UseCasAuthentication(new CasAuthenticationOptions
             {
-                CasServerUrlBase = ConfigurationManager.AppSettings["Authentication:CAS:CasServerUrlBase"],
+                CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
                 Provider = new CasAuthenticationProvider
                 {
-                    OnCreatingTicket = (context) =>
+                    OnCreatingTicket = context =>
                     {
                         // first_name, family_name, display_name, email, verified_email
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null) return Task.FromResult(0);
+                        if (assertion == null) return Task.CompletedTask;
                         var email = assertion.Attributes["email"].FirstOrDefault();
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -70,22 +76,22 @@ namespace GSS.Authentication.Owin.Sample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
                 }
             });
 
-            app.UseOAuthAuthentication((options)=> {
-                options.ClientId = ConfigurationManager.AppSettings["Authentication:OAuth:ClientId"];
-                options.ClientSecret = ConfigurationManager.AppSettings["Authentication:OAuth:ClientSecret"];
+            app.UseOAuthAuthentication(options=> {
+                options.ClientId = configuration["Authentication:OAuth:ClientId"];
+                options.ClientSecret = configuration["Authentication:OAuth:ClientSecret"];
                 options.CallbackPath = new PathString("/sign-oauth");
-                options.AuthorizationEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:TokenEndpoint"];
+                options.AuthorizationEndpoint = configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = configuration["Authentication:OAuth:TokenEndpoint"];
                 options.SaveTokensAsClaims = true;
-                options.UserInformationEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:UserInformationEndpoint"];
+                options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
                 options.Events = new OAuthEvents
                 {
-                    OnCreatingTicket = async (context) =>
+                    OnCreatingTicket = async context =>
                     {
                         var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
@@ -131,12 +137,12 @@ namespace GSS.Authentication.Owin.Sample
                     }
 
                     context.Response.ContentType = "text/html";
-                    await context.Response.WriteAsync("<html><body>");
+                    await context.Response.WriteAsync(@"<!DOCTYPE html><html><head><meta charset=""utf-8""></head><body>");
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
                     foreach (var type in context.Authentication.GetAuthenticationTypes())
                     {
                         if (string.IsNullOrEmpty(type.Caption)) continue;
-                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption}</a><br>");
+                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType }</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");
                 });
@@ -149,7 +155,7 @@ namespace GSS.Authentication.Owin.Sample
                 {
                     context.Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
                     context.Response.Redirect("/");
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 });
             });
 
@@ -173,7 +179,7 @@ namespace GSS.Authentication.Owin.Sample
 
                 // Display user information
                 context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("<html><body>");
+                await context.Response.WriteAsync(@"<!DOCTYPE html><html><head><meta charset=""utf-8""></head><body>");
                 await context.Response.WriteAsync($"<h1>Hello {user.Identity.Name ?? "anonymous"}</h1>");
                 await context.Response.WriteAsync("<ul>");
                 foreach (var claim in user.Claims)

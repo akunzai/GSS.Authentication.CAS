@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -19,10 +19,16 @@ using Owin.OAuthGeneric;
 [assembly: OwinStartup(typeof(GSS.Authentication.AspNetMvc.Sample.Startup))]
 namespace GSS.Authentication.AspNetMvc.Sample
 {
-    public partial class Startup
+    public class Startup
     {
         public void Configuration(IAppBuilder app)
         {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
+            var configuration = builder.Build();
+
             // MVC
             GlobalFilters.Filters.Add(new HandleErrorAttribute());
             RouteTable.Routes.MapRoute(
@@ -30,7 +36,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
-
+            
             app.UseErrorPage();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
@@ -46,7 +52,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                     OnResponseSignOut = (context) =>
                     {
                         // Single Sign-Out
-                        var casUrl = new Uri(ConfigurationManager.AppSettings["Authentication:CAS:CasServerUrlBase"]);
+                        var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
                         var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
@@ -63,14 +69,14 @@ namespace GSS.Authentication.AspNetMvc.Sample
 
             app.UseCasAuthentication(new CasAuthenticationOptions
             {
-                CasServerUrlBase = ConfigurationManager.AppSettings["Authentication:CAS:CasServerUrlBase"],
+                CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
                 Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = (context) =>
                     {
                         // first_name, family_name, display_name, email, verified_email
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null) return Task.FromResult(0);
+                        if (assertion == null) return Task.CompletedTask;
                         var email = assertion.Attributes["email"].FirstOrDefault();
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -81,19 +87,19 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
                 }
             });
 
-            app.UseOAuthAuthentication((options) => {
-                options.ClientId = ConfigurationManager.AppSettings["Authentication:OAuth:ClientId"];
-                options.ClientSecret = ConfigurationManager.AppSettings["Authentication:OAuth:ClientSecret"];
+            app.UseOAuthAuthentication(options => {
+                options.ClientId = configuration["Authentication:OAuth:ClientId"];
+                options.ClientSecret = configuration["Authentication:OAuth:ClientSecret"];
                 options.CallbackPath = new PathString("/sign-oauth");
-                options.AuthorizationEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:TokenEndpoint"];
+                options.AuthorizationEndpoint = configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = configuration["Authentication:OAuth:TokenEndpoint"];
                 options.SaveTokensAsClaims = true;
-                options.UserInformationEndpoint = ConfigurationManager.AppSettings["Authentication:OAuth:UserInformationEndpoint"];
+                options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async (context) =>

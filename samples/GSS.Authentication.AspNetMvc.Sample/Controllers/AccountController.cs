@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using GSS.Authentication.AspNetMvc.Sample.Models;
@@ -42,12 +41,6 @@ namespace GSS.Authentication.AspNetMvc.Sample.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
+        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
     }
 }

@@ -1,16 +1,14 @@
 ﻿{
   "dependencies": {
-    "GSS.Authentication.CAS.Core": "1.1.0",
-    "GSS.Authentication.CAS.Owin": "1.1.0",
     "Microsoft.AspNet.Mvc": "5.2.3",
-    "Microsoft.CodeDom.Providers.DotNetCompilerPlatform": "1.0.4",
+    "Microsoft.Extensions.Configuration.Json": "1.1.2",
     "Microsoft.Owin.Diagnostics": "3.1.0",
     "Microsoft.Owin.Host.SystemWeb": "3.1.0",
     "Microsoft.Owin.Security.Cookies": "3.1.0",
     "Owin.OAuthGeneric": "1.0.3"
   },
   "frameworks": {
-    "net45": {}
+    "net461": {}
   },
   "runtimes": {
     "win": {}

@@ -6,88 +6,78 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
-using GSS.Authentication.CAS.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
-            services.AddDataProtection();
-
             var servierTicketStore = new DistributedCacheServiceTicketStore();
             var ticketStore = new TicketStoreWrapper(servierTicketStore);
 
             services.AddSingleton<IServiceTicketStore>(servierTicketStore);
             services.AddSingleton<ITicketStore>(ticketStore);
-            services.Configure<CookieAuthenticationOptions>(options =>
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
             {
-                options.AutomaticAuthenticate = true;
-                options.AutomaticChallenge = true;
-                options.LoginPath = new PathString("/login");
-                options.LogoutPath = new PathString("/logout");
+                options.LoginPath = "/login";
+                options.LogoutPath = "/logout";
                 options.SessionStore = ticketStore;
                 options.Events = new CookieAuthenticationEvents
                 {
-                    OnSigningOut = (context) =>
+                    OnSigningOut = context =>
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
                         var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
 
-                        var logoutRedirectContext = new CookieRedirectContext(
+                        var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
                             context.HttpContext,
+                            context.Scheme,
                             context.Options,
-                            redirectUri,
-                            context.Properties
-                            );
+                            context.Properties,
+                            redirectUri
+                        );
                         context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
                         context.Options.Events.RedirectToLogout(logoutRedirectContext);
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
                 };
-            });
-            services.Configure<CasAuthenticationOptions>(options=>
-            {
+            })
+            .AddCAS(options => {
+                options.CallbackPath = "/signin-cas";
                 options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-                options.UseTicketStore = true;
+                options.SaveTokens = true;
                 options.Events = new CasEvents
                 {
-                    OnCreatingTicket = (context) =>
+                    OnCreatingTicket = context =>
                     {
                         // first_name, family_name, display_name, email, verified_email
-                        var assertion = (context.Principal as ICasPrincipal)?.Assertion;
-                        if (assertion == null || !assertion.Attributes.Any()) return Task.FromResult(0);
-                        var identity = context.Principal.Identity as ClaimsIdentity;
-                        if (identity == null) return Task.FromResult(0);
+                        var assertion = context.Assertion;
+                        if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                        if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
                         var email = assertion.Attributes["email"]?.FirstOrDefault();
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -98,17 +88,15 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                         {
                             identity.AddClaim(new Claim(ClaimTypes.Name, name));
                         }
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     }
                 };
-            });
-            services.Configure<OAuthOptions>( options =>
+            })
+            .AddOAuth("OAuth", options =>
             {
-                options.AuthenticationScheme = "OAuth";
-                options.DisplayName = "OAuth";
+                options.CallbackPath = "/signin-oauth";
                 options.ClientId = Configuration["Authentication:OAuth:ClientId"];
                 options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
-                options.CallbackPath = new PathString("/sign-oauth");
                 options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
                 options.SaveTokens = true;
@@ -117,11 +105,14 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                 {
                     OnCreatingTicket = async context =>
                     {
-                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        var request =
+                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
                         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                        var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                        var response =
+                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
                         response.EnsureSuccessStatusCode();
 
                         var user = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -148,23 +139,14 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseCasSingleSignOut();
-
-            app.UseCookieAuthentication();
-
-            app.UseCasAuthentication();
-
-            app.UseOAuthAuthentication();
+            app.UseAuthentication();
 
             // Choose an authentication type
             app.Map("/login", branch =>
@@ -176,17 +158,17 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     {
                         // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
                         // send them to the home page instead (/).
-                        await context.Authentication.ChallengeAsync(authType, new AuthenticationProperties { RedirectUri = "/" });
+                        await context.ChallengeAsync(authType, new AuthenticationProperties { RedirectUri = "/" });
                         return;
                     }
 
                     context.Response.ContentType = "text/html";
-                    await context.Response.WriteAsync("<html><body>");
+                    await context.Response.WriteAsync(@"<!DOCTYPE html><html><head><meta charset=""utf-8""></head><body>");
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
-                    foreach (var type in context.Authentication.GetAuthenticationSchemes())
+                    foreach (var type in context.RequestServices.GetRequiredService<IOptions<AuthenticationOptions>>().Value.Schemes)
                     {
                         if (string.IsNullOrEmpty(type.DisplayName)) continue;
-                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationScheme}\">{type.DisplayName}</a><br>");
+                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.Name}\">{type.DisplayName ?? type.Name}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");
                 });
@@ -197,7 +179,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
             {
                 branch.Run(async context =>
                 {
-                    await context.Authentication.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                     context.Response.Redirect("/");
                 });
             });
@@ -215,14 +197,14 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                 {
                     // This is what [Authorize] calls
                     // The cookie middleware will intercept this 401 and redirect to /login
-                    await context.Authentication.ChallengeAsync();
+                    await context.ChallengeAsync();
 
                     return;
                 }
 
                 // Display user information
                 context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("<html><body>");
+                await context.Response.WriteAsync(@"<!DOCTYPE html><html><head><meta charset=""utf-8""></head><body>");
                 await context.Response.WriteAsync($"<h1>Hello {user.Identity.Name ?? "anonymous"}</h1>");
                 await context.Response.WriteAsync("<ul>");
                 foreach (var claim in user.Claims)
@@ -231,12 +213,12 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                 }
                 await context.Response.WriteAsync("</ul>");
                 await context.Response.WriteAsync("Tokens:<ol>");
-                await context.Response.WriteAsync($"<li>Access Token: {await context.Authentication.GetTokenAsync("access_token")}</li>");
-                await context.Response.WriteAsync($"<li>Refresh Token: {await context.Authentication.GetTokenAsync("refresh_token")}</li>");
-                await context.Response.WriteAsync($"<li>Token Type: {await context.Authentication.GetTokenAsync("token_type")}</li>");
-                await context.Response.WriteAsync($"<li>Expires At: {await context.Authentication.GetTokenAsync("expires_at")}</li>");
+                await context.Response.WriteAsync($"<li>Access Token: {await context.GetTokenAsync("access_token")}</li>");
+                await context.Response.WriteAsync($"<li>Refresh Token: {await context.GetTokenAsync("refresh_token")}</li>");
+                await context.Response.WriteAsync($"<li>Token Type: {await context.GetTokenAsync("token_type")}</li>");
+                await context.Response.WriteAsync($"<li>Expires At: {await context.GetTokenAsync("expires_at")}</li>");
                 await context.Response.WriteAsync("</ol>");
-                await context.Response.WriteAsync($"<a href=\"/logout\">Logout</a><br>");
+                await context.Response.WriteAsync("<a href=\"/logout\">Logout</a><br>");
                 await context.Response.WriteAsync("</body></html>");
             });
         }

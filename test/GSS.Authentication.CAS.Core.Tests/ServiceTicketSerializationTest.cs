@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using GSS.Authentication.CAS.Security;
@@ -12,15 +11,14 @@ namespace GSS.Authentication.CAS.Core.Tests
 {
     public class ServiceTicketSerializationTest
     {
-        JsonSerializerSettings SerializerSettings { get; set; } = new JsonSerializerSettings
+        JsonSerializerSettings SerializerSettings => new JsonSerializerSettings
         {
             Formatting = Formatting.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore
         };
-
-        [Trait("pass","true")]
+        
         [Fact]
         public void SerializeServiceTicket()
         {
@@ -36,8 +34,7 @@ namespace GSS.Authentication.CAS.Core.Tests
             Assert.NotNull(json);
             Debug.WriteLine(json);
         }
-
-        [Trait("pass", "true")]
+        
         [Fact]
         public void DeserializeServiceTicket()
         {

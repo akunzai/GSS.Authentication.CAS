@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
+using GSS.Authentication.CAS.Tests;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Owin;
@@ -18,25 +19,21 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
 {
-    public class CasAuthenticationMiddlewareTest : IDisposable
+    public class CasAuthenticationMiddlewareTest : IClassFixture<CasFixture>,IDisposable
     {
-        protected readonly TestServer server;
-        protected readonly HttpClient client;
-        protected CasAuthenticationOptions options;
-        protected IServiceTicketValidator ticketValidator;
-        protected ICasPrincipal principal;
-
-        public CasAuthenticationMiddlewareTest()
+        private readonly TestServer server;
+        private readonly HttpClient client;
+        private readonly CasFixture fixture;
+        private IServiceTicketValidator ticketValidator;
+        private ICasPrincipal principal;
+        
+        public CasAuthenticationMiddlewareTest(CasFixture fixture)
         {
+            this.fixture = fixture;
             // Arrange
             var principalName = Guid.NewGuid().ToString();
-            principal = new CasPrincipal(new Assertion(principalName), "CAS");
+            principal = new CasPrincipal(new Assertion(principalName), CasAuthenticationDefaults.AuthenticationType);
             ticketValidator = Mock.Of<IServiceTicketValidator>();
-            options = new CasAuthenticationOptions
-            {
-                ServiceTicketValidator = ticketValidator,
-                CasServerUrlBase = "http://example.com/cas"
-            };
             server = TestServer.Create(app =>
             {
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
@@ -45,19 +42,25 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     LoginPath = new PathString("/login"),
                     LogoutPath = new PathString("/logout")
                 });
-                app.UseCasAuthentication(options);
-                app.Use((context, next) =>
+                app.UseCasAuthentication(new CasAuthenticationOptions
+                {
+                    CallbackPath = new PathString("/signin-cas"),
+                    ServiceTicketValidator = ticketValidator,
+                    CasServerUrlBase = fixture.Options.CasServerUrlBase
+                });
+                app.Use(async (context, next) =>
                 {
                     var request = context.Request;
                     if (request.Path.StartsWithSegments(new PathString("/login")))
                     {
-                        context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/" }, options.AuthenticationType);
+                        context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, CasAuthenticationDefaults.AuthenticationType);
+                        return;
                     }
-                    else if (request.Path.StartsWithSegments(new PathString("/logout")))
+                    if (request.Path.StartsWithSegments(new PathString("/logout")))
                     {
                         context.Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
                     }
-                    return next.Invoke();
+                    await next.Invoke();
                 });
                 app.Run(async context =>
                 {
@@ -65,7 +68,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     // Deny anonymous request beyond this point.
                     if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
                     {
-                        context.Authentication.Challenge(options.AuthenticationType);
+                        context.Authentication.Challenge(CasAuthenticationDefaults.AuthenticationType);
                         return;
                     }
                     // Display authenticated principal name
@@ -87,7 +90,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             var response = await client.GetAsync("/login");
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.True(response.Headers.Location.AbsoluteUri.StartsWith(options.CasServerUrlBase));
+            Assert.True(response.Headers.Location.AbsoluteUri.StartsWith(fixture.Options.CasServerUrlBase));
         }
 
         [Fact]

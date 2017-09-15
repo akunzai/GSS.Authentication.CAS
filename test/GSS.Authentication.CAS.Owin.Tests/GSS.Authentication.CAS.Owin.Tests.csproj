@@ -1,32 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <AssemblyName>GSS.Authentication.CAS.Owin.Tests</AssemblyName>
-    <PackageId>GSS.Authentication.CAS.Owin.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Tests.Shared\GSS.Authentication.CAS.Tests.Shared.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Tests\GSS.Authentication.CAS.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.0.0" />
     <PackageReference Include="Microsoft.Owin.Testing" Version="3.1.0" />
-    <PackageReference Include="Moq" Version="4.7.10" />
+    <PackageReference Include="Moq" Version="4.7.99" />
     <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.Linq.Expressions" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System" />

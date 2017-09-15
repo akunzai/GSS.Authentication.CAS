@@ -1,35 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
-    <DebugType>portable</DebugType>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <AssemblyName>GSS.Authentication.CAS.Core.Tests</AssemblyName>
-    <PackageId>GSS.Authentication.CAS.Core.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\*.xml" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Tests.Shared\GSS.Authentication.CAS.Tests.Shared.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Tests\GSS.Authentication.CAS.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <PackageReference Include="Moq" Version="4.7.10" />
-    <PackageReference Include="RichardSzalay.MockHttp" Version="1.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Moq" Version="4.7.99" />
+    <PackageReference Include="RichardSzalay.MockHttp" Version="3.2.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

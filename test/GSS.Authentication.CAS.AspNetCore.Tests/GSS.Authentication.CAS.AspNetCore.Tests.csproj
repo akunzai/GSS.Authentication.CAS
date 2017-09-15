@@ -1,36 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
-    <DebugType>portable</DebugType>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <AssemblyName>GSS.Authentication.CAS.AspNetCore.Tests</AssemblyName>
-    <PackageId>GSS.Authentication.CAS.AspNetCore.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Tests.Shared\GSS.Authentication.CAS.Tests.Shared.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Tests\GSS.Authentication.CAS.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
-    <PackageReference Include="Moq" Version="4.7.10" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Moq" Version="4.7.99" />
+    <!--<PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.Net.Primitives" Version="4.3.0" />-->
     <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
 

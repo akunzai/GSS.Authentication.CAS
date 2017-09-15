@@ -7,12 +7,13 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
+using GSS.Authentication.CAS.Tests;
 using GSS.Authentication.CAS.Validation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,51 +22,51 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.AspNetCore.Tests
 {
-    public class CasAuthenticationMiddlewareTest : IDisposable
+    public class CasAuthenticationTest : IClassFixture<CasFixture>, IDisposable
     {
-        protected readonly TestServer server;
-        protected readonly HttpClient client;
-        protected CasAuthenticationOptions options;
-        protected IServiceTicketValidator ticketValidator;
-        protected ICasPrincipal principal;
+        private readonly TestServer server;
+        private readonly HttpClient client;
+        private readonly CasFixture fixture;
+        private IServiceTicketValidator ticketValidator;
+        private ICasPrincipal principal;
 
-        public CasAuthenticationMiddlewareTest()
+        public CasAuthenticationTest(CasFixture fixture)
         {
+            this.fixture = fixture;
             // Arrange
             var principalName = Guid.NewGuid().ToString();
-            principal = new CasPrincipal(new Assertion(principalName), "CAS");
+            principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationScheme);
             ticketValidator = Mock.Of<IServiceTicketValidator>();
-            options = new CasAuthenticationOptions
-            {
-                ServiceTicketValidator = ticketValidator,
-                CasServerUrlBase = "http://example.com/cas"
-            };
             server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
-                    services.Configure<CookieAuthenticationOptions>(options =>
+                    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(options =>
                     {
-                        options.AutomaticAuthenticate = true;
-                        options.AutomaticChallenge = true;
-                        options.LoginPath = new PathString("/login");
-                        options.LogoutPath = new PathString("/logout");
+                        options.LoginPath = "/login";
+                        options.LogoutPath = "/logout";
+                    })
+                    .AddCAS(options =>
+                    {
+                        options.CallbackPath = "/signin-cas";
+                        options.ServiceTicketValidator = ticketValidator;
+                        options.CasServerUrlBase = fixture.Options.CasServerUrlBase;
                     });
                 })
                 .Configure(app =>
                 {
-                    app.UseCookieAuthentication();
-                    app.UseCasAuthentication(options);
+                    app.UseAuthentication();
                     app.Use(async (context, next) =>
                     {
                         var request = context.Request;
                         if (request.Path.StartsWithSegments(new PathString("/login")))
                         {
-                            await context.Authentication.ChallengeAsync(options.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+                            await context.ChallengeAsync(CasDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+                            return;
                         }
-                        else if (request.Path.StartsWithSegments(new PathString("/logout")))
+                        if (request.Path.StartsWithSegments(new PathString("/logout")))
                         {
-                            await context.Authentication.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                         }
                         await next.Invoke();
                     });
@@ -75,7 +76,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         // Deny anonymous request beyond this point.
                         if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
                         {
-                            await context.Authentication.ChallengeAsync(options.AuthenticationScheme);
+                            await context.ChallengeAsync(CasDefaults.AuthenticationScheme);
                             return;
                         }
                         // Display authenticated user id
@@ -97,7 +98,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var response = await client.GetAsync("/login");
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.True(response.Headers.Location.AbsoluteUri.StartsWith(options.CasServerUrlBase));
+            Assert.True(response.Headers.Location.AbsoluteUri.StartsWith(fixture.Options.CasServerUrlBase));
             Mock.Get(ticketValidator)
                 .Verify(x => x.ValidateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Never);
@@ -111,6 +112,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             Mock.Get(ticketValidator)
                 .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(principal);
+
             //// challenge to CAS login page
             var response = await client.GetAsync("/login");
 

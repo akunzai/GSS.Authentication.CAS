@@ -1,30 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
-    public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthenticationOptions>
+    public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions> 
+        where TOptions : CasAuthenticationOptions, new()
     {
-        public CasAuthenticationHandler()
+        public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
+            : base(options, logger, encoder, clock)
         {
         }
 
-        protected override async Task<bool> HandleUnauthorizedAsync(ChallengeContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+        protected HttpClient Backchannel => Options.Backchannel;
 
-            var properties = new AuthenticationProperties(context.Properties);
+        protected new CasEvents Events
+        {
+            get => base.Events as CasEvents;
+            set => base.Events = value;
+        }
+
+        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+        {
             if (string.IsNullOrEmpty(properties.RedirectUri))
             {
                 properties.RedirectUri = CurrentUri;
@@ -35,67 +39,66 @@ namespace GSS.Authentication.CAS.AspNetCore
             var state = Options.StateDataFormat.Protect(properties);
             var service = BuildRedirectUri($"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
             var authorizationEndpoint = $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(service)}";
-            var redirectContext = new CasRedirectToAuthorizationEndpointContext(
-                Context, Options,
+            var redirectContext = new RedirectContext<CasAuthenticationOptions>(
+                Context, Scheme, Options,
                 properties, authorizationEndpoint);
 
             await Options.Events.RedirectToAuthorizationEndpoint(redirectContext);
-
-            return true;
         }
 
-        protected override async Task<AuthenticateResult> HandleRemoteAuthenticateAsync()
+        protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
             var query = Request.Query;
             var state = query["state"];
-
             var properties = Options.StateDataFormat.Unprotect(state);
             if (properties == null)
             {
-                return AuthenticateResult.Fail("The state was missing or invalid.");
+                return HandleRequestResult.Fail("The state was missing or invalid.");
             }
 
             // CSRF
             if (!ValidateCorrelationId(properties))
             {
-                return AuthenticateResult.Fail("Correlation failed.");
+                return HandleRequestResult.Fail("Correlation failed.");
             }
 
-            var ticket = query["ticket"];
-            if (string.IsNullOrEmpty(ticket))
+            var serviceTicket = query["ticket"];
+            if (string.IsNullOrEmpty(serviceTicket))
             {
-                return AuthenticateResult.Fail("Missing CAS ticket.");
+                return HandleRequestResult.Fail("Missing CAS ticket.");
             }
 
             var service = BuildRedirectUri($"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
-            ICasPrincipal principal = null;
+            ICasPrincipal principal;
             try
             {
-                principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Context.RequestAborted);
+                principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted);
             }
             catch (Exception e)
             {
                 Logger.LogWarning(e.Message, e);
-                return AuthenticateResult.Fail("There was a problem validating ticket.");
+                return HandleRequestResult.Fail("There was a problem validating ticket.");
             }
             if (principal == null)
             {
-                return AuthenticateResult.Fail("Missing Validate Principal.");
+                return HandleRequestResult.Fail("Missing Validate Principal.");
             }
-            if (Options.UseTicketStore)
+            if (Options.SaveTokens)
             {
-                properties.SetServiceTicket(ticket);
+                properties.StoreTokens(new List<AuthenticationToken>
+                {
+                    new AuthenticationToken {Name = "access_token", Value = serviceTicket}
+                });
             }
-            var ticketContext = new CasCreatingTicketContext(Context, Options)
-            {
-                Principal = principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),
-                Properties = properties
-            };
-            await Options.Events.CreatingTicket(ticketContext);
-            return AuthenticateResult.Success(new AuthenticationTicket(
-                        ticketContext.Principal,
-                        ticketContext.Properties,
-                        Options.AuthenticationScheme));
+            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),properties,principal.Assertion);
+            return ticket != null ? HandleRequestResult.Success(ticket) : HandleRequestResult.Fail("Failed to retrieve user information from remote server.");
+        }
+
+        protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal, AuthenticationProperties properties, Assertion assertion)
+        {
+            var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Backchannel, assertion);
+            await Events.CreatingTicket(context);
+            return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
     }
 }

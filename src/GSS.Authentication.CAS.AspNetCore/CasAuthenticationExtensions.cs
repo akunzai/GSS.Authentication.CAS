@@ -1,30 +1,26 @@
 ﻿using System;
-using GSS.Authentication.CAS.AspNetCore;
-using Microsoft.Extensions.Options;
+using GSS.Authentication.CAS;
 
 namespace Microsoft.AspNetCore.Builder
 {
     public static class CasAuthenticationExtensions
     {
+        [Obsolete("UseCasAuthentication is obsolete. Configure CAS authentication with AddAuthentication().AddCAS in ConfigureServices.", error: true)]
         public static IApplicationBuilder UseCasAuthentication(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            return app.UseMiddleware<CasAuthenticationMiddleware>();
+            throw new NotSupportedException("This method is no longer supported");
         }
 
+        [Obsolete("UseCasAuthentication is obsolete. Configure CAS authentication with AddAuthentication().AddCAS in ConfigureServices.", error: true)]
         public static IApplicationBuilder UseCasAuthentication(this IApplicationBuilder app, Action<CasAuthenticationOptions> configureOptions)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            var options = new CasAuthenticationOptions();
-            configureOptions.Invoke(options);
-            return app.UseCasAuthentication(options);
+            throw new NotSupportedException("This method is no longer supported");
         }
 
+        [Obsolete("UseCasAuthentication is obsolete. Configure CAS authentication with AddAuthentication().AddCAS in ConfigureServices.", error: true)]
         public static IApplicationBuilder UseCasAuthentication(this IApplicationBuilder app, CasAuthenticationOptions options)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (options == null) throw new ArgumentNullException(nameof(options));
-            return app.UseMiddleware<CasAuthenticationMiddleware>(Options.Create(options));
+            throw new NotSupportedException("This method is no longer supported");
         }
     }
 }

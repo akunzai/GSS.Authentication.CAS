@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Authentication;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
@@ -45,7 +44,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var ticketId = ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString();
+            var ticketId = ticket.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
             var principal = ticket.Principal;
             var properties = ticket.Properties;
             var assertion = (principal as CasPrincipal)?.Assertion 
@@ -62,14 +61,19 @@ namespace GSS.Authentication.CAS.AspNetCore
             if (ticket == null) return null;
             var assertion = ticket.Assertion;
             var principal = new CasPrincipal(assertion, ticket.AuthenticationType);
-            var identity = (principal.Identity as ClaimsIdentity);
-            if (identity != null)
+            if (!(principal.Identity is ClaimsIdentity identity))
+                return new AuthenticationTicket(
+                    principal,
+                    new AuthenticationProperties
+                    {
+                        IssuedUtc = assertion.ValidFrom,
+                        ExpiresUtc = assertion.ValidUntil
+                    },
+                    ticket.AuthenticationType);
+            foreach(var claim in ticket.Claims)
             {
-                foreach(var claim in ticket.Claims)
-                {
-                    if (identity.HasClaim(claim.Type, claim.Value)) continue;
-                    identity.AddClaim(claim.ToClaim());
-                }
+                if (identity.HasClaim(claim.Type, claim.Value)) continue;
+                identity.AddClaim(claim.ToClaim());
             }
             return new AuthenticationTicket(
                 principal, 

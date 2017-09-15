@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
-    public class CasEvents : RemoteAuthenticationEvents, ICasEvents
+    public class CasEvents : RemoteAuthenticationEvents
     {
-        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = context => Task.FromResult(0);
+        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = context => Task.CompletedTask;
 
-        public Func<CasRedirectToAuthorizationEndpointContext, Task> OnRedirectToAuthorizationEndpoint { get; set; } = context =>
+        public Func<RedirectContext<CasAuthenticationOptions>, Task> OnRedirectToAuthorizationEndpoint { get; set; } = context =>
         {
             context.Response.Redirect(context.RedirectUri);
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         };
 
         public virtual Task CreatingTicket(CasCreatingTicketContext context) => OnCreatingTicket(context);
 
-        public virtual Task RedirectToAuthorizationEndpoint(CasRedirectToAuthorizationEndpointContext context) => OnRedirectToAuthorizationEndpoint(context);
+        public virtual Task RedirectToAuthorizationEndpoint(RedirectContext<CasAuthenticationOptions> context) => OnRedirectToAuthorizationEndpoint(context);
     }
 }

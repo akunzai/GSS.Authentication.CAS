@@ -14,8 +14,7 @@ namespace GSS.Authentication.CAS.Validation
 
         public CasServiceTicketValidator(ICasOptions options, HttpClient httpClient = null)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-            this.options = options;
+            this.options = options ?? throw new ArgumentNullException(nameof(options));
             this.httpClient = httpClient ?? new HttpClient();
         }
 
@@ -30,8 +29,8 @@ namespace GSS.Authentication.CAS.Validation
             // unescape first to prevent double escape
             var escapedService = Uri.EscapeDataString(Uri.UnescapeDataString(service));
             var escapedTicket = Uri.EscapeDataString(ticket);
-            var validateUrl = $"{validateUri.AbsoluteUri}?service={escapedService}&ticket={ticket}";
-            var response = await httpClient.GetAsync(validateUrl, cancellationToken).ConfigureAwait(false);
+            var requestUri = $"{validateUri.AbsoluteUri}?service={escapedService}&ticket={escapedTicket}";
+            var response = await httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return BuildPrincipal(responseBody);

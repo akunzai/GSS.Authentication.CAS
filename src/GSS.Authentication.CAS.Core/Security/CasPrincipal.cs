@@ -13,8 +13,7 @@ namespace GSS.Authentication.CAS.Security
 
         public CasPrincipal(Assertion assertion, string authenticationType, IEnumerable<string> roles)
         : base(new CasIdentity(assertion, authenticationType)){
-            if (assertion == null) throw new ArgumentNullException(nameof(assertion));
-            Assertion = assertion;
+            Assertion = assertion ?? throw new ArgumentNullException(nameof(assertion));
             if (roles != null)
             {
                 this.roles = roles;
@@ -30,14 +29,7 @@ namespace GSS.Authentication.CAS.Security
             {
                 return true;
             }
-            foreach (string attr in Assertion.Attributes.Keys)
-            {
-                if (Assertion.Attributes[attr].Contains(role))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return Assertion.Attributes.Keys.Any(attr => Assertion.Attributes[attr].Contains(role));
         }
         #endregion
     }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS
@@ -13,9 +10,8 @@ namespace GSS.Authentication.CAS
         {
             if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType)) throw new ArgumentNullException(nameof(authenticationType));
-            if (assertion == null) throw new ArgumentNullException(nameof(assertion));
             TicketId = ticketId;
-            Assertion = assertion;
+            Assertion = assertion ?? throw new ArgumentNullException(nameof(assertion));
             Claims = claims;
             AuthenticationType = authenticationType;
         }

@@ -41,9 +41,11 @@ namespace GSS.Authentication.CAS.Owin
 
             if (Options.ServiceTicketValidator == null)
             {
-                var httpClient = new HttpClient(Options.BackchannelHttpHandler ?? new HttpClientHandler());
-                httpClient.Timeout = Options.BackchannelTimeout;
-                httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+                var httpClient = new HttpClient(Options.BackchannelHttpHandler ?? new HttpClientHandler())
+                {
+                    Timeout = Options.BackchannelTimeout,
+                    MaxResponseContentBufferSize = 1024 * 1024 * 10 // 10 MB
+                };
                 httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
                 httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET CAS middleware");
                 httpClient.DefaultRequestHeaders.ExpectContinue = false;

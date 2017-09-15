@@ -38,9 +38,11 @@ namespace GSS.Authentication.CAS.Owin
                 return true;
             }
 
-            var context = new CasRedirectToAuthorizationEndpointContext(Context, model);
-            context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;
-            context.RedirectUri = model.Properties.RedirectUri;
+            var context = new CasRedirectToAuthorizationEndpointContext(Context, model)
+            {
+                SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
+                RedirectUri = model.Properties.RedirectUri
+            };
             model.Properties.RedirectUri = null;
 
             await Options.Provider.RedirectToAuthorizationEndpoint(context);
@@ -131,7 +133,7 @@ namespace GSS.Authentication.CAS.Owin
         {
             if (Response.StatusCode != 401)
             {
-                return Task.FromResult<object>(null);
+                return Task.FromResult(0);
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -151,23 +153,19 @@ namespace GSS.Authentication.CAS.Owin
 
                 var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
 
-                var authorizationEndpoint = string.Format("{0}/login?service={1}", 
-                    Options.CasServerUrlBase, Uri.EscapeDataString(returnTo));
+                var authorizationEndpoint =
+                    $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";
 
                 Response.Redirect(authorizationEndpoint);
             }
 
-            return Task.FromResult<object>(null);
+            return Task.FromResult(0);
         }
 
         private string BuildReturnTo(string state)
         {
-            return string.Format("{0}://{1}{2}{3}?state={4}",
-                Request.Scheme,
-                Request.Host,
-                RequestPathBase,
-                Options.CallbackPath,
-                Uri.EscapeDataString(state));
+            return
+                $"{Request.Scheme}://{Request.Host}{RequestPathBase}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
         }
     }
 }

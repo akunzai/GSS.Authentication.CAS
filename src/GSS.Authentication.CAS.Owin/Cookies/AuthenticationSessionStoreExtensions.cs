@@ -13,8 +13,7 @@ namespace GSS.Authentication.CAS.Owin
 
         public static string GetServiceTicket(this AuthenticationProperties properties)
         {
-            string ticket = null;
-            properties.Dictionary.TryGetValue(ServiceTicketKey, out ticket);
+            properties.Dictionary.TryGetValue(ServiceTicketKey, out var ticket);
             return (string.IsNullOrWhiteSpace(ticket)) ? null : ticket;
         }
     }

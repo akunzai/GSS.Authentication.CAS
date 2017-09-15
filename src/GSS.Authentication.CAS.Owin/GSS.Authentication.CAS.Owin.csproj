@@ -2,21 +2,17 @@
 
   <PropertyGroup>
     <Description>Owin Middlewares for CAS Authentication</Description>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>Galaxy Software Services Corporation</Authors>
-    <TargetFramework>net45</TargetFramework>
-    <AssemblyName>GSS.Authentication.CAS.Owin</AssemblyName>
-    <PackageId>GSS.Authentication.CAS.Owin</PackageId>
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <PackageTags>CAS</PackageTags>
     <PackageReleaseNotes>
-      migrate from xproj to new csproj and upgrade dependencies
+      Migrate to .NET Standard 2.0
+      Polish codes
     </PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <NoWarn>1701;1702;1705;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +21,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="3.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Net.Http" Version="4.3.2" />
+    <PackageReference Include="System.Security.Principal" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

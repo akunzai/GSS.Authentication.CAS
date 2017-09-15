@@ -10,10 +10,10 @@ namespace Owin
 {
     public class CasAuthenticationOptions : AuthenticationOptions, ICasOptions
     {
-        public const string Scheme = "CAS";
-        public CasAuthenticationOptions() : base(Scheme)
+        public const string Scheme = CasDefaults.AuthenticationType;
+        public CasAuthenticationOptions() : base(CasDefaults.AuthenticationType)
         {
-            Caption = Scheme;
+            Caption = CasDefaults.AuthenticationType;
             CallbackPath = new PathString("/signin-cas");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
@@ -25,14 +25,17 @@ namespace Owin
 
         public string Caption
         {
-            get { return Description.Caption; }
-            set { Description.Caption = value; }
+            get => Description.Caption;
+            set => Description.Caption = value;
         }
 
         public PathString CallbackPath { get; set; }
 
         public string SignInAsAuthenticationType { get; set; }
 
+        /// <summary>
+        /// store serviceTicket in AuthenticationProperties for single sign out ?
+        /// </summary>
         public bool UseAuthenticationSessionStore { get; set; }
 
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }

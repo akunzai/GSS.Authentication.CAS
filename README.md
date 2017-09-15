@@ -10,7 +10,7 @@
 
 ### ASP.NET Core
 
-- .NET runtime 4.5.1 or newer
+- ASP.NET Core 2.0 or newer
 
 ## Usage
 

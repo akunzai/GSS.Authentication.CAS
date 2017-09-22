@@ -10,9 +10,11 @@
       Migrate to .NET Standard 2.0
       Polish codes
     </PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
     <NoWarn>1701;1702;1705;NU1701</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

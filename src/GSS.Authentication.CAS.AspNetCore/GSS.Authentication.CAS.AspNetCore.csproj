@@ -6,11 +6,11 @@
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>
-      Migrate to ASP.NET Core 2.0
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>Migrate to ASP.NET Core 2.0</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

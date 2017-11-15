@@ -134,12 +134,12 @@ namespace GSS.OAuth.Owin.Sample
             {
                 branch.Run(async context =>
                 {
-                    var authType = context.Request.Query["authscheme"];
-                    if (!string.IsNullOrEmpty(authType))
+                    var scheme = context.Request.Query["authscheme"];
+                    if (!string.IsNullOrEmpty(scheme))
                     {
                         // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
                         // send them to the home page instead (/).
-                        context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/" }, authType);
+                        context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
                         return;
                     }
 

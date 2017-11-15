@@ -145,12 +145,12 @@ namespace GSS.Authentication.AspNetCore.Sample
             {
                 branch.Run(async context =>
                 {
-                    var authType = context.Request.Query["authscheme"];
-                    if (!string.IsNullOrEmpty(authType))
+                    var scheme = context.Request.Query["authscheme"];
+                    if (!string.IsNullOrEmpty(scheme))
                     {
-                        // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
+                        // By default the client will be redirect back to the URL that issued the challenge (/login?authscheme=foo),
                         // send them to the home page instead (/).
-                        await context.ChallengeAsync(authType, new AuthenticationProperties { RedirectUri = "/" });
+                        await context.ChallengeAsync(scheme, new AuthenticationProperties { RedirectUri = "/" });
                         return;
                     }
 

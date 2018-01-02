@@ -74,7 +74,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 {
                     OnCreatingTicket = (context) =>
                     {
-                        // first_name, family_name, display_name, email, verified_email
+                        // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
                         var email = assertion.Attributes["email"].FirstOrDefault();

@@ -15,27 +15,27 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
 {
     public class CasSingleSignOutMiddlewareTest : IClassFixture<CasFixture>, IDisposable
     {
-        private readonly TestServer server;
-        private readonly HttpClient client;
-        private readonly CasFixture fixture;
-        private ITicketStore store;
+        private readonly TestServer _server;
+        private readonly HttpClient _client;
+        private readonly CasFixture _fixture;
+        private readonly ITicketStore _store;
 
         public CasSingleSignOutMiddlewareTest(CasFixture fixture)
         {
-            this.fixture = fixture;
+            _fixture = fixture;
             // Arrange
-            store = Mock.Of<ITicketStore>();
-            server = new TestServer(new WebHostBuilder()
+            _store = Mock.Of<ITicketStore>();
+            _server = new TestServer(new WebHostBuilder()
                 .Configure(app =>
                 {
-                    app.UseCasSingleSignOut(store);
+                    app.UseCasSingleSignOut(_store);
                 }));
-            client = server.CreateClient();
+            _client = _server.CreateClient();
 
         }
         public void Dispose()
         {
-            server.Dispose();
+            _server.Dispose();
         }
 
         [Fact]
@@ -45,10 +45,10 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var content = new FormUrlEncodedContent(new Dictionary<string, string>());
 
             // Act
-            await client.PostAsync("/", content);
+            await _client.PostAsync("/", content);
 
             // Assert
-            Mock.Get(store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+            Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -56,21 +56,21 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         {
             // Arrange
             var removedTicket = string.Empty;
-            Mock.Get(store).Setup(x => x.RemoveAsync(It.IsAny<string>()))
+            Mock.Get(_store).Setup(x => x.RemoveAsync(It.IsAny<string>()))
                 .Callback<string>((x) => removedTicket = x)
                 .Returns(Task.CompletedTask);
             var ticket = Guid.NewGuid().ToString();
             var parts = new Dictionary<string, string>
             {
-                ["logoutRequest"] = fixture.FileProvider.ReadAsString("SamlLogoutRequest.xml").Replace("$TICKET", ticket)
+                ["logoutRequest"] = _fixture.FileProvider.ReadAsString("SamlLogoutRequest.xml").Replace("$TICKET", ticket)
             };
 
             // Act
-            await client.PostAsync("/", new FormUrlEncodedContent(parts));
+            await _client.PostAsync("/", new FormUrlEncodedContent(parts));
 
             // Assert
             Assert.Equal(ticket, removedTicket);
-            Mock.Get(store).Verify(x => x.RemoveAsync(ticket), Times.Once);
+            Mock.Get(_store).Verify(x => x.RemoveAsync(ticket), Times.Once);
         }
     }
 }

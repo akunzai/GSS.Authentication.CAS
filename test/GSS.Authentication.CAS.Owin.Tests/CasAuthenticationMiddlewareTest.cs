@@ -21,20 +21,20 @@ namespace GSS.Authentication.CAS.Owin.Tests
 {
     public class CasAuthenticationMiddlewareTest : IClassFixture<CasFixture>,IDisposable
     {
-        private readonly TestServer server;
-        private readonly HttpClient client;
-        private readonly CasFixture fixture;
-        private IServiceTicketValidator ticketValidator;
-        private ICasPrincipal principal;
+        private readonly TestServer _server;
+        private readonly HttpClient _client;
+        private readonly CasFixture _fixture;
+        private readonly IServiceTicketValidator _ticketValidator;
+        private readonly ICasPrincipal _principal;
         
         public CasAuthenticationMiddlewareTest(CasFixture fixture)
         {
-            this.fixture = fixture;
+            _fixture = fixture;
             // Arrange
             var principalName = Guid.NewGuid().ToString();
-            principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationType);
-            ticketValidator = Mock.Of<IServiceTicketValidator>();
-            server = TestServer.Create(app =>
+            _principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationType);
+            _ticketValidator = Mock.Of<IServiceTicketValidator>();
+            _server = TestServer.Create(app =>
             {
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -45,7 +45,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 app.UseCasAuthentication(new CasAuthenticationOptions
                 {
                     CallbackPath = new PathString("/signin-cas"),
-                    ServiceTicketValidator = ticketValidator,
+                    ServiceTicketValidator = _ticketValidator,
                     CasServerUrlBase = fixture.Options.CasServerUrlBase
                 });
                 app.Use(async (context, next) =>
@@ -75,22 +75,22 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     await context.Response.WriteAsync(user.GetPrincipalName());
                 });
             });
-            client = server.HttpClient;
+            _client = _server.HttpClient;
         }
 
         public void Dispose()
         {
-            server.Dispose();
+            _server.Dispose();
         }
 
         [Fact]
         public async Task Challenge_RedirectToCasServerUrlAsync()
         {
             // Act
-            var response = await client.GetAsync("/login");
+            var response = await _client.GetAsync("/login");
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.True(response.Headers.Location.AbsoluteUri.StartsWith(fixture.Options.CasServerUrlBase));
+            Assert.StartsWith(_fixture.Options.CasServerUrlBase, response.Headers.Location.AbsoluteUri);
         }
 
         [Fact]
@@ -98,11 +98,11 @@ namespace GSS.Authentication.CAS.Owin.Tests
         {
             // Arrange
             var ticket = Guid.NewGuid().ToString();
-            Mock.Get(ticketValidator)
+            Mock.Get(_ticketValidator)
                 .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(principal);
+                .ReturnsAsync(_principal);
             //// challenge to CAS login page
-            var response = await client.GetAsync("/login");
+            var response = await _client.GetAsync("/login");
 
             var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
             var serviceUrl = query["service"];
@@ -110,17 +110,17 @@ namespace GSS.Authentication.CAS.Owin.Tests
 
             //// validate service ticket & state
             var request = response.GetRequest(url);
-            var validateResponse = await client.SendAsync(request);
+            var validateResponse = await _client.SendAsync(request);
 
             // Act : should got auth cookie
             request = validateResponse.GetRequest("/");
-            var homeResponse = await client.SendAsync(request);
+            var homeResponse = await _client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, homeResponse.StatusCode);
             var bodyText = await homeResponse.Content.ReadAsStringAsync();
-            Assert.Equal(principal.GetPrincipalName(), bodyText);
-            Mock.Get(ticketValidator).Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.Equal(_principal.GetPrincipalName(), bodyText);
+            Mock.Get(_ticketValidator).Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

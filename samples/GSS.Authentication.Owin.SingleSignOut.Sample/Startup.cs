@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
+using GSS.Authentication.Owin.SingleSignOut.Sample;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -15,9 +16,9 @@ using Newtonsoft.Json.Linq;
 using Owin;
 using Owin.OAuthGeneric;
 
-[assembly: OwinStartup(typeof(GSS.OAuth.Owin.Sample.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 
-namespace GSS.OAuth.Owin.Sample
+namespace GSS.Authentication.Owin.SingleSignOut.Sample
 {
     public class Startup
     {
@@ -70,7 +71,7 @@ namespace GSS.OAuth.Owin.Sample
                 {
                     OnCreatingTicket = context =>
                     {
-                        // first_name, family_name, display_name, email, verified_email
+                        // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
                         var email = assertion.Attributes["email"].FirstOrDefault();

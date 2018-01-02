@@ -33,102 +33,103 @@ namespace GSS.Authentication.AspNetCore.Sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/login";
+                options.LogoutPath = "/logout";
+                options.Events = new CookieAuthenticationEvents
                 {
-                    options.LoginPath = "/login";
-                    options.LogoutPath = "/logout";
-                    options.Events = new CookieAuthenticationEvents
+                    OnSigningOut = context =>
                     {
-                        OnSigningOut = context =>
-                        {
-                            // Single Sign-Out
-                            var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
-                            var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                            var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
+                        // Single Sign-Out
+                        var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                        var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
 
-                            var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
-                                context.HttpContext,
-                                context.Scheme,
-                                context.Options,
-                                context.Properties,
-                                redirectUri
-                            );
-                            context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
-                            context.Options.Events.RedirectToLogout(logoutRedirectContext);
-                            return Task.CompletedTask;
-                        }
-                    };
-                })
-                .AddCAS(options =>{
-                    options.CallbackPath = "/signin-cas";
-                    options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-                    options.SaveTokens = true;
-                    options.Events = new CasEvents
-                    {
-                        OnCreatingTicket = context =>
-                        {
-                            // first_name, family_name, display_name, email, verified_email
-                            var assertion = context.Assertion;
-                            if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
-                            if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                            var email = assertion.Attributes["email"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                            }
-                            var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Name, name));
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                })
-                .AddOAuth("OAuth", options =>
+                        var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
+                            context.HttpContext,
+                            context.Scheme,
+                            context.Options,
+                            context.Properties,
+                            redirectUri
+                        );
+                        context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
+                        context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                        return Task.CompletedTask;
+                    }
+                };
+            })
+            .AddCAS(options =>
+            {
+                options.CallbackPath = "/signin-cas";
+                options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
+                options.SaveTokens = true;
+                options.Events = new CasEvents
                 {
-                    options.CallbackPath = "/signin-oauth";
-                    options.ClientId = Configuration["Authentication:OAuth:ClientId"];
-                    options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
-                    options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
-                    options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
-                    options.SaveTokens = true;
-                    options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
-                    options.Events = new OAuthEvents
+                    OnCreatingTicket = context =>
                     {
-                        OnCreatingTicket = async context =>
+                        // add claims from CasIdentity.Assertion ?
+                        var assertion = context.Assertion;
+                        if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                        if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
+                        var email = assertion.Attributes["email"]?.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(email))
                         {
-                            var request =
-                                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                            request.Headers.Authorization =
-                                new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                            var response =
-                                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
-                            response.EnsureSuccessStatusCode();
-
-                            var user = JObject.Parse(await response.Content.ReadAsStringAsync());
-                            var identifier = user.Value<string>("id");
-                            if (!string.IsNullOrEmpty(identifier))
-                            {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
-                            }
-                            var attributes = user.Value<JObject>("attributes");
-                            if (attributes == null) return;
-                            var email = attributes.Value<string>("email");
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                            }
-                            var name = attributes.Value<string>("display_name");
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Name, name));
-                            }
+                            identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
-                    };
-                });
+                        var name = assertion.Attributes["display_name"]?.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            })
+            .AddOAuth("OAuth", options =>
+            {
+                options.CallbackPath = "/signin-oauth";
+                options.ClientId = Configuration["Authentication:OAuth:ClientId"];
+                options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
+                options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
+                options.SaveTokens = true;
+                options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.Events = new OAuthEvents
+                {
+                    OnCreatingTicket = async context =>
+                    {
+                        var request =
+                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var response =
+                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                        response.EnsureSuccessStatusCode();
+
+                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+                        var identifier = user.Value<string>("id");
+                        if (!string.IsNullOrEmpty(identifier))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
+                        }
+                        var attributes = user.Value<JObject>("attributes");
+                        if (attributes == null) return;
+                        var email = attributes.Value<string>("email");
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                        }
+                        var name = attributes.Value<string>("display_name");
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        }
+                    }
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -139,7 +140,7 @@ namespace GSS.Authentication.AspNetCore.Sample
                 app.UseDeveloperExceptionPage();
             }
             app.UseAuthentication();
-            
+
             // Choose an authentication type
             app.Map("/login", branch =>
             {

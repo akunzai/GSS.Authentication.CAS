@@ -66,7 +66,8 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     }
                 };
             })
-            .AddCAS(options => {
+            .AddCAS(options =>
+            {
                 options.CallbackPath = "/signin-cas";
                 options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
                 options.SaveTokens = true;
@@ -74,7 +75,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                 {
                     OnCreatingTicket = context =>
                     {
-                        // first_name, family_name, display_name, email, verified_email
+                        // add claims from CasIdentity.Assertion ?
                         var assertion = context.Assertion;
                         if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                         if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
@@ -156,7 +157,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     var scheme = context.Request.Query["authscheme"];
                     if (!string.IsNullOrEmpty(scheme))
                     {
-                        // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
+                        // By default the client will be redirect back to the URL that issued the challenge (/login?authscheme=foo),
                         // send them to the home page instead (/).
                         await context.ChallengeAsync(scheme, new AuthenticationProperties { RedirectUri = "/" });
                         return;
@@ -198,7 +199,6 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     // This is what [Authorize] calls
                     // The cookie middleware will intercept this 401 and redirect to /login
                     await context.ChallengeAsync();
-
                     return;
                 }
 

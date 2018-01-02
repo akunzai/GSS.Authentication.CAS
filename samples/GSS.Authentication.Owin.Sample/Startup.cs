@@ -63,7 +63,7 @@ namespace GSS.Authentication.Owin.Sample
                 {
                     OnCreatingTicket = context =>
                     {
-                        // first_name, family_name, display_name, email, verified_email
+                        // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
                         var email = assertion.Attributes["email"].FirstOrDefault();
@@ -132,7 +132,7 @@ namespace GSS.Authentication.Owin.Sample
                     {
                         // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
                         // send them to the home page instead (/).
-                        context.Authentication.Challenge(new AuthenticationProperties() { RedirectUri = "/" }, scheme);
+                        context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
                         return;
                     }
 
@@ -142,7 +142,7 @@ namespace GSS.Authentication.Owin.Sample
                     foreach (var type in context.Authentication.GetAuthenticationTypes())
                     {
                         if (string.IsNullOrEmpty(type.Caption)) continue;
-                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType }</a><br>");
+                        await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");
                 });

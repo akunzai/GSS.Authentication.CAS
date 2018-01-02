@@ -14,11 +14,11 @@ namespace GSS.Authentication.CAS.Tests.Validation
 {
     public class Cas30ServiceTicketValidationTest : IClassFixture<CasFixture>
     {
-        private CasFixture fixture;
+        private readonly CasFixture _fixture;
 
         public Cas30ServiceTicketValidationTest(CasFixture fixture)
         {
-            this.fixture = fixture;
+            _fixture = fixture;
         }
         
         [Fact]
@@ -26,14 +26,14 @@ namespace GSS.Authentication.CAS.Tests.Validation
         {
             // Arrange
             var ticket = Guid.NewGuid().ToString();
-            var requestUrl = $"{fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(fixture.Service)}";
+            var requestUrl = $"{_fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_fixture.Service)}";
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.Expect(HttpMethod.Get, requestUrl)
-              .Respond(fixture.FileProvider.ReadAsHttpContent("Cas30ValidationSuccess.xml", mediaType: "application/xml"));
-            var validator = new Cas30ServiceTicketValidator(fixture.Options, new HttpClient(mockHttp));
+              .Respond(_fixture.FileProvider.ReadAsHttpContent("Cas30ValidationSuccess.xml", mediaType: "application/xml"));
+            var validator = new Cas30ServiceTicketValidator(_fixture.Options, new HttpClient(mockHttp));
 
             // Act
-            var principal = await validator.ValidateAsync(ticket, fixture.Service, CancellationToken.None);
+            var principal = await validator.ValidateAsync(ticket, _fixture.Service, CancellationToken.None);
 
             //Assert
             Assert.NotNull(principal);
@@ -49,14 +49,14 @@ namespace GSS.Authentication.CAS.Tests.Validation
         {
             // Arrange
             var ticket = Guid.NewGuid().ToString();
-            var requestUrl = $"{fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(fixture.Service)}";
+            var requestUrl = $"{_fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_fixture.Service)}";
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.Expect(HttpMethod.Get, requestUrl)
-              .Respond(fixture.FileProvider.ReadAsHttpContent("Cas20ValidationFail.xml", mediaType: "application/xml"));
-            var validator = new Cas30ServiceTicketValidator(fixture.Options, new HttpClient(mockHttp));
+              .Respond(_fixture.FileProvider.ReadAsHttpContent("Cas20ValidationFail.xml", mediaType: "application/xml"));
+            var validator = new Cas30ServiceTicketValidator(_fixture.Options, new HttpClient(mockHttp));
 
             // Act & Assert
-            await Assert.ThrowsAsync<AuthenticationException>(() => validator.ValidateAsync(ticket, fixture.Service, CancellationToken.None));
+            await Assert.ThrowsAsync<AuthenticationException>(() => validator.ValidateAsync(ticket, _fixture.Service, CancellationToken.None));
             mockHttp.VerifyNoOutstandingRequest();
             mockHttp.VerifyNoOutstandingExpectation();
         }
@@ -66,14 +66,14 @@ namespace GSS.Authentication.CAS.Tests.Validation
         {
             // Arrange
             var ticket = Guid.NewGuid().ToString();
-            var requestUrl = $"{fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(fixture.Service)}";
+            var requestUrl = $"{_fixture.Options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_fixture.Service)}";
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.Expect(HttpMethod.Get, requestUrl)
               .Respond(HttpStatusCode.BadRequest);
-            var validator = new Cas30ServiceTicketValidator(fixture.Options, new HttpClient(mockHttp));
+            var validator = new Cas30ServiceTicketValidator(_fixture.Options, new HttpClient(mockHttp));
 
             // Act & Assert
-            await Assert.ThrowsAsync<HttpRequestException>(() => validator.ValidateAsync(ticket, fixture.Service, CancellationToken.None));
+            await Assert.ThrowsAsync<HttpRequestException>(() => validator.ValidateAsync(ticket, _fixture.Service, CancellationToken.None));
             mockHttp.VerifyNoOutstandingRequest();
             mockHttp.VerifyNoOutstandingExpectation();
         }

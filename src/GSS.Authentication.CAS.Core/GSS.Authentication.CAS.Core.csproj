@@ -14,6 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/blob/master/README.md</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>

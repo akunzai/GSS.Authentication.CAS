@@ -1,12 +1,20 @@
 # GSS.Authentication.CAS
 
-CAS Authentication Middleware for Owin & ASP.NET Core
+CAS Authentication Middleware for OWIN & ASP.NET Core
 
 [![Build status](https://ci.appveyor.com/api/projects/status/uk7kwjvo1e6yl33m?svg=true)](https://ci.appveyor.com/project/akunzai/gss-authentication-cas)
 
+## NuGet Packages
+
+- [GSS.Authentication.CAS.Core ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.Core.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.Core/)
+- [GSS.Authentication.CAS.Owin ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.Owin.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.Owin/)
+- [GSS.Authentication.CAS.AspNetCore ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.AspNetCore/)
+- [GSS.Authentication.CAS.DistributedCache ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.DistributedCache.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.DistributedCache/)
+- [GSS.Authentication.CAS.RuntimeCache ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.RuntimeCache.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.RuntimeCache/)
+
 ## Installation
 
-Owin
+OWIN
 
 ```shell
 # Package Manager
@@ -42,14 +50,14 @@ Owin
 ```csharp
 public class Startup
 {
-	public void Configuration(IAppBuilder app)
-	{
-		var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+    public void Configuration(IAppBuilder app)
+    {
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json", reloadOnChange: true)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
-        var configuration = builder.Build();
-		app.UseCasAuthentication(new CasAuthenticationOptions
+            .Build();
+        app.UseCasAuthentication(new CasAuthenticationOptions
         {
             CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
             Provider = new CasAuthenticationProvider
@@ -73,7 +81,7 @@ public class Startup
                 }
             }
         });
-	}
+    }
 }
 ```
 
@@ -84,9 +92,9 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
 
-	public void ConfigureServices(IServiceCollection services)
-	{
-		services.Configure<CasAuthenticationOptions>(options =>
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.Configure<CasAuthenticationOptions>(options =>
         {
             options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
             options.UseTicketStore = true;
@@ -96,9 +104,9 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.FromResult(0);
+                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
-                    if (identity == null) return Task.FromResult(0);
+                    if (identity == null) return Task.CompletedTask;
                     var email = assertion.Attributes["email"]?.FirstOrDefault();
                     if (!string.IsNullOrEmpty(email))
                     {
@@ -109,15 +117,16 @@ public class Startup
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Name, name));
                     }
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }
             };
         });
-	}
+    }
 
-	public void Configure(IApplicationBuilder app){
-		app.UseCasAuthentication();
-	}
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseCasAuthentication();
+    }
 }
 ```
 
@@ -128,40 +137,41 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
 
-	public void ConfigureServices(IServiceCollection services)
-	{
-		services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCAS(options =>{
-                    options.CallbackPath = "/signin-cas";
-                    options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-                    options.SaveTokens = true;
-                    options.Events = new CasEvents
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCAS(options =>{
+            options.CallbackPath = "/signin-cas";
+            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
+            options.SaveTokens = true;
+            options.Events = new CasEvents
+            {
+                OnCreatingTicket = context =>
+                {
+                    // add claims from CasIdentity.Assertion ?
+                    var assertion = context.Assertion;
+                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
+                    var email = assertion.Attributes["email"]?.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        OnCreatingTicket = context =>
-                        {
-                            // add claims from CasIdentity.Assertion ?
-                            var assertion = context.Assertion;
-                            if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
-                            if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                            var email = assertion.Attributes["email"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                            }
-                            var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Name, name));
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                })
-	}
+                        identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                    }
+                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
+    }
 
-	public void Configure(IApplicationBuilder app){
-		app.UseAuthentication();
-	}
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseAuthentication();
+    }
 }
 ```
 
@@ -172,16 +182,16 @@ Owin
 ```csharp
 public class Startup
 {
-	public void Configuration(IAppBuilder app)
-	{
-		var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+    public void Configuration(IAppBuilder app)
+    {
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json", reloadOnChange: true)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
-        var configuration = builder.Build();
-		var sessionStore = new AuthenticationSessionStoreWrapper(new RuntimeCacheServiceTicketStore());
+            .Build();
+        var sessionStore = new AuthenticationSessionStoreWrapper(new RuntimeCacheServiceTicketStore());
         app.UseCasSingleSignOut(sessionStore);
-		app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+        app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
         app.UseCookieAuthentication(new CookieAuthenticationOptions
         {
             LoginPath = new PathString("/login"),
@@ -206,10 +216,10 @@ public class Startup
                 }
             }
         });
-		app.UseCasAuthentication(new CasAuthenticationOptions
+        app.UseCasAuthentication(new CasAuthenticationOptions
         {
             CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
-			UseAuthenticationSessionStore = true,
+            UseAuthenticationSessionStore = true,
             Provider = new CasAuthenticationProvider
             {
                 OnCreatingTicket = context =>
@@ -231,7 +241,7 @@ public class Startup
                 }
             }
         });
-	}
+    }
 }
 ```
 
@@ -242,15 +252,15 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
 
-	public void ConfigureServices(IServiceCollection services)
-	{
-        var servierTicketStore = new DistributedCacheServiceTicketStore();
-        var ticketStore = new TicketStoreWrapper(servierTicketStore);
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var serviceTicketStore = new DistributedCacheServiceTicketStore();
+        var ticketStore = new TicketStoreWrapper(serviceTicketStore);
 
-        services.AddSingleton<IServiceTicketStore>(servierTicketStore);
+        services.AddSingleton<IServiceTicketStore>(serviceTicketStore);
         services.AddSingleton<ITicketStore>(ticketStore);
-		services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
-		services.Configure<CookieAuthenticationOptions>(options =>
+        services.AddAuthentication(options => options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme);
+        services.Configure<CookieAuthenticationOptions>(options =>
         {
             options.AutomaticAuthenticate = true;
             options.AutomaticChallenge = true;
@@ -263,9 +273,13 @@ public class Startup
                 {
                     // Single Sign-Out
                     var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
-                    var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                    var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
-
+                    var serviceUrl = new Uri(context.Request.GetEncodedUrl())
+                        .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                    var redirectUri = UriHelper.BuildAbsolute(
+                        casUrl.Scheme,
+                        new HostString(casUrl.Host, casUrl.Port),
+                        casUrl.LocalPath, "/logout",
+                        QueryString.Create("service", serviceUrl));
                     var logoutRedirectContext = new CookieRedirectContext(
                         context.HttpContext,
                         context.Options,
@@ -274,11 +288,11 @@ public class Startup
                         );
                     context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
                     context.Options.Events.RedirectToLogout(logoutRedirectContext);
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }
             };
         });
-		services.Configure<CasAuthenticationOptions>(options =>
+        services.Configure<CasAuthenticationOptions>(options =>
         {
             options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
             options.UseTicketStore = true;
@@ -288,9 +302,9 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.FromResult(0);
+                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
-                    if (identity == null) return Task.FromResult(0);
+                    if (identity == null) return Task.CompletedTask;
                     var email = assertion.Attributes["email"]?.FirstOrDefault();
                     if (!string.IsNullOrEmpty(email))
                     {
@@ -301,17 +315,18 @@ public class Startup
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Name, name));
                     }
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 }
             };
         });
-	}
+    }
 
-	public void Configure(IApplicationBuilder app){
-		app.UseCasSingleSignOut();
-		app.UseCookieAuthentication();
-		app.UseCasAuthentication();
-	}
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseCasSingleSignOut();
+        app.UseCookieAuthentication();
+        app.UseCasAuthentication();
+    }
 }
 ```
 
@@ -322,91 +337,80 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
 
-	public void ConfigureServices(IServiceCollection services)
-	{
-		var servierTicketStore = new DistributedCacheServiceTicketStore();
-        var ticketStore = new TicketStoreWrapper(servierTicketStore);
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var serviceTicketStore = new DistributedCacheServiceTicketStore();
+        var ticketStore = new TicketStoreWrapper(serviceTicketStore);
 
-        services.AddSingleton<IServiceTicketStore>(servierTicketStore);
+        services.AddSingleton<IServiceTicketStore>(serviceTicketStore);
         services.AddSingleton<ITicketStore>(ticketStore);
-		services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie(options =>
-				{
-					options.LoginPath = "/login";
-					options.LogoutPath = "/logout";
-					options.SessionStore = ticketStore;
-					options.Events = new CookieAuthenticationEvents
-					{
-						OnSigningOut = context =>
-						{
-							// Single Sign-Out
-							var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
-							var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-							var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
-
-							var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
-								context.HttpContext,
-								context.Scheme,
-								context.Options,
-								context.Properties,
-								redirectUri
-							);
-							context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
-							context.Options.Events.RedirectToLogout(logoutRedirectContext);
-							return Task.CompletedTask;
-						}
-					};
-				})
-                .AddCAS(options =>{
-                    options.CallbackPath = "/signin-cas";
-                    options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-                    options.SaveTokens = true;
-                    options.Events = new CasEvents
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/login";
+            options.LogoutPath = "/logout";
+            options.SessionStore = ticketStore;
+            options.Events = new CookieAuthenticationEvents
+            {
+                OnSigningOut = context =>
+                {
+                    // Single Sign-Out
+                    var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                    var serviceUrl = new Uri(context.Request.GetEncodedUrl())
+                        .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                    var redirectUri = UriHelper.BuildAbsolute(
+                        casUrl.Scheme,
+                        new HostString(casUrl.Host, casUrl.Port),
+                        casUrl.LocalPath, "/logout",
+                        QueryString.Create("service", serviceUrl));
+                    var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
+                        context.HttpContext,
+                        context.Scheme,
+                        context.Options,
+                        context.Properties,
+                        redirectUri
+                    );
+                    context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
+                    context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                    return Task.CompletedTask;
+                }
+            };
+        })
+        .AddCAS(options =>{
+            options.CallbackPath = "/signin-cas";
+            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
+            options.SaveTokens = true;
+            options.Events = new CasEvents
+            {
+                OnCreatingTicket = context =>
+                {
+                    // add claims from CasIdentity.Assertion ?
+                    var assertion = context.Assertion;
+                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
+                    var email = assertion.Attributes["email"]?.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        OnCreatingTicket = context =>
-                        {
-                            // add claims from CasIdentity.Assertion ?
-                            var assertion = context.Assertion;
-                            if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
-                            if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                            var email = assertion.Attributes["email"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                            }
-                            var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(name))
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Name, name));
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                })
-	}
+                        identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                    }
+                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
+    }
 
-	public void Configure(IApplicationBuilder app){
-		app.UseCasSingleSignOut();
-		app.UseAuthentication();
-	}
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseCasSingleSignOut();
+        app.UseAuthentication();
+    }
 }
 ```
-
-## NuGet Package
-
-### Shared
-
-- [GSS.Authentication.CAS.Core ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.Core.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.Core/)
-
-### Single-Sign-On
-
-- [GSS.Authentication.CAS.Owin ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.Owin.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.Owin/)
-- [GSS.Authentication.CAS.AspNetCore ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.AspNetCore/)
-
-### Single-Sign-Out
-
-- [GSS.Authentication.CAS.DistributedCache ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.DistributedCache.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.DistributedCache/)
-- [GSS.Authentication.CAS.RuntimeCache ![NuGet version](https://img.shields.io/nuget/v/GSS.Authentication.CAS.RuntimeCache.svg?style=flat-square)](https://www.nuget.org/packages/GSS.Authentication.CAS.RuntimeCache/)
 
 ## [Release Notes](https://github.com/akunzai/GSS.Authentication.CAS/releases)
 ## [License](LICENSE.md)

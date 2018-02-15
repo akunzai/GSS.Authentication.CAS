@@ -138,7 +138,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                     var scheme = context.Request.Query["authscheme"];
                     if (!string.IsNullOrEmpty(scheme))
                     {
-                        // By default the client will be redirect back to the URL that issued the challenge (/login?authtype=foo),
+                        // By default the client will be redirect back to the URL that issued the challenge (/login?authscheme=foo),
                         // send them to the home page instead (/).
                         context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
                         return;

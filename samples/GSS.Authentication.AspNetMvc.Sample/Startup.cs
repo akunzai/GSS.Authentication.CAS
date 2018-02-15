@@ -36,17 +36,15 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
-            
+
             app.UseErrorPage();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                AuthenticationType = CookieAuthenticationDefaults.AuthenticationType,
                 LoginPath = CookieAuthenticationDefaults.LoginPath,
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
-                ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter,
                 Provider = new CookieAuthenticationProvider
                 {
                     OnResponseSignOut = (context) =>
@@ -65,7 +63,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         context.Options.Provider.ApplyRedirect(logoutRedirectContext);
                     }
                 }
-        });
+            });
 
             app.UseCasAuthentication(new CasAuthenticationOptions
             {
@@ -92,7 +90,8 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 }
             });
 
-            app.UseOAuthAuthentication(options => {
+            app.UseOAuthAuthentication(options =>
+            {
                 options.ClientId = configuration["Authentication:OAuth:ClientId"];
                 options.ClientSecret = configuration["Authentication:OAuth:ClientSecret"];
                 options.CallbackPath = new PathString("/sign-oauth");

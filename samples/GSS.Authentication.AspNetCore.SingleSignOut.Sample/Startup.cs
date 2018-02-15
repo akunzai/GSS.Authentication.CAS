@@ -33,10 +33,10 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var servierTicketStore = new DistributedCacheServiceTicketStore();
-            var ticketStore = new TicketStoreWrapper(servierTicketStore);
+            var serviceTicketStore = new DistributedCacheServiceTicketStore();
+            var ticketStore = new TicketStoreWrapper(serviceTicketStore);
 
-            services.AddSingleton<IServiceTicketStore>(servierTicketStore);
+            services.AddSingleton<IServiceTicketStore>(serviceTicketStore);
             services.AddSingleton<ITicketStore>(ticketStore);
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
@@ -50,8 +50,13 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
-                        var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                        var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
+                        var serviceUrl = new Uri(context.Request.GetEncodedUrl())
+                            .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = UriHelper.BuildAbsolute(
+                            casUrl.Scheme,
+                            new HostString(casUrl.Host, casUrl.Port),
+                            casUrl.LocalPath, "/logout",
+                            QueryString.Create("service", serviceUrl));
 
                         var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
                             context.HttpContext,

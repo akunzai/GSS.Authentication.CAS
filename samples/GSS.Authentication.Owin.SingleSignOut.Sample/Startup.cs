@@ -66,6 +66,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
             app.UseCasAuthentication(new CasAuthenticationOptions
             {
                 CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
+                ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase"),
                 UseAuthenticationSessionStore = true,
                 Provider = new CasAuthenticationProvider
                 {

@@ -59,6 +59,7 @@ namespace GSS.Authentication.Owin.Sample
             app.UseCasAuthentication(new CasAuthenticationOptions
             {
                 CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
+                ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase"),
                 Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = context =>

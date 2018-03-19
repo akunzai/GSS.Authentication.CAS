@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Owin Middlewares for CAS Authentication</Description>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <Description>OWIN Middlewares for CAS Authentication</Description>
+    <Version>2.1.0</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <PackageTags>CAS</PackageTags>
     <PackageReleaseNotes>
-      Migrate to .NET Standard 2.0
-      Polish codes
+      Add ServiceUrlBase options to override service base URL
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
-    <NoWarn>1701;1702;1705;NU1701</NoWarn>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/blob/master/README.md</PackageLicenseUrl>
   </PropertyGroup>

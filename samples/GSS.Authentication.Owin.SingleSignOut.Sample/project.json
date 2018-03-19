@@ -1,5 +1,6 @@
 ﻿{
   "dependencies": {
+    "Microsoft.Extensions.Configuration.Binder": "1.1.2",
     "Microsoft.Extensions.Configuration.Json": "1.1.2",
     "Microsoft.Owin.Diagnostics": "3.1.0",
     "Microsoft.Owin.Host.SystemWeb": "3.1.0",

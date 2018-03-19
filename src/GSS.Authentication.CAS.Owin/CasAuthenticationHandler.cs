@@ -164,8 +164,11 @@ namespace GSS.Authentication.CAS.Owin
 
         private string BuildReturnTo(string state)
         {
+            var baseUrl = Options.ServiceUrlBase != null && Options.ServiceUrlBase.IsAbsoluteUri
+                ? Options.ServiceUrlBase.AbsoluteUri.TrimEnd('/')
+                : $"{Request.Scheme}://{Request.Host}{RequestPathBase}";
             return
-                $"{Request.Scheme}://{Request.Host}{RequestPathBase}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
+                $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
         }
     }
 }

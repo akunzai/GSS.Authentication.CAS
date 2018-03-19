@@ -45,7 +45,7 @@ dotnet add package GSS.Authentication.CAS.AspNetCore
 
 ### Single-Sign-On
 
-Owin
+OWIN
 
 ```csharp
 public class Startup
@@ -177,7 +177,7 @@ public class Startup
 
 ### Single-Sign-Out
 
-Owin
+OWIN
 
 ```csharp
 public class Startup

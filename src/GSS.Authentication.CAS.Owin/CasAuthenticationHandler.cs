@@ -164,8 +164,8 @@ namespace GSS.Authentication.CAS.Owin
 
         private string BuildReturnTo(string state)
         {
-            return
-                $"{Request.Scheme}://{Request.Host}{RequestPathBase}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
+            var publicOrigin = Options.Provider.GetPublicOrigin(Context);
+            return $"{publicOrigin}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
         }
     }
 }

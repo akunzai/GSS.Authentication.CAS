@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>Runtime cache implementation of the IServiceTicketStore for Single sign-out</Description>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <Version>1.2.0</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>net45</TargetFramework>
     <PackageTags>CAS</PackageTags>

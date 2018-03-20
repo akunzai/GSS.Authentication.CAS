@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +20,14 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
 {
-    public class CasAuthenticationMiddlewareTest : IClassFixture<CasFixture>,IDisposable
+    public class CasAuthenticationMiddlewareTest : IClassFixture<CasFixture>, IDisposable
     {
         private readonly TestServer _server;
         private readonly HttpClient _client;
         private readonly CasFixture _fixture;
         private readonly IServiceTicketValidator _ticketValidator;
         private readonly ICasPrincipal _principal;
-        
+
         public CasAuthenticationMiddlewareTest(CasFixture fixture)
         {
             _fixture = fixture;
@@ -46,7 +47,17 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 {
                     CallbackPath = new PathString("/signin-cas"),
                     ServiceTicketValidator = _ticketValidator,
-                    CasServerUrlBase = fixture.Options.CasServerUrlBase
+                    CasServerUrlBase = fixture.Options.CasServerUrlBase,
+                    Provider = new CasAuthenticationProvider
+                    {
+                        OnCreatingTicket = context =>
+                        {
+                            var assertion = (context.Identity as CasIdentity)?.Assertion;
+                            if (assertion == null) return Task.CompletedTask;
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                            return Task.CompletedTask;
+                        }
+                    }
                 });
                 app.Use(async (context, next) =>
                 {

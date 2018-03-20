@@ -51,6 +51,17 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         options.CallbackPath = "/signin-cas";
                         options.ServiceTicketValidator = _ticketValidator;
                         options.CasServerUrlBase = fixture.Options.CasServerUrlBase;
+                        options.Events = new CasEvents
+                        {
+                            OnCreatingTicket = context =>
+                            {
+                                var assertion = context.Assertion;
+                                if (assertion == null) return Task.CompletedTask;
+                                if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
+                                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                                return Task.CompletedTask;
+                            }
+                        };
                     });
                 })
                 .Configure(app =>
@@ -133,7 +144,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var bodyText = await homeResponse.Content.ReadAsStringAsync();
             Assert.Equal(_principal.GetPrincipalName(), bodyText);
             Mock.Get(_ticketValidator)
-                .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), 
+                .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
     }

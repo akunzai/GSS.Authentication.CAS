@@ -8,6 +8,7 @@
     <PackageTags>CAS</PackageTags>
     <PackageReleaseNotes>
       Change attribute value type of Assertion to StringValues
+      Ignore to insert default claims (NameIdentifier) to CasIdentity
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

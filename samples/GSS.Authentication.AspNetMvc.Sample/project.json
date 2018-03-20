@@ -1,10 +1,10 @@
 ﻿{
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "5.2.3",
-    "Microsoft.Extensions.Configuration.Json": "1.1.2",
-    "Microsoft.Owin.Diagnostics": "3.1.0",
-    "Microsoft.Owin.Host.SystemWeb": "3.1.0",
-    "Microsoft.Owin.Security.Cookies": "3.1.0",
+    "Microsoft.AspNet.Mvc": "5.2.4",
+    "Microsoft.Extensions.Configuration.Json": "2.0.1",
+    "Microsoft.Owin.Diagnostics": "4.0.0",
+    "Microsoft.Owin.Host.SystemWeb": "4.0.0",
+    "Microsoft.Owin.Security.Cookies": "4.0.0",
     "Owin.OAuthGeneric": "1.0.3"
   },
   "frameworks": {

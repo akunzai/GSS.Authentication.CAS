@@ -67,13 +67,11 @@ public class Startup
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Identity as CasIdentity)?.Assertion;
                     if (assertion == null) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var displayName = assertion.Attributes["display_name"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(displayName))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
@@ -107,15 +105,13 @@ public class Startup
                     if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
                     if (identity == null) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(name))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
                     return Task.CompletedTask;
                 }
@@ -152,15 +148,13 @@ public class Startup
                     var assertion = context.Assertion;
                     if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(name))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
                     return Task.CompletedTask;
                 }
@@ -227,13 +221,12 @@ public class Startup
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Identity as CasIdentity)?.Assertion;
                     if (assertion == null) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var displayName = assertion.Attributes["display_name"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(displayName))
+                    var displayName = assertion.Attributes["display_name"];
+                    if (!StringValues.IsNullOrEmpty(displayName))
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
@@ -305,15 +298,13 @@ public class Startup
                     if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
                     if (identity == null) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(name))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
                     return Task.CompletedTask;
                 }
@@ -388,15 +379,13 @@ public class Startup
                     var assertion = context.Assertion;
                     if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                     if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                    var email = assertion.Attributes["email"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(email))
+                    if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(name))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                        identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                     }
                     return Task.CompletedTask;
                 }

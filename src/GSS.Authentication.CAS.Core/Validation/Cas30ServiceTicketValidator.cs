@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Xml.Linq;
 using GSS.Authentication.CAS.Security;
+using Microsoft.Extensions.Primitives;
 
 namespace GSS.Authentication.CAS.Validation
 {
@@ -44,18 +45,13 @@ namespace GSS.Authentication.CAS.Validation
             var successElement = doc.Element(AuthenticationSuccess);
             if (null == successElement) return null;
             var principalName = successElement.Element(User)?.Value;
-            var attributes = new Dictionary<string, IList<string>>();
+            var attributes = new Dictionary<string, StringValues>();
             foreach (var attr in successElement.Element(Attributes)?.Elements())
             {
                 var name = attr.Name.LocalName;
-                if (attributes.ContainsKey(name))
-                {
-                    attributes[name].Add(attr.Value);
-                }
-                else
-                {
-                    attributes.Add(name, new List<string> { attr.Value });
-                }
+                attributes[name] = attributes.ContainsKey(name)
+                    ? StringValues.Concat(attributes[name], attr.Value)
+                    : new StringValues(attr.Value);
             }
             var assertion = new Assertion(principalName, attributes);
             return new CasPrincipal(assertion, options.AuthenticationType);

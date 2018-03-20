@@ -72,15 +72,13 @@ namespace GSS.Authentication.AspNetCore.Sample
                         var assertion = context.Assertion;
                         if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
                         if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                        var email = assertion.Attributes["email"]?.FirstOrDefault();
-                        if (!string.IsNullOrEmpty(email))
+                        if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
-                        var name = assertion.Attributes["display_name"]?.FirstOrDefault();
-                        if (!string.IsNullOrEmpty(name))
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                         {
-                            identity.AddClaim(new Claim(ClaimTypes.Name, name));
+                            identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
                         return Task.CompletedTask;
                     }

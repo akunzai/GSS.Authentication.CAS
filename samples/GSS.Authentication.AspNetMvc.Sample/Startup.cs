@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -75,13 +74,11 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
-                        var email = assertion.Attributes["email"].FirstOrDefault();
-                        if (!string.IsNullOrEmpty(email))
+                        if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
-                        var displayName = assertion.Attributes["display_name"].FirstOrDefault();
-                        if (!string.IsNullOrEmpty(displayName))
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }

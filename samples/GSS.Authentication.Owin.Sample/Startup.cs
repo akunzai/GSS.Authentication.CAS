@@ -67,13 +67,11 @@ namespace GSS.Authentication.Owin.Sample
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
-                        var email = assertion.Attributes["email"].FirstOrDefault();
-                        if (!string.IsNullOrEmpty(email))
+                        if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
-                        var displayName = assertion.Attributes["display_name"].FirstOrDefault();
-                        if (!string.IsNullOrEmpty(displayName))
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
@@ -82,7 +80,8 @@ namespace GSS.Authentication.Owin.Sample
                 }
             });
 
-            app.UseOAuthAuthentication(options=> {
+            app.UseOAuthAuthentication(options =>
+            {
                 options.ClientId = configuration["Authentication:OAuth:ClientId"];
                 options.ClientSecret = configuration["Authentication:OAuth:ClientSecret"];
                 options.CallbackPath = new PathString("/sign-oauth");

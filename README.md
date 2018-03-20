@@ -103,7 +103,7 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (assertion == null) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
                     if (identity == null) return Task.CompletedTask;
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
@@ -148,7 +148,7 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = context.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (assertion == null) return Task.CompletedTask;
                     if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
                     if (assertion.Attributes.TryGetValue("email", out var email))
@@ -299,7 +299,7 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (assertion == null) return Task.CompletedTask;
                     var identity = context.Principal.Identity as ClaimsIdentity;
                     if (identity == null) return Task.CompletedTask;
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
@@ -382,7 +382,7 @@ public class Startup
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = context.Assertion;
-                    if (assertion == null || !assertion.Attributes.Any()) return Task.CompletedTask;
+                    if (assertion == null) return Task.CompletedTask;
                     if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
                     if (assertion.Attributes.TryGetValue("email", out var email))

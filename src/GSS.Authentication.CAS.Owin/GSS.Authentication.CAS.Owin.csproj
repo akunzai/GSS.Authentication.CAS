@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/blob/master/README.md</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
+    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html
     public abstract class CasServiceTicketValidator : IServiceTicketValidator
     {
         protected string validateUrl;

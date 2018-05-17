@@ -5,7 +5,7 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
-    // see https://github.com/apereo/cas/blob/master/cas-server-documentation/protocol/CAS-Protocol-Specification.md#25-servicevalidate-cas-20
+    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html#25-servicevalidate-cas-20
     public class Cas20ServiceTicketValidator : CasServiceTicketValidator
     {
         protected static XNamespace Namespace = "http://www.yale.edu/tp/cas";

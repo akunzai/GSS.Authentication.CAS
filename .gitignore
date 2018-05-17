@@ -1,60 +1,7 @@
-# Created by https://www.gitignore.io/api/visualstudio,visualstudiocode,windows,osx
+**/PublishProfiles/**
+appsettings.*.json
 
-### OSX ###
-*.DS_Store
-.AppleDouble
-.LSOverride
-
-# Icon must end with two \r
-Icon
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-### VisualStudioCode ###
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history
-
-### Windows ###
-# Windows thumbnail cache files
-Thumbs.db
-ehthumbs.db
-ehthumbs_vista.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
+# Created by https://www.gitignore.io/api/visualstudio
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
@@ -106,7 +53,6 @@ dlldata.c
 *project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
-appsettings.*.json
 
 *_i.c
 *_p.c
@@ -211,7 +157,7 @@ publish/
 # TODO: Uncomment the next line to ignore your web deploy settings.
 # By default, sensitive information, such as encrypted password
 # should be stored in the .pubxml.user file.
-#*.pubxml
+*.pubxml
 *.pubxml.user
 *.publishproj
 
@@ -353,4 +299,5 @@ __pycache__/
 # By default, sensitive information, such as encrypted password
 # should be stored in the .pubxml.user file.
 
-# End of https://www.gitignore.io/api/visualstudio,visualstudiocode,windows,osx
+
+# End of https://www.gitignore.io/api/visualstudio

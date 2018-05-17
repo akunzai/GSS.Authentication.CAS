@@ -45,7 +45,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                 SessionStore = sessionStore,
                 Provider = new CookieAuthenticationProvider
                 {
-                    OnResponseSignOut = (context) =>
+                    OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);

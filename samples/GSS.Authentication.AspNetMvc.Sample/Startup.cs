@@ -46,7 +46,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
                 Provider = new CookieAuthenticationProvider
                 {
-                    OnResponseSignOut = (context) =>
+                    OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
@@ -69,7 +69,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
                 Provider = new CasAuthenticationProvider
                 {
-                    OnCreatingTicket = (context) =>
+                    OnCreatingTicket = context =>
                     {
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
@@ -99,7 +99,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                 options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
                 options.Events = new OAuthEvents
                 {
-                    OnCreatingTicket = async (context) =>
+                    OnCreatingTicket = async context =>
                     {
                         var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);

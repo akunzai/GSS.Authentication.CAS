@@ -43,8 +43,13 @@ namespace GSS.Authentication.AspNetCore.Sample
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
-                        var serviceUrl = new Uri(context.Request.GetEncodedUrl()).GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                        var redirectUri = UriHelper.BuildAbsolute(casUrl.Scheme, new HostString(casUrl.Host, casUrl.Port), casUrl.LocalPath, "/logout", QueryString.Create("service", serviceUrl));
+                        var serviceUrl = new Uri(context.Request.GetEncodedUrl())
+                            .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = UriHelper.BuildAbsolute(
+                            casUrl.Scheme,
+                            new HostString(casUrl.Host, casUrl.Port),
+                            casUrl.LocalPath, "/logout",
+                            QueryString.Create("service", serviceUrl));
 
                         var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
                             context.HttpContext,

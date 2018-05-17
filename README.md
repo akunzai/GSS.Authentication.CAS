@@ -99,7 +99,7 @@ public class Startup
             options.UseTicketStore = true;
             options.Events = new CasEvents
             {
-                OnCreatingTicket = (context) =>
+                OnCreatingTicket = context =>
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;
@@ -196,7 +196,7 @@ public class Startup
             SessionStore = sessionStore,
             Provider = new CookieAuthenticationProvider
             {
-                OnResponseSignOut = (context) =>
+                OnResponseSignOut = context =>
                 {
                     // Single Sign-Out
                     var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
@@ -266,7 +266,7 @@ public class Startup
             options.SessionStore = ticketStore;
             options.Events = new CookieAuthenticationEvents
             {
-                OnSigningOut = (context) =>
+                OnSigningOut = context =>
                 {
                     // Single Sign-Out
                     var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
@@ -295,7 +295,7 @@ public class Startup
             options.UseTicketStore = true;
             options.Events = new CasEvents
             {
-                OnCreatingTicket = (context) =>
+                OnCreatingTicket = context =>
                 {
                     // add claims from CasIdentity.Assertion ?
                     var assertion = (context.Principal as ICasPrincipal)?.Assertion;

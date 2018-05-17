@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
+using GSS.Authentication.CAS.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -41,7 +42,7 @@ namespace GSS.Authentication.Owin.Sample
                     OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
-                        var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
+                        var casUrl = new Uri(configuration["Authentication:CAS:ServerUrlBase"]);
                         var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
@@ -56,11 +57,24 @@ namespace GSS.Authentication.Owin.Sample
                 }
             });
 
-            app.UseCasAuthentication(new CasAuthenticationOptions
+            app.UseCasAuthentication(options =>
             {
-                CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
-                ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase"),
-                Provider = new CasAuthenticationProvider
+                options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
+                options.ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+                if (protocolVersion != 3)
+                {
+                    switch (protocolVersion)
+                    {
+                        case 1:
+                            options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                            break;
+                        case 2:
+                            options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                            break;
+                    }
+                }
+                options.Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = context =>
                     {
@@ -78,7 +92,7 @@ namespace GSS.Authentication.Owin.Sample
                         }
                         return Task.CompletedTask;
                     }
-                }
+                };
             });
 
             app.UseOAuthAuthentication(options =>

@@ -57,10 +57,23 @@ public class Startup
             .AddJsonFile($"appsettings.json", reloadOnChange: true)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
             .Build();
-        app.UseCasAuthentication(new CasAuthenticationOptions
+        app.UseCasAuthentication(options =>
         {
-            CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
-            Provider = new CasAuthenticationProvider
+            options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
+            var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
+            options.Provider = new CasAuthenticationProvider
             {
                 OnCreatingTicket = context =>
                 {
@@ -78,7 +91,7 @@ public class Startup
                     }
                     return Task.CompletedTask;
                 }
-            }
+            };
         });
     }
 }
@@ -95,8 +108,20 @@ public class Startup
     {
         services.Configure<CasAuthenticationOptions>(options =>
         {
-            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-            options.UseTicketStore = true;
+            options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
             options.Events = new CasEvents
             {
                 OnCreatingTicket = context =>
@@ -140,8 +165,20 @@ public class Startup
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCAS(options =>{
             options.CallbackPath = "/signin-cas";
-            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-            options.SaveTokens = true;
+            options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
             options.Events = new CasEvents
             {
                 OnCreatingTicket = context =>
@@ -199,7 +236,7 @@ public class Startup
                 OnResponseSignOut = context =>
                 {
                     // Single Sign-Out
-                    var casUrl = new Uri(configuration["Authentication:CAS:CasServerUrlBase"]);
+                    var casUrl = new Uri(configuration["Authentication:CAS:ServerUrlBase"]);
                     var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                     var redirectUri = new UriBuilder(casUrl);
                     redirectUri.Path += "/logout";
@@ -215,8 +252,21 @@ public class Startup
         });
         app.UseCasAuthentication(new CasAuthenticationOptions
         {
-            CasServerUrlBase = configuration["Authentication:CAS:CasServerUrlBase"],
+            CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"],
             UseAuthenticationSessionStore = true,
+            var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
             Provider = new CasAuthenticationProvider
             {
                 OnCreatingTicket = context =>
@@ -269,7 +319,7 @@ public class Startup
                 OnSigningOut = context =>
                 {
                     // Single Sign-Out
-                    var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                    var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
                     var serviceUrl = new Uri(context.Request.GetEncodedUrl())
                         .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                     var redirectUri = UriHelper.BuildAbsolute(
@@ -291,8 +341,20 @@ public class Startup
         });
         services.Configure<CasAuthenticationOptions>(options =>
         {
-            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-            options.UseTicketStore = true;
+            options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
             options.Events = new CasEvents
             {
                 OnCreatingTicket = context =>
@@ -351,7 +413,7 @@ public class Startup
                 OnSigningOut = context =>
                 {
                     // Single Sign-Out
-                    var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                    var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
                     var serviceUrl = new Uri(context.Request.GetEncodedUrl())
                         .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                     var redirectUri = UriHelper.BuildAbsolute(
@@ -374,8 +436,20 @@ public class Startup
         })
         .AddCAS(options =>{
             options.CallbackPath = "/signin-cas";
-            options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-            options.SaveTokens = true;
+            options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+            if (protocolVersion != 3)
+            {
+                switch (protocolVersion)
+                {
+                    case 1:
+                        options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                        break;
+                    case 2:
+                        options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                        break;
+                }
+            }
             options.Events = new CasEvents
             {
                 OnCreatingTicket = context =>

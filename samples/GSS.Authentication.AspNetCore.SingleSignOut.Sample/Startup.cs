@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
+using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -49,7 +50,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     OnSigningOut = context =>
                     {
                         // Single Sign-Out
-                        var casUrl = new Uri(Configuration["Authentication:CAS:CasServerUrlBase"]);
+                        var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
                         var serviceUrl = new Uri(context.Request.GetEncodedUrl())
                             .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = UriHelper.BuildAbsolute(
@@ -74,8 +75,20 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
             .AddCAS(options =>
             {
                 options.CallbackPath = "/signin-cas";
-                options.CasServerUrlBase = Configuration["Authentication:CAS:CasServerUrlBase"];
-                options.SaveTokens = true;
+                options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+                var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+                if (protocolVersion != 3)
+                {
+                    switch (protocolVersion)
+                    {
+                        case 1:
+                            options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
+                            break;
+                        case 2:
+                            options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
+                            break;
+                    }
+                }
                 options.Events = new CasEvents
                 {
                     OnCreatingTicket = context =>

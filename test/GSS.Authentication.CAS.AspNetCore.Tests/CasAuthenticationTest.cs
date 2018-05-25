@@ -58,7 +58,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                                 var assertion = context.Assertion;
                                 if (assertion == null) return Task.CompletedTask;
                                 if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
-                                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                                identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
                                 return Task.CompletedTask;
                             }
                         };
@@ -91,7 +91,8 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                             return;
                         }
                         // Display authenticated user id
-                        await context.Response.WriteAsync((user.Identity as ClaimsIdentity)?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                        var claimsIdentity = user.Identity as ClaimsIdentity;
+                        await context.Response.WriteAsync(claimsIdentity?.FindFirst(claimsIdentity.NameClaimType)?.Value);
                     });
                 }));
             _client = _server.CreateClient();

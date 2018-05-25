@@ -88,14 +88,14 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null) return Task.CompletedTask;
-                        context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                        context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
                         if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                         return Task.CompletedTask;
                     }
@@ -126,7 +126,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         var identifier = user.Value<string>("id");
                         if (!string.IsNullOrEmpty(identifier))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
+                            context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
                         if (attributes == null) return;
@@ -138,7 +138,7 @@ namespace GSS.Authentication.AspNetMvc.Sample
                         var displayName = attributes.Value<string>("display_name");
                         if (!string.IsNullOrEmpty(displayName))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                     }
                 };

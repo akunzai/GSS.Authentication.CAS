@@ -27,7 +27,7 @@ namespace GSS.Authentication.AspNetMvc.Sample.Controllers
             if (ModelState.IsValid && model.Username == "test" && model.Password == "test")
             {
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationType);
-                identity.AddClaim(new Claim(ClaimTypes.Name, "test"));
+                identity.AddClaim(new Claim(identity.NameClaimType, model.Username));
                 AuthenticationManager.SignIn(identity);
             }
             return RedirectToAction("Index", "Home");

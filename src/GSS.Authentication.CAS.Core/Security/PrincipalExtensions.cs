@@ -7,13 +7,16 @@ namespace System.Security.Principal
     {
         public static string GetPrincipalName(this IIdentity identity)
         {
-            if (identity is CasIdentity casIdentity && !string.IsNullOrEmpty(casIdentity.Assertion.PrincipalName))
+            if (identity is CasIdentity casIdentity
+                && !string.IsNullOrEmpty(casIdentity.Assertion.PrincipalName))
             {
                 return casIdentity.Assertion.PrincipalName;
             }
-            if (identity is ClaimsIdentity claimsIdentity && claimsIdentity.HasClaim(claim=> claim.Type == ClaimTypes.NameIdentifier))
+
+            if (identity is ClaimsIdentity claimsIdentity
+                && claimsIdentity.HasClaim(claim => claim.Type == claimsIdentity.NameClaimType))
             {
-                return claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                return claimsIdentity.FindFirst(claimsIdentity.NameClaimType).Value;
             }
 
             return string.Empty;
@@ -21,14 +24,23 @@ namespace System.Security.Principal
 
         public static string GetPrincipalName(this IPrincipal principal)
         {
-            if (principal is ICasPrincipal casPrincipal && !string.IsNullOrEmpty(casPrincipal.Assertion.PrincipalName))
+            if (principal is ICasPrincipal casPrincipal
+                && !string.IsNullOrEmpty(casPrincipal.Assertion.PrincipalName))
             {
                 return casPrincipal.Assertion.PrincipalName;
             }
-            if (principal is ClaimsPrincipal claimsPrincipal && claimsPrincipal.HasClaim(x=> x.Type == ClaimTypes.NameIdentifier))
+
+            if (principal is ClaimsPrincipal claimsPrincipal)
             {
-                return claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier).Value;
+                foreach (var identity in claimsPrincipal.Identities)
+                {
+                    if (identity is ClaimsIdentity claimsIdentity && claimsIdentity.HasClaim(x => x.Type == claimsIdentity.NameClaimType))
+                    {
+                        return claimsIdentity.FindFirst(claimsIdentity.NameClaimType).Value;
+                    }
+                }
             }
+
             return principal.Identity.GetPrincipalName();
         }
     }

@@ -30,7 +30,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         {
             // Arrange
             var assertion = new Assertion("test");
-            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) };
             var ticket = new ServiceTicket(Guid.NewGuid().ToString(), assertion, claims.Select(x => new ClaimWrapper(x)), "TEST");
 
             // Act
@@ -46,7 +46,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         {
             // Arrange
             var assertion = new Assertion("test");
-            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) };
             var json = JsonConvert.SerializeObject(new ServiceTicket(Guid.NewGuid().ToString(), assertion, claims.Select(x => new ClaimWrapper(x)), "TEST"), SerializerSettings);
 
             // Act

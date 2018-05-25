@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <Description>Core components for CAS Authentication</Description>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <PackageTags>CAS</PackageTags>
     <PackageReleaseNotes>
       Change attribute value type of Assertion to StringValues
       Ignore to insert default claims (NameIdentifier) to CasIdentity
+      Prefer ClaimsIdentity.NameClaimType instead of ClaimTypes.NameIdentifier
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

@@ -54,7 +54,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                         {
                             var assertion = (context.Identity as CasIdentity)?.Assertion;
                             if (assertion == null) return Task.CompletedTask;
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                            context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
                             return Task.CompletedTask;
                         }
                     }

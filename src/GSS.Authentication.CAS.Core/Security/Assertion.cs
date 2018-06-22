@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 
 namespace GSS.Authentication.CAS.Security
 {
@@ -21,6 +22,7 @@ namespace GSS.Authentication.CAS.Security
 
         public string PrincipalName { get; protected set; }
         
+        [JsonConverter(typeof(StringValuesDictionaryConverter))]
         public IDictionary<string, StringValues> Attributes { get; protected set; }
         
         public DateTimeOffset? ValidFrom { get; protected set; }

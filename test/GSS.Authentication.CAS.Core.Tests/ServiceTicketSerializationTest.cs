@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using Newtonsoft.Json;
 using GSS.Authentication.CAS.Security;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,7 +30,10 @@ namespace GSS.Authentication.CAS.Core.Tests
         public void SerializeServiceTicket()
         {
             // Arrange
-            var assertion = new Assertion("test");
+            var assertion = new Assertion("test", new Dictionary<string, StringValues>()
+            {
+                ["foo"] = "bar"
+            });
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) };
             var ticket = new ServiceTicket(Guid.NewGuid().ToString(), assertion, claims.Select(x => new ClaimWrapper(x)), "TEST");
 
@@ -45,7 +49,10 @@ namespace GSS.Authentication.CAS.Core.Tests
         public void DeserializeServiceTicket()
         {
             // Arrange
-            var assertion = new Assertion("test");
+            var assertion = new Assertion("test", new Dictionary<string, StringValues>()
+            {
+                ["foo"] = "bar"
+            });
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) };
             var json = JsonConvert.SerializeObject(new ServiceTicket(Guid.NewGuid().ToString(), assertion, claims.Select(x => new ClaimWrapper(x)), "TEST"), SerializerSettings);
 
@@ -54,6 +61,9 @@ namespace GSS.Authentication.CAS.Core.Tests
 
             // Assert
             Assert.NotNull(ticket);
+            Assert.NotNull(ticket.Assertion);
+            Assert.NotEmpty(ticket.Assertion.Attributes);
+            Assert.Equal(assertion.Attributes, ticket.Assertion.Attributes);
         }
     }
 }

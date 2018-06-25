@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <Description>ASP.NET Core Middlewares for CAS Authentication</Description>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>Migrate to ASP.NET Core 2.0</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix SingleSignOut ReadFormAsync error</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
@@ -15,10 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.1" />

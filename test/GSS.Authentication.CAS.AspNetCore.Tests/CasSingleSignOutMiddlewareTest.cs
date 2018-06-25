@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Tests;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.FileProviders;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace GSS.Authentication.CAS.AspNetCore.Tests
@@ -43,6 +45,26 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         {
             // Arrange
             var content = new FormUrlEncodedContent(new Dictionary<string, string>());
+
+            // Act
+            await _client.PostAsync("/", content);
+
+            // Assert
+            Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RecievedSignoutRequest_FailWithJsonContentAsync()
+        {
+            // Arrange
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new
+                {
+                    logoutRequest = new { ticket = Guid.NewGuid().ToString() }
+                }),
+                Encoding.UTF8,
+                "application/json"
+                );
 
             // Act
             await _client.PostAsync("/", content);

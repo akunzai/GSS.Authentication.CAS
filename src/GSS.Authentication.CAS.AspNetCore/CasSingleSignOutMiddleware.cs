@@ -13,11 +13,12 @@ namespace GSS.Authentication.CAS.AspNetCore
 {
     public class CasSingleSignOutMiddleware
     {
+        private const string RequestContentType = "application/x-www-form-urlencoded";
         private readonly RequestDelegate next;
 
+        protected static XmlNamespaceManager xmlNamespaceManager;
         protected ITicketStore store;
         protected ILogger<CasSingleSignOutMiddleware> logger;
-        protected static XmlNamespaceManager xmlNamespaceManager;
 
         static CasSingleSignOutMiddleware()
         {
@@ -34,7 +35,8 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase))
+            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) 
+                && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
                 if (formData.ContainsKey("logoutRequest")){

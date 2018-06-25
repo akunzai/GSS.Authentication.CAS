@@ -15,6 +15,7 @@ namespace GSS.Authentication.CAS.Owin
     public class CasSingleSignOutMiddleware : OwinMiddleware
     {
         protected static XmlNamespaceManager xmlNamespaceManager;
+        private const string RequestContentType = "application/x-www-form-urlencoded";
         private readonly ILogger logger;
 
         static CasSingleSignOutMiddleware()
@@ -36,7 +37,8 @@ namespace GSS.Authentication.CAS.Owin
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase))
+            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase)
+                && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);
                 var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value?[0];

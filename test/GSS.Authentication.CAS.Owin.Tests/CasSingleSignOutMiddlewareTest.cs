@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Tests;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Owin.Testing;
 using Moq;
+using Newtonsoft.Json;
 using Owin;
 using Xunit;
 
@@ -34,19 +36,37 @@ namespace GSS.Authentication.CAS.Owin.Tests
         {
             _server.Dispose();
         }
-
-        [Trait("pass", "true")]
+        
         [Fact]
         public async Task RecievedSignoutRequest_FailAsync()
         {
             // Act
-            await _client.PostAsync("/", new StringContent(string.Empty));
+            await _client.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>()));
 
             // Assert
             Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
         }
 
-        [Trait("pass", "true")]
+        [Fact]
+        public async Task RecievedSignoutRequest_FailWithJsonContentAsync()
+        {
+            // Arrange
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new
+                {
+                    logoutRequest = new { ticket = Guid.NewGuid().ToString() }
+                }),
+                Encoding.UTF8,
+                "application/json"
+                );
+
+            // Act
+            await _client.PostAsync("/", content);
+
+            // Assert
+            Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+        }
+
         [Fact]
         public async Task RecievedSignoutRequest_SuccessAsync()
         {

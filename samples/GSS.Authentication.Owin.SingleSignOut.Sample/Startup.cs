@@ -25,9 +25,9 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
     {
         public void Configuration(IAppBuilder app)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+            var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
             var builder = new ConfigurationBuilder()
-                .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
             var configuration = builder.Build();
 

@@ -21,7 +21,7 @@ namespace GSS.Authentication.CAS
         public string AuthenticationType { get; }
 
         public Assertion Assertion { get; }
-        
+
         public IEnumerable<ClaimWrapper> Claims { get; }
     }
 }

@@ -4,7 +4,6 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
-
     public interface IServiceTicketValidator
     {
         /// <summary>

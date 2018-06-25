@@ -2,25 +2,21 @@
 
   <PropertyGroup>
     <Description>Core components for CAS Authentication</Description>
-    <Version>2.1.2</Version>
+    <Version>2.2.0</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>
-Change attribute value type of Assertion to StringValues
-Ignore to insert default claims (NameIdentifier) to CasIdentity
-Prefer ClaimsIdentity.NameClaimType instead of ClaimTypes.NameIdentifier
-Fix StringValues deserialization
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>Enable SourceLink</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/blob/master/LICENSE.md</PackageLicenseUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="1.1.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 

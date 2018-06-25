@@ -2,20 +2,21 @@
 
   <PropertyGroup>
     <Description>Runtime cache implementation of the IServiceTicketStore for Single sign-out</Description>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>net45</TargetFramework>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>Migrate from xproj to new csproj and upgrade dependencies</PackageReleaseNotes>
+    <PackageReleaseNotes>Enable SourceLink</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/akunzai/GSS.Authentication.CAS</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseUrl>https://github.com/akunzai/GSS.Authentication.CAS/LICENSE.md</PackageLicenseUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <Description>OWIN Middlewares for CAS Authentication</Description>
-    <Version>2.2.0</Version>
+    <Version>2.2.1</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>Enable SourceLink</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix reference version</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.1.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="3.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" PrivateAssets="All" />
   </ItemGroup>

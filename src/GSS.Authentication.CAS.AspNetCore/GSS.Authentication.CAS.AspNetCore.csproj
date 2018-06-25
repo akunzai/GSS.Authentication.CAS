@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <Description>ASP.NET Core Middlewares for CAS Authentication</Description>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <Authors>Galaxy Software Services Corporation</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>CAS</PackageTags>
-    <PackageReleaseNotes>Enable SourceLink</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix reference version</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.1" />

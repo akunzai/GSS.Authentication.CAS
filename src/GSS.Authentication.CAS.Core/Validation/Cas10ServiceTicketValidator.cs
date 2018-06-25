@@ -8,7 +8,7 @@ namespace GSS.Authentication.CAS.Validation
     {
         public Cas10ServiceTicketValidator(
             ICasOptions options,
-            HttpClient httpClient = null) 
+            HttpClient httpClient = null)
             : base(options, httpClient)
         {
             ValidateUrlSuffix = "validate";

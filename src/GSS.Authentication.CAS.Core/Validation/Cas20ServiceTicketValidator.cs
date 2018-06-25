@@ -34,7 +34,7 @@ namespace GSS.Authentication.CAS.Validation
             </cas:serviceResponse>
             */
             var failureElement = doc.Element(AuthenticationFailure);
-            if (null != failureElement)
+            if (failureElement != null)
             {
                 throw new AuthenticationException(failureElement.Value);
             }

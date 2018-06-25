@@ -11,8 +11,8 @@ namespace GSS.Authentication.CAS.Validation
     public class Cas30ServiceTicketValidator : Cas20ServiceTicketValidator
     {
         public Cas30ServiceTicketValidator(
-            ICasOptions options, 
-            HttpClient httpClient = null) 
+            ICasOptions options,
+            HttpClient httpClient = null)
             : base(options, httpClient)
         {
             ValidateUrlSuffix = "p3/serviceValidate";
@@ -22,7 +22,7 @@ namespace GSS.Authentication.CAS.Validation
         {
             var doc = XElement.Parse(responseBody);
             var failureElement = doc.Element(AuthenticationFailure);
-            if (null != failureElement)
+            if (failureElement != null)
             {
                 throw new AuthenticationException(failureElement.Value);
             }
@@ -43,7 +43,7 @@ namespace GSS.Authentication.CAS.Validation
             </cas:serviceResponse>
             */
             var successElement = doc.Element(AuthenticationSuccess);
-            if (null == successElement) return null;
+            if (successElement == null) return null;
             var principalName = successElement.Element(User)?.Value;
             var attributes = new Dictionary<string, StringValues>();
             foreach (var attr in successElement.Element(Attributes)?.Elements())

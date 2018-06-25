@@ -8,7 +8,7 @@ namespace GSS.Authentication.CAS.Security
     public class Assertion
     {
         public Assertion(
-            string principalName, 
+            string principalName,
             IDictionary<string, StringValues> attributes = null,
             DateTimeOffset? validFrom = null,
             DateTimeOffset? validUntil = null)
@@ -21,12 +21,12 @@ namespace GSS.Authentication.CAS.Security
         }
 
         public string PrincipalName { get; protected set; }
-        
+
         [JsonConverter(typeof(StringValuesDictionaryConverter))]
         public IDictionary<string, StringValues> Attributes { get; protected set; }
-        
+
         public DateTimeOffset? ValidFrom { get; protected set; }
-        
+
         public DateTimeOffset? ValidUntil { get; protected set; }
     }
 }

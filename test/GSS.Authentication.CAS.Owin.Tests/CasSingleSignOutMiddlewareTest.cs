@@ -25,10 +25,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             _fixture = fixture;
             // Arrange
             _store = Mock.Of<IServiceTicketStore>();
-            _server = TestServer.Create(app =>
-            {
-                app.UseCasSingleSignOut(new AuthenticationSessionStoreWrapper(_store));
-            });
+            _server = TestServer.Create(app => app.UseCasSingleSignOut(new AuthenticationSessionStoreWrapper(_store)));
             _client = _server.HttpClient;
         }
 
@@ -36,12 +33,12 @@ namespace GSS.Authentication.CAS.Owin.Tests
         {
             _server.Dispose();
         }
-        
+
         [Fact]
         public async Task RecievedSignoutRequest_FailAsync()
         {
             // Act
-            await _client.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>()));
+            await _client.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>())).ConfigureAwait(false);
 
             // Assert
             Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -61,7 +58,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 );
 
             // Act
-            await _client.PostAsync("/", content);
+            await _client.PostAsync("/", content).ConfigureAwait(false);
 
             // Assert
             Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -82,7 +79,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             };
 
             // Act
-            await _client.PostAsync("/", new FormUrlEncodedContent(parts));
+            await _client.PostAsync("/", new FormUrlEncodedContent(parts)).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(ticket, removedTicket);

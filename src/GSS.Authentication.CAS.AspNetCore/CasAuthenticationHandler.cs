@@ -43,7 +43,7 @@ namespace GSS.Authentication.CAS.AspNetCore
                 Context, Scheme, Options,
                 properties, authorizationEndpoint);
 
-            await Options.Events.RedirectToAuthorizationEndpoint(redirectContext);
+            await Options.Events.RedirectToAuthorizationEndpoint(redirectContext).ConfigureAwait(false);
         }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
@@ -72,7 +72,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             ICasPrincipal principal;
             try
             {
-                principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted);
+                principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -90,14 +90,14 @@ namespace GSS.Authentication.CAS.AspNetCore
                     new AuthenticationToken {Name = "access_token", Value = serviceTicket}
                 });
             }
-            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),properties,principal.Assertion);
+            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),properties,principal.Assertion).ConfigureAwait(false);
             return ticket != null ? HandleRequestResult.Success(ticket) : HandleRequestResult.Fail("Failed to retrieve user information from remote server.");
         }
 
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal, AuthenticationProperties properties, Assertion assertion)
         {
             var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Backchannel, assertion);
-            await Events.CreatingTicket(context);
+            await Events.CreatingTicket(context).ConfigureAwait(false);
             return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
     }

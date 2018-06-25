@@ -48,12 +48,12 @@ namespace GSS.Authentication.CAS.AspNetCore
                         if (!string.IsNullOrEmpty(serviceTicket))
                         {
                             logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
-                            await store.RemoveAsync(serviceTicket);
+                            await store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                         }
                     }
                 }
             }
-            await next.Invoke(context);
+            await next.Invoke(context).ConfigureAwait(false);
         }
 
         protected string ExtractSingleSignOutTicketFromSamlResponse(string text)

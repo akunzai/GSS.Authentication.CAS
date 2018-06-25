@@ -71,19 +71,19 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     {
                         context.Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
                     }
-                    await next.Invoke();
+                    await next.Invoke().ConfigureAwait(false);
                 });
                 app.Run(async context =>
                 {
                     var user = context.Authentication.User;
                     // Deny anonymous request beyond this point.
-                    if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
+                    if (user?.Identities.Any(identity => identity.IsAuthenticated) != true)
                     {
                         context.Authentication.Challenge(CasDefaults.AuthenticationType);
                         return;
                     }
                     // Display authenticated principal name
-                    await context.Response.WriteAsync(user.GetPrincipalName());
+                    await context.Response.WriteAsync(user.GetPrincipalName()).ConfigureAwait(false);
                 });
             });
             _client = _server.HttpClient;
@@ -98,7 +98,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task Challenge_RedirectToCasServerUrlAsync()
         {
             // Act
-            var response = await _client.GetAsync("/login");
+            var response = await _client.GetAsync("/login").ConfigureAwait(false);
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
             Assert.StartsWith(_fixture.Options.CasServerUrlBase, response.Headers.Location.AbsoluteUri);
@@ -113,7 +113,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_principal);
             //// challenge to CAS login page
-            var response = await _client.GetAsync("/login");
+            var response = await _client.GetAsync("/login").ConfigureAwait(false);
 
             var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
             var serviceUrl = query["service"];
@@ -121,15 +121,15 @@ namespace GSS.Authentication.CAS.Owin.Tests
 
             //// validate service ticket & state
             var request = response.GetRequest(url);
-            var validateResponse = await _client.SendAsync(request);
+            var validateResponse = await _client.SendAsync(request).ConfigureAwait(false);
 
             // Act : should got auth cookie
             request = validateResponse.GetRequest("/");
-            var homeResponse = await _client.SendAsync(request);
+            var homeResponse = await _client.SendAsync(request).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, homeResponse.StatusCode);
-            var bodyText = await homeResponse.Content.ReadAsStringAsync();
+            var bodyText = await homeResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             Assert.Equal(_principal.GetPrincipalName(), bodyText);
             Mock.Get(_ticketValidator).Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }

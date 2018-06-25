@@ -13,7 +13,8 @@ namespace GSS.Authentication.CAS.Core.Tests
     public class ServiceTicketSerializationTest
     {
         private readonly ITestOutputHelper _output;
-        JsonSerializerSettings SerializerSettings => new JsonSerializerSettings
+
+        private JsonSerializerSettings SerializerSettings => new JsonSerializerSettings
         {
             Formatting = Formatting.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -25,7 +26,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         {
             _output = output;
         }
-        
+
         [Fact]
         public void SerializeServiceTicket()
         {
@@ -44,7 +45,7 @@ namespace GSS.Authentication.CAS.Core.Tests
             Assert.NotNull(json);
             _output.WriteLine(json);
         }
-        
+
         [Fact]
         public void DeserializeServiceTicket()
         {

@@ -23,14 +23,14 @@ namespace GSS.Authentication.CAS.Owin
         {
             if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
-                return await InvokeReturnPathAsync();
+                return await InvokeReturnPathAsync().ConfigureAwait(false);
             }
             return false;
         }
 
         public async Task<bool> InvokeReturnPathAsync()
         {
-            var model = await AuthenticateAsync();
+            var model = await AuthenticateAsync().ConfigureAwait(false);
             if (model == null)
             {
                 logger.WriteWarning("Invalid return state, unable to redirect.");
@@ -45,7 +45,7 @@ namespace GSS.Authentication.CAS.Owin
             };
             model.Properties.RedirectUri = null;
 
-            await Options.Provider.RedirectToAuthorizationEndpoint(context);
+            await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
 
             if (context.SignInAsAuthenticationType != null && context.Identity != null)
             {
@@ -101,7 +101,7 @@ namespace GSS.Authentication.CAS.Owin
                     return new AuthenticationTicket(null, properties);
                 }
                 var service = BuildReturnTo(state);
-                var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled);
+                var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
                 
                 // No principal
                 if (principal == null)
@@ -118,7 +118,7 @@ namespace GSS.Authentication.CAS.Owin
                     principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
                     properties);
 
-                await Options.Provider.CreatingTicket(context);
+                await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
 
                 return new AuthenticationTicket(context.Identity, context.Properties);
             }

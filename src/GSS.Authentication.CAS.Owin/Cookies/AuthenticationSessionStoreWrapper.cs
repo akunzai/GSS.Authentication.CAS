@@ -26,7 +26,7 @@ namespace GSS.Authentication.CAS.Owin
 
         public async Task<AuthenticationTicket> RetrieveAsync(string key)
         {
-            var ticket = await store.RetrieveAsync(key);
+            var ticket = await store.RetrieveAsync(key).ConfigureAwait(false);
             return BuildAuthenticationTicket(ticket);
         }
 
@@ -46,11 +46,11 @@ namespace GSS.Authentication.CAS.Owin
             var ticketId = ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString();
             var identity = ticket.Identity;
             var properties = ticket.Properties;
-            var assertion = (identity as CasIdentity)?.Assertion 
+            var assertion = (identity as CasIdentity)?.Assertion
                 ?? new Assertion(
-                    identity.GetPrincipalName(), 
-                    null, 
-                    properties.IssuedUtc, 
+                    identity.GetPrincipalName(),
+                    null,
+                    properties.IssuedUtc,
                     properties.ExpiresUtc);
             return new ServiceTicket(ticketId, assertion, identity.Claims.Select(x => new ClaimWrapper(x)), identity.AuthenticationType);
         }
@@ -62,7 +62,7 @@ namespace GSS.Authentication.CAS.Owin
             var identity = new CasIdentity(assertion, ticket.AuthenticationType);
             identity.AddClaims(ticket.Claims.Select(x=>x.ToClaim()));
             return new AuthenticationTicket(
-                identity, 
+                identity,
                 new AuthenticationProperties {
                     IssuedUtc = assertion.ValidFrom,
                     ExpiresUtc = assertion.ValidUntil });

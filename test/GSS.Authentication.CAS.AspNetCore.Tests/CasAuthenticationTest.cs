@@ -72,27 +72,27 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                         var request = context.Request;
                         if (request.Path.StartsWithSegments(new PathString("/login")))
                         {
-                            await context.ChallengeAsync(CasDefaults.AuthenticationType, new AuthenticationProperties { RedirectUri = "/" });
+                            await context.ChallengeAsync(CasDefaults.AuthenticationType, new AuthenticationProperties { RedirectUri = "/" }).ConfigureAwait(false);
                             return;
                         }
                         if (request.Path.StartsWithSegments(new PathString("/logout")))
                         {
-                            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
                         }
-                        await next.Invoke();
+                        await next.Invoke().ConfigureAwait(false);
                     });
                     app.Run(async context =>
                     {
                         var user = context.User;
                         // Deny anonymous request beyond this point.
-                        if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
+                        if (user?.Identities.Any(identity => identity.IsAuthenticated) != true)
                         {
-                            await context.ChallengeAsync(CasDefaults.AuthenticationType);
+                            await context.ChallengeAsync(CasDefaults.AuthenticationType).ConfigureAwait(false);
                             return;
                         }
                         // Display authenticated user id
                         var claimsIdentity = user.Identity as ClaimsIdentity;
-                        await context.Response.WriteAsync(claimsIdentity?.FindFirst(claimsIdentity.NameClaimType)?.Value);
+                        await context.Response.WriteAsync(claimsIdentity?.FindFirst(claimsIdentity.NameClaimType)?.Value).ConfigureAwait(false);
                     });
                 }));
             _client = _server.CreateClient();
@@ -107,7 +107,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         public async Task Challenge_RedirectToCasServerUrlAsync()
         {
             // Act
-            var response = await _client.GetAsync("/login");
+            var response = await _client.GetAsync("/login").ConfigureAwait(false);
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
             Assert.StartsWith(_fixture.Options.CasServerUrlBase, response.Headers.Location.AbsoluteUri);
@@ -126,7 +126,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                 .ReturnsAsync(_principal);
 
             //// challenge to CAS login page
-            var response = await _client.GetAsync("/login");
+            var response = await _client.GetAsync("/login").ConfigureAwait(false);
 
             var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
             var serviceUrl = query["service"];
@@ -134,15 +134,15 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
 
             //// validate service ticket & state
             var request = response.GetRequest(url);
-            var validateResponse = await _client.SendAsync(request);
+            var validateResponse = await _client.SendAsync(request).ConfigureAwait(false);
 
             // Act : should got auth cookie
             request = validateResponse.GetRequest("/");
-            var homeResponse = await _client.SendAsync(request);
+            var homeResponse = await _client.SendAsync(request).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, homeResponse.StatusCode);
-            var bodyText = await homeResponse.Content.ReadAsStringAsync();
+            var bodyText = await homeResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             Assert.Equal(_principal.GetPrincipalName(), bodyText);
             Mock.Get(_ticketValidator)
                 .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),

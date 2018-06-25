@@ -53,7 +53,7 @@ namespace GSS.Authentication.CAS.Owin
                     }
                 }
             }
-            await Next.Invoke(context);
+            await Next.Invoke(context).ConfigureAwait(false);
         }
 
         protected string ExtractSingleSignOutTicketFromSamlResponse(string text)

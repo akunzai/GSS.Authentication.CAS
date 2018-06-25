@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 

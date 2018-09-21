@@ -441,7 +441,7 @@ public class Startup
             options.CallbackPath = "/signin-cas";
             options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
             // required for CasSingleSignOutMiddleware
-            options.UseAuthenticationSessionStore = true;
+            options.SaveTokens = true;
             var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
             if (protocolVersion != 3)
             {

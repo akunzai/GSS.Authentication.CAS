@@ -250,10 +250,12 @@ public class Startup
                 }
             }
         });
-        app.UseCasAuthentication(new CasAuthenticationOptions
+        app.UseCasAuthentication(options =>
         {
-            CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"],
-            UseAuthenticationSessionStore = true,
+            options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
+            options.ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+            // required for CasSingleSignOutMiddleware
+            options.UseAuthenticationSessionStore = true;
             var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
             if (protocolVersion != 3)
             {
@@ -267,7 +269,7 @@ public class Startup
                         break;
                 }
             }
-            Provider = new CasAuthenticationProvider
+            options.Provider = new CasAuthenticationProvider
             {
                 OnCreatingTicket = context =>
                 {
@@ -279,14 +281,13 @@ public class Startup
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                     }
-                    var displayName = assertion.Attributes["display_name"];
-                    if (!StringValues.IsNullOrEmpty(displayName))
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                     {
                         context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                     }
                     return Task.CompletedTask;
                 }
-            }
+            };
         });
     }
 }
@@ -342,6 +343,8 @@ public class Startup
         services.Configure<CasAuthenticationOptions>(options =>
         {
             options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            // required for CasSingleSignOutMiddleware
+            options.UseTicketStore = true;
             var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
             if (protocolVersion != 3)
             {
@@ -437,6 +440,8 @@ public class Startup
         .AddCAS(options =>{
             options.CallbackPath = "/signin-cas";
             options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+            // required for CasSingleSignOutMiddleware
+            options.UseAuthenticationSessionStore = true;
             var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
             if (protocolVersion != 3)
             {

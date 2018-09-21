@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -64,10 +64,11 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                 }
             });
 
-            app.UseCasAuthentication(options=>
+            app.UseCasAuthentication(options =>
             {
                 options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
                 options.ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                // required for CasSingleSignOutMiddleware
                 options.UseAuthenticationSessionStore = true;
                 var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)

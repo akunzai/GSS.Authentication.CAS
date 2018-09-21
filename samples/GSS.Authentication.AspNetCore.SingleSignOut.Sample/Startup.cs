@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -76,6 +76,8 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
             {
                 options.CallbackPath = "/signin-cas";
                 options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
+                // required for CasSingleSignOutMiddleware
+                options.SaveTokens = true;
                 var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {

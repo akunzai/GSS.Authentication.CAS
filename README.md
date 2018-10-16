@@ -485,6 +485,3 @@ public class Startup
     }
 }
 ```
-
-## [Release Notes](https://github.com/akunzai/GSS.Authentication.CAS/releases)
-## [License](LICENSE.md)

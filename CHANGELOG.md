@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2018-10-16
 
+### GSS.Authentication.CAS.Core 2.3.1
+
+- Fix reference condition
+
 ### GSS.Authentication.CAS.Core 2.3.0
 
 - Upgrade target from netstandard1.3 to netstandard2.0

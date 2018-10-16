@@ -10,7 +10,7 @@ using Microsoft.Extensions.FileProviders;
 using RichardSzalay.MockHttp;
 using Xunit;
 
-namespace GSS.Authentication.CAS.Tests.Validation
+namespace GSS.Authentication.CAS.Testing.Validation
 {
     public class Cas20ServiceTicketValidationTest : IClassFixture<CasFixture>
     {

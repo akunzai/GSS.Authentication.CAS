@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.FileProviders;
 
-namespace GSS.Authentication.CAS.Tests
+namespace GSS.Authentication.CAS.Testing
 {
     public class CasFixture
     {

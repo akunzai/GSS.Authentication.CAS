@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
-using GSS.Authentication.CAS.Tests;
+using GSS.Authentication.CAS.Testing;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Owin;

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Tests\GSS.Authentication.CAS.Tests.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

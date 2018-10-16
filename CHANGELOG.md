@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2018-10-16
+
+### GSS.Authentication.CAS.Core 2.3.0
+
+- Upgrade target from netstandard1.3 to netstandard2.0
+- Upgrade target from net45 to net461
+- Upgrade Newtonsoft.Json to 11.0.2
+
+### GSS.Authentication.CAS.Owin 2.3.0
+
+- Upgrade target from net45 to net461
+
+### GSS.Authentication.CAS.RuntimeCache 1.4.0
+
+- Upgrade target from net45 to net461
+
 ## 2018-06-25
 
 ### GSS.Authentication.CAS.Core 2.2.0

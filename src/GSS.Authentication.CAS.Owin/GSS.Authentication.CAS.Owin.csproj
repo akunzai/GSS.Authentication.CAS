@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Description>OWIN Middlewares for CAS Authentication</Description>
-    <Version>2.2.1</Version>
+    <Version>2.3.0</Version>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 

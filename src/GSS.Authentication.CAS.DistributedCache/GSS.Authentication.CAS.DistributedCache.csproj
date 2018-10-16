@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)'=='Release' ">
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
   </ItemGroup>
   
 </Project>

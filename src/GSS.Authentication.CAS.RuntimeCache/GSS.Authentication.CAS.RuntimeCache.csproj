@@ -1,18 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <Description>Runtime cache implementation of the IServiceTicketStore for Single sign-out</Description>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
+    <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Runtime.Caching" />
+  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)'=='Release' ">
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

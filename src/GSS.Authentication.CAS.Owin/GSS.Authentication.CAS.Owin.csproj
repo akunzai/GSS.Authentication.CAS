@@ -1,25 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Description>OWIN Middlewares for CAS Authentication</Description>
-    <Version>2.2.1</Version>
+    <Version>2.3.0</Version>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.1.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="3.1.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
-    <PackageReference Include="System.Security.Principal" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Security.Principal" />
+  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)'=='Release' ">
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

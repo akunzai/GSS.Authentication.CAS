@@ -10,6 +10,7 @@ using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
 using GSS.Authentication.Owin.SingleSignOut.Sample;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -26,16 +27,29 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
         public void Configuration(IAppBuilder app)
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
-            var builder = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
-            var configuration = builder.Build();
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+                .Build();
 
             app.UseErrorPage();
 
-            var sessionStore = new AuthenticationSessionStoreWrapper(new RuntimeCacheServiceTicketStore());
+            var serviceCollection = new ServiceCollection();
+            if (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("Redis")))
+            {
+                serviceCollection.AddDistributedRedisCache(options => options.Configuration = configuration.GetConnectionString("Redis"));
+            }
+            else
+            {
+                serviceCollection.AddDistributedMemoryCache();
+            }
 
-            app.UseCasSingleSignOut(sessionStore);
+            serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
+            serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
+
+            var services = serviceCollection.BuildServiceProvider();
+
+            app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
@@ -43,7 +57,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
             {
                 LoginPath = new PathString("/login"),
                 LogoutPath = new PathString("/logout"),
-                SessionStore = sessionStore,
+                SessionStore = services.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {
                     OnResponseSignOut = context =>

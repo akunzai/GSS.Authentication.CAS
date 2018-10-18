@@ -19,6 +19,7 @@ OWIN
 ```shell
 # Package Manager
 Install-Package GSS.Authentication.CAS.Owin
+
 # .NET CLI
 dotnet add package GSS.Authentication.CAS.Owin
 ```
@@ -28,6 +29,7 @@ ASP.NET Core 2.x
 ```shell
 # Package Manager
 Install-Package GSS.Authentication.CAS.AspNetCore
+
 # .NET CLI
 dotnet add package GSS.Authentication.CAS.AspNetCore
 ```
@@ -43,10 +45,10 @@ public class Startup
 {
     public void Configuration(IAppBuilder app)
     {
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
         var configuration = new ConfigurationBuilder()
             .AddJsonFile($"appsettings.json", reloadOnChange: true)
-            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
+            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
             .Build();
         app.UseCasAuthentication(options =>
         {
@@ -153,19 +155,34 @@ public class Startup
 {
     public void Configuration(IAppBuilder app)
     {
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
         var configuration = new ConfigurationBuilder()
             .AddJsonFile($"appsettings.json", reloadOnChange: true)
-            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
+            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
             .Build();
-        var sessionStore = new AuthenticationSessionStoreWrapper(new RuntimeCacheServiceTicketStore());
-        app.UseCasSingleSignOut(sessionStore);
+        
+        var serviceCollection = new ServiceCollection();
+        if (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("Redis")))
+        {
+            serviceCollection.AddDistributedRedisCache(options => options.Configuration = configuration.GetConnectionString("Redis"));
+        }
+        else
+        {
+            serviceCollection.AddDistributedMemoryCache();
+        }
+
+        serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
+        serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
+
+        var services = serviceCollection.BuildServiceProvider();
+
+        app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
         app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
         app.UseCookieAuthentication(new CookieAuthenticationOptions
         {
             LoginPath = new PathString("/login"),
             LogoutPath = new PathString("/logout"),
-            SessionStore = sessionStore,
+            SessionStore = services.GetRequiredService<IAuthenticationSessionStore>(),
             Provider = new CookieAuthenticationProvider
             {
                 OnResponseSignOut = context =>
@@ -235,19 +252,27 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
 
+    private IServiceProvider Services { get; set; }
+
     public void ConfigureServices(IServiceCollection services)
     {
-        var serviceTicketStore = new DistributedCacheServiceTicketStore();
-        var ticketStore = new TicketStoreWrapper(serviceTicketStore);
+        if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("Redis")))
+        {
+            services.AddDistributedRedisCache(options => options.Configuration = Configuration.GetConnectionString("Redis"));
+        }
+        else
+        {
+            services.AddDistributedMemoryCache();
+        }
 
-        services.AddSingleton<IServiceTicketStore>(serviceTicketStore);
-        services.AddSingleton<ITicketStore>(ticketStore);
+        services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
+            services.AddSingleton<ITicketStore, TicketStoreWrapper>();
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
             options.LoginPath = "/login";
             options.LogoutPath = "/logout";
-            options.SessionStore = ticketStore;
+            options.SessionStore = Services.GetRequiredService<ITicketStore>();
             options.Events = new CookieAuthenticationEvents
             {
                 OnSigningOut = context =>
@@ -317,6 +342,7 @@ public class Startup
 
     public void Configure(IApplicationBuilder app)
     {
+        Services = app.ApplicationServices;
         app.UseCasSingleSignOut();
         app.UseAuthentication();
     }

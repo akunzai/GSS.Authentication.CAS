@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -24,10 +24,10 @@ namespace GSS.Authentication.AspNetMvc.Sample
         public void Configuration(IAppBuilder app)
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
-            var builder = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true);
-            var configuration = builder.Build();
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+                .Build();
 
             // MVC
             GlobalFilters.Filters.Add(new HandleErrorAttribute());

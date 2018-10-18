@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Runtime.Caching;
 
@@ -6,8 +6,8 @@ namespace GSS.Authentication.CAS
 {
     public class RuntimeCacheServiceTicketStore : IServiceTicketStore
     {
-        protected const string Prefix = "cas-st";
-        protected ObjectCache cache;
+        private const string Prefix = "cas-st";
+        private readonly ObjectCache _cache;
 
         public RuntimeCacheServiceTicketStore() : this(MemoryCache.Default)
         {
@@ -15,8 +15,10 @@ namespace GSS.Authentication.CAS
 
         public RuntimeCacheServiceTicketStore(ObjectCache cache)
         {
-            this.cache = cache;
+            _cache = cache;
         }
+
+        public static Func<string,string> CacheKeyFactory { get; set; } = (key) => $"{Prefix}:{key}";
 
         public Task<string> StoreAsync(ServiceTicket ticket)
         {
@@ -25,14 +27,14 @@ namespace GSS.Authentication.CAS
             {
                 policy.AbsoluteExpiration = ticket.Assertion.ValidUntil.Value.ToLocalTime();
             }
-            cache.Add(CombineKey(ticket.TicketId), ticket, policy);
+            _cache.Add(CacheKeyFactory(ticket.TicketId), ticket, policy);
             return Task.FromResult(ticket.TicketId);
         }
 
         public Task<ServiceTicket> RetrieveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            return Task.FromResult((ServiceTicket)cache.Get(CombineKey(key)));
+            return Task.FromResult((ServiceTicket)_cache.Get(CacheKeyFactory(key)));
         }
 
         public Task RenewAsync(string key, ServiceTicket ticket)
@@ -43,20 +45,15 @@ namespace GSS.Authentication.CAS
             {
                 policy.AbsoluteExpiration = ticket.Assertion.ValidUntil.Value.ToLocalTime();
             }
-            cache.Set(CombineKey(ticket.TicketId), ticket, policy);
+            _cache.Set(CacheKeyFactory(ticket.TicketId), ticket, policy);
             return Task.FromResult(0);
         }
 
         public Task RemoveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            cache.Remove(CombineKey(key));
+            _cache.Remove(CacheKeyFactory(key));
             return Task.FromResult(0);
-        }
-
-        protected virtual string CombineKey(string key)
-        {
-            return $"{Prefix}:{key}";
         }
     }
 }

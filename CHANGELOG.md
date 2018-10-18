@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2018-10-18
+
+### GSS.Authentication.CAS.DistributedCache 2.2.0
+
+- Add Custom CacheKeyFactory
+- Remove default constructor
+- Fix renewed cache never expired
+- Fix naming
+
+### GSS.Authentication.CAS.RuntimeCache 1.5.0
+
+- Add Custom CacheKeyFactory
+- Fix naming
+
 ## 2018-10-16
 
 ### GSS.Authentication.CAS.Core 2.3.1

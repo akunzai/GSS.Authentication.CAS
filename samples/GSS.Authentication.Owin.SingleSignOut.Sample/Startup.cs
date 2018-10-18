@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS;
@@ -33,26 +31,21 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                 .Build();
 
             app.UseErrorPage();
-
             var serviceCollection = new ServiceCollection();
-            if (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("Redis")))
+            var redisConfiguration = configuration.GetConnectionString("Redis");
+            if (!string.IsNullOrWhiteSpace(redisConfiguration))
             {
-                serviceCollection.AddDistributedRedisCache(options => options.Configuration = configuration.GetConnectionString("Redis"));
+                serviceCollection.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
             }
             else
             {
                 serviceCollection.AddDistributedMemoryCache();
             }
-
             serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
             serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
-
             var services = serviceCollection.BuildServiceProvider();
-
             app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
-
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 LoginPath = new PathString("/login"),
@@ -103,7 +96,8 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                     {
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null) return Task.CompletedTask;
+                        if (assertion == null)
+                            return Task.CompletedTask;
                         context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
@@ -145,7 +139,8 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                             context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
-                        if (attributes == null) return;
+                        if (attributes == null)
+                            return;
                         var email = attributes.Value<string>("email");
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -179,7 +174,8 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
                     foreach (var type in context.Authentication.GetAuthenticationTypes())
                     {
-                        if (string.IsNullOrEmpty(type.Caption)) continue;
+                        if (string.IsNullOrEmpty(type.Caption))
+                            continue;
                         await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");

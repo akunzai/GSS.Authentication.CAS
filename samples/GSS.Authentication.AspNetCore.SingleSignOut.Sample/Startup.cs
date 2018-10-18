@@ -36,15 +36,15 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("Redis")))
+            var redisConfiguration = Configuration.GetConnectionString("Redis");
+            if (!string.IsNullOrWhiteSpace(redisConfiguration))
             {
-                services.AddDistributedRedisCache(options => options.Configuration = Configuration.GetConnectionString("Redis"));
+                services.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
             }
             else
             {
                 services.AddDistributedMemoryCache();
             }
-
             services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
             services.AddSingleton<ITicketStore, TicketStoreWrapper>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

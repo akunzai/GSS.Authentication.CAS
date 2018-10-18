@@ -160,22 +160,19 @@ public class Startup
             .AddJsonFile($"appsettings.json", reloadOnChange: true)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
             .Build();
-        
         var serviceCollection = new ServiceCollection();
-        if (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("Redis")))
+        var redisConfiguration = configuration.GetConnectionString("Redis");
+        if (!string.IsNullOrWhiteSpace(redisConfiguration))
         {
-            serviceCollection.AddDistributedRedisCache(options => options.Configuration = configuration.GetConnectionString("Redis"));
+            serviceCollection.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
         }
         else
         {
             serviceCollection.AddDistributedMemoryCache();
         }
-
         serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
         serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
-
         var services = serviceCollection.BuildServiceProvider();
-
         app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
         app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
         app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -251,22 +248,21 @@ ASP.NET Core 2.x
 public class Startup
 {
     public IConfiguration Configuration { get; }
-
     private IServiceProvider Services { get; set; }
 
     public void ConfigureServices(IServiceCollection services)
     {
-        if (!string.IsNullOrWhiteSpace(Configuration.GetConnectionString("Redis")))
+        var redisConfiguration = Configuration.GetConnectionString("Redis");
+        if (!string.IsNullOrWhiteSpace(redisConfiguration))
         {
-            services.AddDistributedRedisCache(options => options.Configuration = Configuration.GetConnectionString("Redis"));
+            services.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
         }
         else
         {
             services.AddDistributedMemoryCache();
         }
-
         services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-            services.AddSingleton<ITicketStore, TicketStoreWrapper>();
+        services.AddSingleton<ITicketStore, TicketStoreWrapper>();
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {

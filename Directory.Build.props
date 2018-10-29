@@ -1,6 +1,8 @@
 <Project>
+  
   <PropertyGroup>
     <Authors>Galaxy Software Services Corporation</Authors>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
 </Project>

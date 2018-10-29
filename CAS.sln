@@ -28,6 +28,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.RuntimeCache", "src\GSS.Authentication.CAS.RuntimeCache\GSS.Authentication.CAS.RuntimeCache.csproj", "{6056153E-C4D5-4889-9D4B-2371BC03C6CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+		test\Directory.Build.targets = test\Directory.Build.targets
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Testing", "test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj", "{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}"
 EndProject

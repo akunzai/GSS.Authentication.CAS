@@ -14,12 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="GSS.Authentication.CAS.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.3.1" />
+    <PackageReference Include="GSS.Authentication.CAS.DistributedCache" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.2" />
   </ItemGroup>

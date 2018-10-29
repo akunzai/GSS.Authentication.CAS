@@ -4,13 +4,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
-using GSS.Authentication.Owin.SingleSignOut.Sample;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -18,9 +15,9 @@ using Newtonsoft.Json.Linq;
 using Owin;
 using Owin.OAuthGeneric;
 
-[assembly: OwinStartup(typeof(Startup))]
+[assembly: OwinStartup(typeof(OwinSample.Startup))]
 
-namespace GSS.Authentication.Owin.SingleSignOut.Sample
+namespace OwinSample
 {
     public class Startup
     {
@@ -33,26 +30,13 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                 .Build();
 
             app.UseErrorPage();
-            var serviceCollection = new ServiceCollection();
-            var redisConfiguration = configuration.GetConnectionString("Redis");
-            if (!string.IsNullOrWhiteSpace(redisConfiguration))
-            {
-                serviceCollection.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
-            }
-            else
-            {
-                serviceCollection.AddDistributedMemoryCache();
-            }
-            serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-            serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
-            var services = serviceCollection.BuildServiceProvider();
-            app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
+
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 LoginPath = new PathString("/login"),
                 LogoutPath = new PathString("/logout"),
-                SessionStore = services.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {
                     OnResponseSignOut = context =>
@@ -77,8 +61,6 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
             {
                 options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
                 options.ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
-                // required for CasSingleSignOutMiddleware
-                options.UseAuthenticationSessionStore = true;
                 var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
@@ -98,8 +80,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                     {
                         // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null)
-                            return Task.CompletedTask;
+                        if (assertion == null) return Task.CompletedTask;
                         context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
@@ -141,8 +122,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                             context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
-                        if (attributes == null)
-                            return;
+                        if (attributes == null) return;
                         var email = attributes.Value<string>("email");
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -176,8 +156,7 @@ namespace GSS.Authentication.Owin.SingleSignOut.Sample
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
                     foreach (var type in context.Authentication.GetAuthenticationTypes())
                     {
-                        if (string.IsNullOrEmpty(type.Caption))
-                            continue;
+                        if (string.IsNullOrEmpty(type.Caption)) continue;
                         await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");

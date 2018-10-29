@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -19,7 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
-namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
+namespace AspNetCoreSample
 {
     public class Startup
     {
@@ -30,29 +29,15 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
 
         public IConfiguration Configuration { get; }
 
-        private IServiceProvider Services { get; set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var redisConfiguration = Configuration.GetConnectionString("Redis");
-            if (!string.IsNullOrWhiteSpace(redisConfiguration))
-            {
-                services.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
-            }
-            else
-            {
-                services.AddDistributedMemoryCache();
-            }
-            services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-            services.AddSingleton<ITicketStore, TicketStoreWrapper>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
-                options.SessionStore = Services.GetRequiredService<ITicketStore>();
                 options.Events = new CookieAuthenticationEvents
                 {
                     OnSigningOut = context =>
@@ -84,8 +69,6 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
             {
                 options.CallbackPath = "/signin-cas";
                 options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
-                // required for CasSingleSignOutMiddleware
-                options.SaveTokens = true;
                 var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
@@ -105,10 +88,8 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     {
                         // add claims from CasIdentity.Assertion ?
                         var assertion = context.Assertion;
-                        if (assertion == null)
-                            return Task.CompletedTask;
-                        if (!(context.Principal.Identity is ClaimsIdentity identity))
-                            return Task.CompletedTask;
+                        if (assertion == null) return Task.CompletedTask;
+                        if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
                         identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
@@ -152,8 +133,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                             context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
-                        if (attributes == null)
-                            return;
+                        if (attributes == null) return;
                         var email = attributes.Value<string>("email");
                         if (!string.IsNullOrEmpty(email))
                         {
@@ -172,12 +152,10 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Services = app.ApplicationServices;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCasSingleSignOut();
             app.UseAuthentication();
 
             // Choose an authentication type
@@ -199,8 +177,7 @@ namespace GSS.Authentication.AspNetCore.SingleSignOut.Sample
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
                     foreach (var type in context.RequestServices.GetRequiredService<IOptions<AuthenticationOptions>>().Value.Schemes)
                     {
-                        if (string.IsNullOrEmpty(type.DisplayName))
-                            continue;
+                        if (string.IsNullOrEmpty(type.DisplayName)) continue;
                         await context.Response.WriteAsync($"<a href=\"?authscheme={type.Name}\">{type.DisplayName ?? type.Name}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");

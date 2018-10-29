@@ -2,15 +2,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.AspNetCore.Sample", "GSS.Authentication.AspNetCore.Sample\GSS.Authentication.AspNetCore.Sample.csproj", "{FC9D5ADE-5F07-4E4E-B542-4D3173D9D420}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample", "AspNetCoreSample\AspNetCoreSample.csproj", "{FC9D5ADE-5F07-4E4E-B542-4D3173D9D420}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.AspNetCore.SingleSignOut.Sample", "GSS.Authentication.AspNetCore.SingleSignOut.Sample\GSS.Authentication.AspNetCore.SingleSignOut.Sample.csproj", "{C6979365-1BCD-4075-97EA-6524E2AF78C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSingleSignOutSample", "AspNetCoreSingleSignOutSample\AspNetCoreSingleSignOutSample.csproj", "{C6979365-1BCD-4075-97EA-6524E2AF78C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.AspNetMvc.Sample", "GSS.Authentication.AspNetMvc.Sample\GSS.Authentication.AspNetMvc.Sample.csproj", "{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMvcSample", "AspNetMvcSample\AspNetMvcSample.csproj", "{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.Owin.Sample", "GSS.Authentication.Owin.Sample\GSS.Authentication.Owin.Sample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSample", "OwinSample\OwinSample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.Owin.SingleSignOut.Sample", "GSS.Authentication.Owin.SingleSignOut.Sample\GSS.Authentication.Owin.SingleSignOut.Sample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSingleSignOutSample", "OwinSingleSignOutSample\OwinSingleSignOutSample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

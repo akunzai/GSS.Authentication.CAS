@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace GSS.Authentication.AspNetCore.Sample
+namespace AspNetCoreSample
 {
     public class Program
     {

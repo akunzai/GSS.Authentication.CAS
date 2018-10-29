@@ -1,11 +1,11 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
-using GSS.Authentication.AspNetMvc.Sample.Models;
+using AspNetMvcSample.Models;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 
-namespace GSS.Authentication.AspNetMvc.Sample.Controllers
+namespace AspNetMvcSample.Controllers
 {
     [Authorize]
     public class AccountController : Controller

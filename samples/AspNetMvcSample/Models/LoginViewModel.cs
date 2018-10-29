@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace GSS.Authentication.AspNetMvc.Sample.Models
+namespace AspNetMvcSample.Models
 {
     public class LoginViewModel
     {

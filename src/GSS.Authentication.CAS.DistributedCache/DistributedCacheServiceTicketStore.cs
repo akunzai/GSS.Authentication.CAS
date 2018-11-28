@@ -46,16 +46,16 @@ namespace GSS.Authentication.CAS
             return Deserialize<ServiceTicket>(value);
         }
 
-        public Task RenewAsync(string key, ServiceTicket ticket)
+        public async Task RenewAsync(string key, ServiceTicket ticket)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             var value = Serialize(ticket);
-            return _cache.RemoveAsync(CacheKeyFactory(key))
-                .ContinueWith(x =>
-               _cache.SetAsync(CacheKeyFactory(key), value, new DistributedCacheEntryOptions
+            await _cache.RemoveAsync(CacheKeyFactory(key)).ConfigureAwait(false);
+
+            await _cache.SetAsync(CacheKeyFactory(key), value, new DistributedCacheEntryOptions
                {
                    AbsoluteExpiration = ticket.Assertion.ValidUntil
-               }));
+               }).ConfigureAwait(false);
         }
 
         public Task RemoveAsync(string key)

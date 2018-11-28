@@ -1,8 +1,6 @@
 <Project>
 
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
-
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
     <PackageTags>CAS</PackageTags>
     <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,7 +9,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release' ">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
   </ItemGroup>
 

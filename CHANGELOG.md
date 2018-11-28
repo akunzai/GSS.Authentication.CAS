@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2018-11-28
+
+### GSS.Authentication.CAS.DistributedCache 2.2.1
+
+- Prefer await over ContinueWith
+
 ## 2018-10-18
 
 ### GSS.Authentication.CAS.DistributedCache 2.2.0

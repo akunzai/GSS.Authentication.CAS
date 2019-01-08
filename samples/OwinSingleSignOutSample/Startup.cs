@@ -36,7 +36,7 @@ namespace OwinSingleSignOutSample
             var redisConfiguration = configuration.GetConnectionString("Redis");
             if (!string.IsNullOrWhiteSpace(redisConfiguration))
             {
-                serviceCollection.AddDistributedRedisCache(options => options.Configuration = redisConfiguration);
+                serviceCollection.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
             }
             else
             {

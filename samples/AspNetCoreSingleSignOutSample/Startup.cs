@@ -97,20 +97,20 @@ namespace AspNetCoreSingleSignOutSample
                 }
                 options.Events.OnCreatingTicket = context =>
                 {
-                    // add claims from CasIdentity.Assertion ?
                     var assertion = context.Assertion;
                     if (assertion == null)
                         return Task.CompletedTask;
                     if (!(context.Principal.Identity is ClaimsIdentity identity))
                         return Task.CompletedTask;
-                    identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
+                    // Map claims from assertion
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                    }
                     if (assertion.Attributes.TryGetValue("email", out var email))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                    }
-                    if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                    {
-                        identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                     }
                     return Task.CompletedTask;
                 };
@@ -122,39 +122,26 @@ namespace AspNetCoreSingleSignOutSample
                 options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
                 options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
-                options.SaveTokens = true;
                 options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.SaveTokens = true;
+                options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
+                options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
                 options.Events.OnCreatingTicket = async context =>
                 {
+                    // Get the OAuth user
                     var request =
                         new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Authorization =
                         new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
                     var response =
-                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
-                    response.EnsureSuccessStatusCode();
-
-                    var user = JObject.Parse(await response.Content.ReadAsStringAsync());
-                    var identifier = user.Value<string>("id");
-                    if (!string.IsNullOrEmpty(identifier))
+                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
                     {
-                        context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
+                        throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                     }
-                    var attributes = user.Value<JObject>("attributes");
-                    if (attributes == null)
-                        return;
-                    var email = attributes.Value<string>("email");
-                    if (!string.IsNullOrEmpty(email))
-                    {
-                        context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                    }
-                    var name = attributes.Value<string>("display_name");
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, name));
-                    }
+                    var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    context.RunClaimActions(JObject.Parse(json));
                 };
             });
         }

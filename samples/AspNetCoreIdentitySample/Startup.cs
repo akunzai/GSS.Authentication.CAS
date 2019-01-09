@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCoreIdentitySample.Data;
 using GSS.Authentication.CAS.Validation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -63,21 +64,20 @@ namespace AspNetCoreIdentitySample
                     }
                     options.Events.OnCreatingTicket = context =>
                     {
-                        // add claims from CasIdentity.Assertion ?
                         var assertion = context.Assertion;
                         if (assertion == null)
                             return Task.CompletedTask;
                         if (!(context.Principal.Identity is ClaimsIdentity identity))
                             return Task.CompletedTask;
-                        // ClaimTypes.NameIdentifier was preferred by Microsoft.AspNetCore.Identity.SignInManager
+                        // Map claims from Assertion
                         context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                        }
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                        {
-                            identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                         return Task.CompletedTask;
                     };
@@ -90,38 +90,24 @@ namespace AspNetCoreIdentitySample
                 options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
+                options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
                 options.Events.OnCreatingTicket = async context =>
                 {
+                    // Get the OAuth user
                     var request =
                         new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Authorization =
                         new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
                     var response =
-                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
-                    response.EnsureSuccessStatusCode();
-
-                    var user = JObject.Parse(await response.Content.ReadAsStringAsync());
-                    var identifier = user.Value<string>("id");
-                    if (!string.IsNullOrEmpty(identifier))
+                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
                     {
-                        // ClaimTypes.NameIdentifier was preferred by Microsoft.AspNetCore.Identity.SignInManager
-                        context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
+                        throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                     }
-                    var attributes = user.Value<JObject>("attributes");
-                    if (attributes == null)
-                        return;
-                    var email = attributes.Value<string>("email");
-                    if (!string.IsNullOrEmpty(email))
-                    {
-                        context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                    }
-                    var name = attributes.Value<string>("display_name");
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, name));
-                    }
+                    var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    context.RunClaimActions(JObject.Parse(json));
                 };
             });
 

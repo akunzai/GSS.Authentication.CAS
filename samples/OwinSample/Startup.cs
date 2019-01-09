@@ -25,7 +25,7 @@ namespace OwinSample
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .Build();
 
@@ -78,17 +78,18 @@ namespace OwinSample
                 {
                     OnCreatingTicket = context =>
                     {
-                        // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null) return Task.CompletedTask;
-                        context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
+                        if (assertion == null)
+                            return Task.CompletedTask;
+                        // Map claims from assertion
+                        context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                        }
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                         return Task.CompletedTask;
                     }
@@ -108,30 +109,33 @@ namespace OwinSample
                 {
                     OnCreatingTicket = async context =>
                     {
+                        // Get the OAuth user
                         var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                        var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled);
-                        response.EnsureSuccessStatusCode();
-
-                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+                        var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                        }
+                        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        var user = JObject.Parse(json);
                         var identifier = user.Value<string>("id");
                         if (!string.IsNullOrEmpty(identifier))
                         {
-                            context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
-                        if (attributes == null) return;
+                        if (attributes == null)
+                            return;
+                        var displayName = attributes.Value<string>("display_name");
+                        if (!string.IsNullOrEmpty(displayName))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                        }
                         var email = attributes.Value<string>("email");
                         if (!string.IsNullOrEmpty(email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        var displayName = attributes.Value<string>("display_name");
-                        if (!string.IsNullOrEmpty(displayName))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                     }
                 };
@@ -156,7 +160,8 @@ namespace OwinSample
                     await context.Response.WriteAsync("<p>Choose an authentication scheme:</p>");
                     foreach (var type in context.Authentication.GetAuthenticationTypes())
                     {
-                        if (string.IsNullOrEmpty(type.Caption)) continue;
+                        if (string.IsNullOrEmpty(type.Caption))
+                            continue;
                         await context.Response.WriteAsync($"<a href=\"?authscheme={type.AuthenticationType}\">{type.Caption ?? type.AuthenticationType}</a><br>");
                     }
                     await context.Response.WriteAsync("</body></html>");

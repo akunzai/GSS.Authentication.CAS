@@ -27,7 +27,7 @@ namespace OwinSingleSignOutSample
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .Build();
 
@@ -95,18 +95,18 @@ namespace OwinSingleSignOutSample
                 {
                     OnCreatingTicket = context =>
                     {
-                        // add claims from CasIdentity.Assertion ?
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
                         if (assertion == null)
                             return Task.CompletedTask;
-                        context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, assertion.PrincipalName));
+                        // Map claims from assertion
+                        context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                        }
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                         return Task.CompletedTask;
                     }
@@ -120,37 +120,39 @@ namespace OwinSingleSignOutSample
                 options.CallbackPath = new PathString("/sign-oauth");
                 options.AuthorizationEndpoint = configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = configuration["Authentication:OAuth:TokenEndpoint"];
-                options.SaveTokensAsClaims = true;
                 options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.SaveTokensAsClaims = true;
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
                     {
+                        // Get the OAuth user
                         var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                        var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled);
-                        response.EnsureSuccessStatusCode();
-
-                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+                        var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                        }
+                        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        var user = JObject.Parse(json);
                         var identifier = user.Value<string>("id");
                         if (!string.IsNullOrEmpty(identifier))
                         {
-                            context.Identity.AddClaim(new Claim(context.Identity.NameClaimType, identifier));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
                         }
                         var attributes = user.Value<JObject>("attributes");
                         if (attributes == null)
                             return;
+                        var displayName = attributes.Value<string>("display_name");
+                        if (!string.IsNullOrEmpty(displayName))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                        }
                         var email = attributes.Value<string>("email");
                         if (!string.IsNullOrEmpty(email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        var displayName = attributes.Value<string>("display_name");
-                        if (!string.IsNullOrEmpty(displayName))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, displayName));
                         }
                     }
                 };

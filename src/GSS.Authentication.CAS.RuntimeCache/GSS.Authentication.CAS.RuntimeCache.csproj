@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <Description>Runtime cache implementation of the IServiceTicketStore for Single sign-out</Description>
-    <Version>1.5.0</Version>
+    <Version>3.0.0</Version>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
@@ -11,12 +11,8 @@
     <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+  <ItemGroup>
     <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(Configuration)'=='Release' ">
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

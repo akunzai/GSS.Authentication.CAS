@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2019-02-04
+
+### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache|RuntimeCache) 3.0.0
+
+- Signing assembly with Strong Name
+- Aligning assembly version numbers
+
 ## 2018-11-28
 
 ### GSS.Authentication.CAS.DistributedCache 2.2.1

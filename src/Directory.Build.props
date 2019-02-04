@@ -1,0 +1,10 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+</Project>

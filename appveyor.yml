@@ -1,0 +1,12 @@
+version: '{build}'
+image: Visual Studio 2017
+configuration: Release
+nuget:
+  disable_publish_on_pr: true
+build_script:
+- ps: dotnet build -c Release
+test_script:
+- ps: dotnet test
+artifacts:
+- path: '**\Release\*.nupkg'
+  name: Nuget

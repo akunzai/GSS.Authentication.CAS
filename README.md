@@ -41,7 +41,7 @@ dotnet add package GSS.Authentication.CAS.Core
 ## Usage
 
 Currently, CAS protocol from 1.0 to 3.0 was supported.
-See [samples](./samples/) for samples, such as:
+Check out these [samples](./samples/) to learn the basics and key features.
 
 - [ASP.NET Core app](./samples/AspNetCoreSample/)
 - [ASP.NET Core app with Single-Sign-Out](./samples/AspNetCoreSingleSignOutSample/)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -10,35 +10,40 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class AuthenticationSessionStoreWrapper : IAuthenticationSessionStore
     {
+        [Obsolete]
         protected IServiceTicketStore store;
-
+        private readonly IServiceTicketStore _store;
+        
         public AuthenticationSessionStoreWrapper(
             IServiceTicketStore store)
         {
+            _store = store;
+#pragma warning disable 0612
             this.store = store;
+#pragma warning restore 0612
         }
 
         public Task<string> StoreAsync(AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return store.StoreAsync(serviceTicket);
+            return _store.StoreAsync(serviceTicket);
         }
 
         public async Task<AuthenticationTicket> RetrieveAsync(string key)
         {
-            var ticket = await store.RetrieveAsync(key).ConfigureAwait(false);
+            var ticket = await _store.RetrieveAsync(key).ConfigureAwait(false);
             return BuildAuthenticationTicket(ticket);
         }
 
         public Task RenewAsync(string key, AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return store.RenewAsync(key, serviceTicket);
+            return _store.RenewAsync(key, serviceTicket);
         }
 
         public Task RemoveAsync(string key)
         {
-            return store.RemoveAsync(key);
+            return _store.RemoveAsync(key);
         }
 
         protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
@@ -57,15 +62,18 @@ namespace GSS.Authentication.CAS.Owin
 
         protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
-            if (ticket == null) return null;
+            if (ticket == null)
+                return null;
             var assertion = ticket.Assertion;
             var identity = new CasIdentity(assertion, ticket.AuthenticationType);
-            identity.AddClaims(ticket.Claims.Select(x=>x.ToClaim()));
+            identity.AddClaims(ticket.Claims.Select(x => x.ToClaim()));
             return new AuthenticationTicket(
                 identity,
-                new AuthenticationProperties {
+                new AuthenticationProperties
+                {
                     IssuedUtc = assertion.ValidFrom,
-                    ExpiresUtc = assertion.ValidUntil });
+                    ExpiresUtc = assertion.ValidUntil
+                });
         }
     }
 }

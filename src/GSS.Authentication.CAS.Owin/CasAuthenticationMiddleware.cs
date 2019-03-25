@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Owin;
@@ -13,7 +13,7 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class CasAuthenticationMiddleware : AuthenticationMiddleware<CasAuthenticationOptions>
     {
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
         public CasAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -22,14 +22,14 @@ namespace GSS.Authentication.CAS.Owin
             if (!Options.CallbackPath.HasValue) throw new ArgumentNullException(nameof(Options.CallbackPath));
             if (string.IsNullOrEmpty(Options.CasServerUrlBase)) throw new ArgumentNullException(nameof(Options.CasServerUrlBase));
 
-            logger = app.CreateLogger<CasAuthenticationMiddleware>();
+            _logger = app.CreateLogger<CasAuthenticationMiddleware>();
             if (Options.Provider == null)
             {
                 Options.Provider = new CasAuthenticationProvider();
             }
             if (Options.StateDataFormat == null)
             {
-                IDataProtector dataProtecter = app.CreateDataProtector(
+                var dataProtecter = app.CreateDataProtector(
                     typeof(CasAuthenticationMiddleware).FullName,
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
@@ -55,7 +55,7 @@ namespace GSS.Authentication.CAS.Owin
 
         protected override AuthenticationHandler<CasAuthenticationOptions> CreateHandler()
         {
-            return new CasAuthenticationHandler(logger);
+            return new CasAuthenticationHandler(_logger);
         }
     }
 }

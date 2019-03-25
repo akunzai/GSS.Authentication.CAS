@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace GSS.Authentication.CAS.Owin
     {
         protected static XmlNamespaceManager xmlNamespaceManager;
         private const string RequestContentType = "application/x-www-form-urlencoded";
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
         static CasSingleSignOutMiddleware()
         {
@@ -32,7 +32,7 @@ namespace GSS.Authentication.CAS.Owin
             ) : base(next)
         {
             this.store = store;
-            logger = app.CreateLogger<CasSingleSignOutMiddleware>();
+            _logger = app.CreateLogger<CasSingleSignOutMiddleware>();
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -44,11 +44,11 @@ namespace GSS.Authentication.CAS.Owin
                 var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value?[0];
                 if (!string.IsNullOrEmpty(logOutRequest))
                 {
-                    logger.WriteVerbose($"logOutRequest: {logOutRequest}");
+                    _logger.WriteVerbose($"logOutRequest: {logOutRequest}");
                     var servieTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
                     if (!string.IsNullOrEmpty(servieTicket))
                     {
-                        logger.WriteInformation($"removing ServiceTicket: {servieTicket} ... from[{context.Request.RemoteIpAddress}]");
+                        _logger.WriteInformation($"removing ServiceTicket: {servieTicket} ... from[{context.Request.RemoteIpAddress}]");
                         await store.RemoveAsync(servieTicket).ConfigureAwait(false);
                     }
                 }

@@ -12,11 +12,11 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class CasAuthenticationHandler : AuthenticationHandler<CasAuthenticationOptions>
     {
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
         public CasAuthenticationHandler(ILogger logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
         public override async Task<bool> InvokeAsync()
@@ -33,7 +33,7 @@ namespace GSS.Authentication.CAS.Owin
             var model = await AuthenticateAsync().ConfigureAwait(false);
             if (model == null)
             {
-                logger.WriteWarning("Invalid return state, unable to redirect.");
+                _logger.WriteWarning("Invalid return state, unable to redirect.");
                 Response.StatusCode = 500;
                 return true;
             }
@@ -84,12 +84,12 @@ namespace GSS.Authentication.CAS.Owin
                 }
                 if (properties == null)
                 {
-                    logger.WriteWarning("Invalid return state");
+                    _logger.WriteWarning("Invalid return state");
                     return null;
                 }
 
                 // Anti-CSRF
-                if (!ValidateCorrelationId(properties, logger))
+                if (!ValidateCorrelationId(properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -124,7 +124,7 @@ namespace GSS.Authentication.CAS.Owin
             }
             catch (Exception ex)
             {
-                logger.WriteError("Authentication failed", ex);
+                _logger.WriteError("Authentication failed", ex);
                 return new AuthenticationTicket(null, properties);
             }
         }
@@ -140,7 +140,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (challenge != null)
             {
-                string requestPrefix = Request.Scheme + Uri.SchemeDelimiter + Request.Host;
+                var requestPrefix = Request.Scheme + Uri.SchemeDelimiter + Request.Host;
 
                 var state = challenge.Properties;
                 if (string.IsNullOrEmpty(state.RedirectUri))

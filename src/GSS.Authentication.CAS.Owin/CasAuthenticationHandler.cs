@@ -133,7 +133,7 @@ namespace GSS.Authentication.CAS.Owin
         {
             if (Response.StatusCode != 401)
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -159,7 +159,7 @@ namespace GSS.Authentication.CAS.Owin
                 Response.Redirect(authorizationEndpoint);
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         private string BuildReturnTo(string state)

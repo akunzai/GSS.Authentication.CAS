@@ -4,6 +4,7 @@ using System.Runtime.Caching;
 
 namespace GSS.Authentication.CAS
 {
+    [Obsolete("Use DistributedCacheServiceTicketStore instead")]
     public class RuntimeCacheServiceTicketStore : IServiceTicketStore
     {
         private const string Prefix = "cas-st";
@@ -46,14 +47,14 @@ namespace GSS.Authentication.CAS
                 policy.AbsoluteExpiration = ticket.Assertion.ValidUntil.Value.ToLocalTime();
             }
             _cache.Set(CacheKeyFactory(ticket.TicketId), ticket, policy);
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public Task RemoveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             _cache.Remove(CacheKeyFactory(key));
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

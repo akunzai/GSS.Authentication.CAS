@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -97,15 +97,15 @@ namespace GSS.Authentication.CAS.Owin
                 var ticket = query.GetValues("ticket")?.FirstOrDefault();
                 if (string.IsNullOrEmpty(ticket))
                 {
-                    // No ticket
+                    _logger.WriteWarning("Missing ticket parameter");
                     return new AuthenticationTicket(null, properties);
                 }
+
                 var service = BuildReturnTo(state);
                 var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
-                
-                // No principal
                 if (principal == null)
                 {
+                    _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
                     return new AuthenticationTicket(null, properties);
                 }
                 if (Options.UseAuthenticationSessionStore)

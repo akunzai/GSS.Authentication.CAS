@@ -3,7 +3,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Testing;
 using Moq;
 using Owin;
@@ -31,12 +34,15 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public CasAuthenticationMiddlewareTest(CasFixture fixture)
         {
             _fixture = fixture;
+
             // Arrange
             var principalName = Guid.NewGuid().ToString();
             _principal = new CasPrincipal(new Assertion(principalName), CasDefaults.AuthenticationType);
             _ticketValidator = Mock.Of<IServiceTicketValidator>();
+            var protectionProvider = new FakeDataProtectionProvider(new AesDataProtector("test"));
             _server = TestServer.Create(app =>
             {
+                //app.SetDataProtectionProvider(protectionProvider);
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
                 {
@@ -132,6 +138,70 @@ namespace GSS.Authentication.CAS.Owin.Tests
             var bodyText = await homeResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             Assert.Equal(_principal.GetPrincipalName(), bodyText);
             Mock.Get(_ticketValidator).Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        private class AesDataProtector : IDataProtector
+        {
+            private readonly byte[] _key;
+            private readonly byte[] _iv;
+            public AesDataProtector(string key = null)
+            {
+                if (!string.IsNullOrWhiteSpace(key))
+                {
+                    using (var sha = SHA256.Create())
+                    {
+                        _key = sha.ComputeHash(Encoding.UTF8.GetBytes(key));
+                    }
+                }
+                using (var aes = Aes.Create())
+                {
+                    if (_key == null)
+                    {
+                        _key = aes.Key;
+                    }
+                    _iv = aes.IV;
+                }
+            }
+
+            public byte[] Protect(byte[] userData)
+            {
+                using (var aes = Aes.Create())
+                {
+                    aes.Key = _key;
+                    aes.IV = _iv;
+                    using (var transform = aes.CreateEncryptor())
+                    {
+                        return transform.TransformFinalBlock(userData, 0, userData.Length);
+                    }
+                }
+            }
+
+            public byte[] Unprotect(byte[] protectedData)
+            {
+                using (var aes = Aes.Create())
+                {
+                    aes.Key = _key;
+                    aes.IV = _iv;
+                    using (var transform = aes.CreateDecryptor())
+                    {
+                        return transform.TransformFinalBlock(protectedData, 0, protectedData.Length);
+                    }
+                }
+            }
+        }
+
+        private class FakeDataProtectionProvider : IDataProtectionProvider
+        {
+            private readonly IDataProtector _provider;
+
+            public FakeDataProtectionProvider(IDataProtector provider)
+            {
+                _provider = provider;
+            }
+            public IDataProtector Create(params string[] purposes)
+            {
+                return _provider;
+            }
         }
     }
 }

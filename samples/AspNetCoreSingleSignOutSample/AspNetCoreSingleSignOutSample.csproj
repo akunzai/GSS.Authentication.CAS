@@ -20,7 +20,7 @@
     <PackageReference Include="GSS.Authentication.CAS.Core" Version="3.0.0" />
     <PackageReference Include="GSS.Authentication.CAS.DistributedCache" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
   </ItemGroup>
 
 </Project>

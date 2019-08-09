@@ -42,7 +42,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             var protectionProvider = new FakeDataProtectionProvider(new AesDataProtector("test"));
             _server = TestServer.Create(app =>
             {
-                //app.SetDataProtectionProvider(protectionProvider);
+                app.SetDataProtectionProvider(protectionProvider);
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
                 {

@@ -19,11 +19,9 @@ OWIN
 ```shell
 # Package Manager
 Install-Package GSS.Authentication.CAS.Owin
-Install-Package GSS.Authentication.CAS.Core
 
 # .NET CLI
 dotnet add package GSS.Authentication.CAS.Owin
-dotnet add package GSS.Authentication.CAS.Core
 ```
 
 ASP.NET Core 2.x
@@ -31,11 +29,9 @@ ASP.NET Core 2.x
 ```shell
 # Package Manager
 Install-Package GSS.Authentication.CAS.AspNetCore
-Install-Package GSS.Authentication.CAS.Core
 
 # .NET CLI
 dotnet add package GSS.Authentication.CAS.AspNetCore
-dotnet add package GSS.Authentication.CAS.Core
 ```
 
 ## Usage

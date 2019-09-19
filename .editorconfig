@@ -8,11 +8,8 @@ root = true
 # Use 4 spaces as indentation
 [*]
 charset = utf-8
-end_of_line = crlf
 indent_style = space
 indent_size = 4
-insert_final_newline = false
-trim_trailing_whitespace = true
 
 # Visual Studio Solution Files
 [*.sln]
@@ -42,14 +39,6 @@ trim_trailing_whitespace = false
 [*.{htm,html,js,ts,tsx,css,sass,scss,less,svg,vue}]
 indent_size = 2
 insert_final_newline = true
-
-# Batch Files
-[*.{cmd,bat}]
-end_of_line = crlf
-
-# Bash Files
-[*.sh]
-end_of_line = lf
 
 # C# files
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference#language-conventions

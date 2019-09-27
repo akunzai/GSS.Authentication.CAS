@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{837DBFAA-0953-4372-A80E-B467DF789202}"
 	ProjectSection(SolutionItems) = preProject
@@ -41,6 +41,20 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Owin.Tests", "test\GSS.Authentication.CAS.Owin.Tests\GSS.Authentication.CAS.Owin.Tests.csproj", "{A489BE29-7066-4B8C-A3AE-4016EE9600CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.AspNetCore.Tests", "test\GSS.Authentication.CAS.AspNetCore.Tests\GSS.Authentication.CAS.AspNetCore.Tests.csproj", "{FD31BBED-1977-4872-BD93-49F70182F7E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreIdentitySample", "samples\AspNetCoreIdentitySample\AspNetCoreIdentitySample.csproj", "{80FC3974-3C6B-460A-8FD3-94563E8619C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample", "samples\AspNetCoreSample\AspNetCoreSample.csproj", "{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSingleSignOutSample", "samples\AspNetCoreSingleSignOutSample\AspNetCoreSingleSignOutSample.csproj", "{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMvcSample", "samples\AspNetMvcSample\AspNetMvcSample.csproj", "{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSample", "samples\OwinSample\OwinSample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSingleSignOutSample", "samples\OwinSingleSignOutSample\OwinSingleSignOutSample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +98,30 @@ Global
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80FC3974-3C6B-460A-8FD3-94563E8619C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80FC3974-3C6B-460A-8FD3-94563E8619C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80FC3974-3C6B-460A-8FD3-94563E8619C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80FC3974-3C6B-460A-8FD3-94563E8619C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +136,12 @@ Global
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
 		{A489BE29-7066-4B8C-A3AE-4016EE9600CD} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
 		{FD31BBED-1977-4872-BD93-49F70182F7E9} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
+		{80FC3974-3C6B-460A-8FD3-94563E8619C8} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
+		{5E4C42F7-72A2-47F6-BB2B-C9E321DE7321} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
+		{B9D94CF4-35C0-42A8-9A8F-2BA948AE239D} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
+		{071B0F67-D4EB-40F1-B2EF-AD7A05C507B1} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
+		{BB89E35B-F73F-426F-8E66-456D6A49FDF3} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
+		{01390DEE-2AB7-478B-8F51-32DE70BF3125} = {7EF4FD23-8615-45EF-BB1E-F52F50B0B5CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C211A196-2432-4E8E-88F4-EBF50079001C}

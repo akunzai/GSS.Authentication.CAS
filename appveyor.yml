@@ -1,11 +1,11 @@
 version: '{build}'
-image: Visual Studio 2017
+image: Visual Studio 2019
 nuget:
   disable_publish_on_pr: true
 build_script:
-- ps: dotnet build -c Release
+- ps: msbuild -noLogo -verbosity:minimal -restore -p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 test_script:
-- ps: dotnet test
+- ps: dotnet test -c Release --no-build --verbosity=normal
 artifacts:
 - path: '**\Release\*.nupkg'
   name: Nuget

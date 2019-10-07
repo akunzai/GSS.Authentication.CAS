@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -13,8 +14,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AspNetCoreSample
 {
@@ -122,14 +123,15 @@ namespace AspNetCoreSample
                     {
                         throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                     }
-                    var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    context.RunClaimActions(JObject.Parse(json));
+
+                    using var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                    context.RunClaimActions(user.RootElement);
                 };
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

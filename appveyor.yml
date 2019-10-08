@@ -8,4 +8,4 @@ test_script:
 - ps: dotnet test -c Release --no-build --verbosity=normal
 artifacts:
 - path: '**\Release\*.nupkg'
-  name: Nuget
+  name: NuGet

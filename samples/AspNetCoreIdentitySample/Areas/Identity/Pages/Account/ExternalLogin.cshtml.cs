@@ -50,7 +50,7 @@ namespace AspNetCoreIdentitySample.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
-        public IActionResult OnGetAsync()
+        public IActionResult OnGet()
         {
             return RedirectToPage("./Login");
         }

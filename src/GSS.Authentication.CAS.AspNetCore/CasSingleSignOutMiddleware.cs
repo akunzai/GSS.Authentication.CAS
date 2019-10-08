@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,28 +14,21 @@ namespace GSS.Authentication.CAS.AspNetCore
     public class CasSingleSignOutMiddleware
     {
         private const string RequestContentType = "application/x-www-form-urlencoded";
-        private readonly RequestDelegate next;
-
-        protected static XmlNamespaceManager xmlNamespaceManager;
-        protected ITicketStore store;
-        protected ILogger<CasSingleSignOutMiddleware> logger;
-
-        static CasSingleSignOutMiddleware()
-        {
-            xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
-            xmlNamespaceManager.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
-        }
+        private static readonly XmlNamespaceManager _xmlNamespaceManager = InitializeXmlNamespaceManager();
+        private readonly ITicketStore _store;
+        private readonly ILogger<CasSingleSignOutMiddleware> _logger;
+        private readonly RequestDelegate _next;
 
         public CasSingleSignOutMiddleware(RequestDelegate next, ITicketStore store, ILogger<CasSingleSignOutMiddleware> logger)
         {
-            this.next = next;
-            this.store = store;
-            this.logger = logger;
+            _next = next;
+            _store = store;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) 
+            if (context?.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) == true
                 && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
@@ -43,17 +36,17 @@ namespace GSS.Authentication.CAS.AspNetCore
                     var logOutRequest = formData.First(x => x.Key == "logoutRequest").Value[0];
                     if (!string.IsNullOrEmpty(logOutRequest))
                     {
-                        logger.LogDebug($"logoutRequest: {logOutRequest}");
+                        _logger.LogDebug($"logoutRequest: {logOutRequest}");
                         var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
                         if (!string.IsNullOrEmpty(serviceTicket))
                         {
-                            logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
-                            await store.RemoveAsync(serviceTicket).ConfigureAwait(false);
+                            _logger.LogInformation($"remove serviceTicket: {serviceTicket} ...");
+                            await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                         }
                     }
                 }
             }
-            await next.Invoke(context).ConfigureAwait(false);
+            await _next.Invoke(context).ConfigureAwait(false);
         }
 
         protected string ExtractSingleSignOutTicketFromSamlResponse(string text)
@@ -73,7 +66,7 @@ namespace GSS.Authentication.CAS.AspNetCore
                   <samlp:SessionIndex>[SESSION IDENTIFIER]</samlp:SessionIndex>
                 </samlp:LogoutRequest>
                 */
-                var node = nav.SelectSingleNode("samlp:LogoutRequest/samlp:SessionIndex/text()", xmlNamespaceManager);
+                var node = nav.SelectSingleNode("samlp:LogoutRequest/samlp:SessionIndex/text()", _xmlNamespaceManager);
                 if (node != null)
                 {
                     return node.Value;
@@ -84,6 +77,13 @@ namespace GSS.Authentication.CAS.AspNetCore
                 //logoutRequest was not xml
             }
             return string.Empty;
+        }
+
+        private static XmlNamespaceManager InitializeXmlNamespaceManager()
+        {
+            var namespaceManager = new XmlNamespaceManager(new NameTable());
+            namespaceManager.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+            return namespaceManager;
         }
     }
 }

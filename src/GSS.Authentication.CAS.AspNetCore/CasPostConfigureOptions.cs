@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
@@ -21,11 +21,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public void PostConfigure(string name, TOptions options)
         {
-            options.DataProtectionProvider = options.DataProtectionProvider ?? _dataProtection;
+            options.DataProtectionProvider ??= _dataProtection;
 
             if (options.Backchannel == null)
             {
+#pragma warning disable CA2000 // Dispose objects before losing scope
                 options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core CAS handler");
                 options.Backchannel.Timeout = options.BackchannelTimeout;
                 options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB

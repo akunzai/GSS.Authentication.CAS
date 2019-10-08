@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1D7E648F-A3B
 	ProjectSection(SolutionItems) = preProject
 		src\Directory.Build.props = src\Directory.Build.props
 		src\Directory.Build.targets = src\Directory.Build.targets
+		src\FxCop.ruleset = src\FxCop.ruleset
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Core", "src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj", "{815A6FCE-B2E2-4D56-98D5-DB73731772D8}"

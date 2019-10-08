@@ -10,17 +10,12 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class AuthenticationSessionStoreWrapper : IAuthenticationSessionStore
     {
-        [Obsolete]
-        protected IServiceTicketStore store;
         private readonly IServiceTicketStore _store;
-        
+
         public AuthenticationSessionStoreWrapper(
             IServiceTicketStore store)
         {
             _store = store;
-#pragma warning disable 0612
-            this.store = store;
-#pragma warning restore 0612
         }
 
         public Task<string> StoreAsync(AuthenticationTicket ticket)
@@ -48,7 +43,7 @@ namespace GSS.Authentication.CAS.Owin
 
         protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var ticketId = ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString();
+            var ticketId = ticket?.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString();
             var identity = ticket.Identity;
             var properties = ticket.Properties;
             var assertion = (identity as CasIdentity)?.Assertion

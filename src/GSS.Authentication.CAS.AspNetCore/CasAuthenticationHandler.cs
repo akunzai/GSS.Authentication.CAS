@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
@@ -11,10 +11,10 @@ using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
-    public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions> 
+    public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
         where TOptions : CasAuthenticationOptions, new()
     {
-        public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
+        public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
         }

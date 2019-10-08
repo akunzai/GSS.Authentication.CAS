@@ -14,6 +14,7 @@ namespace GSS.Authentication.CAS.Owin
     public class CasAuthenticationMiddleware : AuthenticationMiddleware<CasAuthenticationOptions>
     {
         private readonly ILogger _logger;
+
         public CasAuthenticationMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
@@ -41,7 +42,9 @@ namespace GSS.Authentication.CAS.Owin
 
             if (Options.ServiceTicketValidator == null)
             {
+#pragma warning disable CA2000 // Dispose objects before losing scope
                 var httpClient = new HttpClient(Options.BackchannelHttpHandler ?? new HttpClientHandler())
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 {
                     Timeout = Options.BackchannelTimeout,
                     MaxResponseContentBufferSize = 1024 * 1024 * 10 // 10 MB

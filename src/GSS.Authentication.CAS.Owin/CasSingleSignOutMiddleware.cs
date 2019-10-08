@@ -14,30 +14,24 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class CasSingleSignOutMiddleware : OwinMiddleware
     {
-        protected static XmlNamespaceManager xmlNamespaceManager;
         private const string RequestContentType = "application/x-www-form-urlencoded";
+        private static readonly XmlNamespaceManager _xmlNamespaceManager = InitializeXmlNamespaceManager();
+        private readonly IAuthenticationSessionStore _store;
         private readonly ILogger _logger;
 
-        static CasSingleSignOutMiddleware()
-        {
-            xmlNamespaceManager = new XmlNamespaceManager(new NameTable());
-            xmlNamespaceManager.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
-        }
-
-        protected IAuthenticationSessionStore store;
         public CasSingleSignOutMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
             IAuthenticationSessionStore store
             ) : base(next)
         {
-            this.store = store;
+            _store = store;
             _logger = app.CreateLogger<CasSingleSignOutMiddleware>();
         }
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase)
+            if (context?.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) == true
                 && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);
@@ -49,7 +43,7 @@ namespace GSS.Authentication.CAS.Owin
                     if (!string.IsNullOrEmpty(servieTicket))
                     {
                         _logger.WriteInformation($"removing ServiceTicket: {servieTicket} ... from[{context.Request.RemoteIpAddress}]");
-                        await store.RemoveAsync(servieTicket).ConfigureAwait(false);
+                        await _store.RemoveAsync(servieTicket).ConfigureAwait(false);
                     }
                 }
             }
@@ -73,7 +67,7 @@ namespace GSS.Authentication.CAS.Owin
                   <samlp:SessionIndex>[SESSION IDENTIFIER]</samlp:SessionIndex>
                 </samlp:LogoutRequest>
                 */
-                var node = nav.SelectSingleNode("samlp:LogoutRequest/samlp:SessionIndex/text()", xmlNamespaceManager);
+                var node = nav.SelectSingleNode("samlp:LogoutRequest/samlp:SessionIndex/text()", _xmlNamespaceManager);
                 if (node != null)
                 {
                     return node.Value;
@@ -84,6 +78,13 @@ namespace GSS.Authentication.CAS.Owin
                 //logoutRequest was not xml
             }
             return string.Empty;
+        }
+
+        private static XmlNamespaceManager InitializeXmlNamespaceManager()
+        {
+            var namespaceManager = new XmlNamespaceManager(new NameTable());
+            namespaceManager.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+            return namespaceManager;
         }
     }
 }

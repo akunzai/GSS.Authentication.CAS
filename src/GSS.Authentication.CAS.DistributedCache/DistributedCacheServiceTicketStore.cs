@@ -39,7 +39,7 @@ namespace GSS.Authentication.CAS
             return ticket.TicketId;
         }
 
-        public async Task<ServiceTicket> RetrieveAsync(string key)
+        public async Task<ServiceTicket?> RetrieveAsync(string key)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             var value = await _cache.GetAsync(CacheKeyFactory(key)).ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace GSS.Authentication.CAS
             return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, SerializerSettings));
         }
 
-        private static T Deserialize<T>(byte[] value)
+        private static T? Deserialize<T>(byte[] value) where T : class
         {
             if (value == null) return default;
             var json = Encoding.UTF8.GetString(value, 0, value.Length);

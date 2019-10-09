@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -10,24 +10,23 @@ namespace GSS.Authentication.CAS
         public CasAuthenticationOptions()
         {
             CallbackPath = "/signin-cas";
-            Events = new CasEvents();
         }
 
         #region ICasOptions
 
-        public string CasServerUrlBase { get; set; }
+        public string CasServerUrlBase { get; set; } = default!;
 
         public string AuthenticationType => CasDefaults.AuthenticationType;
-        
+
         #endregion
 
-        public IServiceTicketValidator ServiceTicketValidator { get; set; }
+        public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
 
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
 
         public new CasEvents Events
         {
-            get => base.Events as CasEvents;
+            get => base.Events as CasEvents ?? new CasEvents();
             set => base.Events = value;
         }
 

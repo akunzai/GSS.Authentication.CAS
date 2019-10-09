@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Xml.Linq;
@@ -12,13 +12,12 @@ namespace GSS.Authentication.CAS.Validation
     {
         public Cas30ServiceTicketValidator(
             ICasOptions options,
-            HttpClient httpClient = null)
-            : base(options, httpClient)
+            HttpClient? httpClient = null)
+            : base("p3/serviceValidate", options, httpClient)
         {
-            ValidateUrlSuffix = "p3/serviceValidate";
         }
 
-        protected override ICasPrincipal BuildPrincipal(string responseBody)
+        protected override ICasPrincipal? BuildPrincipal(string responseBody)
         {
             var doc = XElement.Parse(responseBody);
             var failureElement = doc.Element(AuthenticationFailure);
@@ -44,14 +43,19 @@ namespace GSS.Authentication.CAS.Validation
             */
             var successElement = doc.Element(AuthenticationSuccess);
             if (successElement == null) return null;
-            var principalName = successElement.Element(User)?.Value;
+            var principalName = successElement.Element(User)?.Value ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(principalName)) return null;
             var attributes = new Dictionary<string, StringValues>();
-            foreach (var attr in successElement.Element(Attributes)?.Elements())
+            var attributeElements = successElement.Element(Attributes)?.Elements();
+            if (attributeElements != null)
             {
-                var name = attr.Name.LocalName;
-                attributes[name] = attributes.ContainsKey(name)
-                    ? StringValues.Concat(attributes[name], attr.Value)
-                    : new StringValues(attr.Value);
+                foreach (var attr in attributeElements)
+                {
+                    var name = attr.Name.LocalName;
+                    attributes[name] = attributes.ContainsKey(name)
+                        ? StringValues.Concat(attributes[name], attr.Value)
+                        : new StringValues(attr.Value);
+                }
             }
             var assertion = new Assertion(principalName, attributes);
             return new CasPrincipal(assertion, options.AuthenticationType);

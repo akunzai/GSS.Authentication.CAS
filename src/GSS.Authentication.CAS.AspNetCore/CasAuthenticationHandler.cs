@@ -23,7 +23,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         protected new CasEvents Events
         {
-            get => base.Events as CasEvents;
+            get => base.Events as CasEvents ?? new CasEvents();
             set => base.Events = value;
         }
 
@@ -69,7 +69,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             }
 
             var service = BuildRedirectUri($"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
-            ICasPrincipal principal;
+            ICasPrincipal? principal;
             try
             {
                 principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted).ConfigureAwait(false);

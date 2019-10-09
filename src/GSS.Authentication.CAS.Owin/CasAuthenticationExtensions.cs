@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using GSS.Authentication.CAS.Owin;
 
 namespace Owin
 {
     public static class CasAuthenticationExtensions
     {
-        public static IAppBuilder UseCasAuthentication(this IAppBuilder app, Action<CasAuthenticationOptions> configureOptions = null)
+        public static IAppBuilder UseCasAuthentication(this IAppBuilder app, Action<CasAuthenticationOptions>? configureOptions = null)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
             var options = new CasAuthenticationOptions();

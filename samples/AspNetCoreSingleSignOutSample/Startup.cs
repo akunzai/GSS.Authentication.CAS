@@ -206,7 +206,7 @@ namespace AspNetCoreSingleSignOutSample
                 // var user = await context.Authentication.AuthenticateAsync(AuthenticationManager.AutomaticScheme);
 
                 // Deny anonymous request beyond this point.
-                if (user == null || !user.Identities.Any(identity => identity.IsAuthenticated))
+                if (user?.Identities.Any(identity => identity.IsAuthenticated) != true)
                 {
                     // This is what [Authorize] calls
                     // The cookie middleware will intercept this 401 and redirect to /login

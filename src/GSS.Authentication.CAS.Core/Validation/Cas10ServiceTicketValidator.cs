@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
@@ -8,13 +8,12 @@ namespace GSS.Authentication.CAS.Validation
     {
         public Cas10ServiceTicketValidator(
             ICasOptions options,
-            HttpClient httpClient = null)
-            : base(options, httpClient)
+            HttpClient? httpClient = null)
+            : base("validate", options, httpClient)
         {
-            ValidateUrlSuffix = "validate";
         }
 
-        protected override ICasPrincipal BuildPrincipal(string responseBody)
+        protected override ICasPrincipal? BuildPrincipal(string responseBody)
         {
             var responseParts = responseBody.Split('\n');
             if (responseParts.Length >= 2 && responseParts[0] == "yes")

@@ -5,6 +5,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
     <CodeAnalysisRuleset>$(MSBuildThisFileDirectory)FxCop.ruleset</CodeAnalysisRuleset>
+    <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
 

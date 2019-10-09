@@ -25,9 +25,11 @@ namespace GSS.Authentication.CAS.AspNetCore
             return _store.StoreAsync(serviceTicket);
         }
 
-        public async Task<AuthenticationTicket> RetrieveAsync(string key)
+        public async Task<AuthenticationTicket?> RetrieveAsync(string key)
         {
             var ticket = await _store.RetrieveAsync(key).ConfigureAwait(false);
+            if (ticket == null)
+                return null;
             return BuildAuthenticationTicket(ticket);
         }
 
@@ -44,7 +46,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var ticketId = ticket?.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
+            var ticketId = ticket.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
             var principal = ticket.Principal;
             var properties = ticket.Properties;
             var assertion = (principal as CasPrincipal)?.Assertion
@@ -53,12 +55,11 @@ namespace GSS.Authentication.CAS.AspNetCore
                     principal.GetPrincipalName(),
                     null, properties.IssuedUtc,
                     properties.ExpiresUtc);
-            return new ServiceTicket(ticketId, assertion, principal.Claims.Select(x=>new ClaimWrapper(x)), principal.Identity.AuthenticationType);
+            return new ServiceTicket(ticketId, assertion, principal.Claims.Select(x => new ClaimWrapper(x)), principal.Identity.AuthenticationType);
         }
 
         protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
-            if (ticket == null) return null;
             var assertion = ticket.Assertion;
             var principal = new CasPrincipal(assertion, ticket.AuthenticationType);
             if (!(principal.Identity is ClaimsIdentity identity))
@@ -75,15 +76,18 @@ namespace GSS.Authentication.CAS.AspNetCore
 
             foreach (var claim in ticket.Claims)
             {
-                if (identity.HasClaim(claim.Type, claim.Value)) continue;
+                if (identity.HasClaim(claim.Type, claim.Value))
+                    continue;
                 identity.AddClaim(claim.ToClaim());
             }
 
             return new AuthenticationTicket(
                 principal,
-                new AuthenticationProperties {
+                new AuthenticationProperties
+                {
                     IssuedUtc = assertion.ValidFrom,
-                    ExpiresUtc = assertion.ValidUntil },
+                    ExpiresUtc = assertion.ValidUntil
+                },
                 ticket.AuthenticationType);
         }
     }

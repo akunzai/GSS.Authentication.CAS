@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -7,17 +7,14 @@ namespace GSS.Authentication.CAS.Security
 {
     public class CasPrincipal : ClaimsPrincipal, ICasPrincipal
     {
-        protected IEnumerable<string> roles;
+        protected IEnumerable<string>? roles;
 
         public CasPrincipal(Assertion assertion, string authenticationType) : this(assertion, authenticationType, null) { }
 
-        public CasPrincipal(Assertion assertion, string authenticationType, IEnumerable<string> roles)
+        public CasPrincipal(Assertion assertion, string authenticationType, IEnumerable<string>? roles)
         : base(new CasIdentity(assertion, authenticationType)){
             Assertion = assertion ?? throw new ArgumentNullException(nameof(assertion));
-            if (roles != null)
-            {
-                this.roles = roles;
-            }
+            this.roles = roles;
         }
 
         #region ICasPrincipal
@@ -25,7 +22,7 @@ namespace GSS.Authentication.CAS.Security
 
         public override bool IsInRole(string role)
         {
-            if (roles != null && roles.Contains(role))
+            if (roles?.Contains(role) == true)
             {
                 return true;
             }

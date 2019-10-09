@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Security.Claims;
 using GSS.Authentication.CAS.Security;
@@ -36,7 +36,6 @@ namespace GSS.Authentication.CAS.AspNetCore
         /// Gets the main identity exposed by the authentication ticket.
         /// This property returns <c>null</c> when the ticket is <c>null</c>.
         /// </summary>
-        public ClaimsIdentity Identity => Principal?.Identity as ClaimsIdentity;
-
+        public ClaimsIdentity? Identity => Principal?.Identity as ClaimsIdentity;
     }
 }

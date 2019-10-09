@@ -35,7 +35,7 @@ namespace GSS.Authentication.CAS.Owin
                 && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);
-                var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value?[0];
+                var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value?[0] ?? string.Empty;
                 if (!string.IsNullOrEmpty(logOutRequest))
                 {
                     _logger.WriteVerbose($"logOutRequest: {logOutRequest}");

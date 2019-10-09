@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ namespace GSS.Authentication.CAS.Security
     {
         public Assertion(
             string principalName,
-            IDictionary<string, StringValues> attributes = null,
+            IDictionary<string, StringValues>? attributes = null,
             DateTimeOffset? validFrom = null,
             DateTimeOffset? validUntil = null)
         {

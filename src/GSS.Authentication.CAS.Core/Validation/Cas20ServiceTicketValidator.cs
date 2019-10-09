@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Security.Authentication;
 using System.Xml.Linq;
 using GSS.Authentication.CAS.Security;
@@ -17,13 +17,20 @@ namespace GSS.Authentication.CAS.Validation
 
         public Cas20ServiceTicketValidator(
             ICasOptions options,
-            HttpClient httpClient = null)
-            : base(options, httpClient)
+            HttpClient? httpClient = null)
+            : base("serviceValidate", options, httpClient)
         {
-            ValidateUrlSuffix = "serviceValidate";
         }
 
-        protected override ICasPrincipal BuildPrincipal(string responseBody)
+        protected Cas20ServiceTicketValidator(
+            string suffix,
+            ICasOptions options,
+            HttpClient? httpClient = null)
+            : base(suffix, options, httpClient)
+        {
+        }
+
+        protected override ICasPrincipal? BuildPrincipal(string responseBody)
         {
             var doc = XElement.Parse(responseBody);
             /* On ticket validation failure:
@@ -46,7 +53,8 @@ namespace GSS.Authentication.CAS.Validation
                 </cas:authenticationSuccess>
             </cas:serviceResponse>
             */
-            var principalName = doc.Element(AuthenticationSuccess).Element(User)?.Value;
+            var principalName = doc.Element(AuthenticationSuccess).Element(User)?.Value ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(principalName)) return null;
             var assertion = new Assertion(principalName);
             return new CasPrincipal(assertion, options.AuthenticationType);
         }

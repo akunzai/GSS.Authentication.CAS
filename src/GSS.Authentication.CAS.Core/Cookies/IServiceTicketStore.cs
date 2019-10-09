@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace GSS.Authentication.CAS
 {
@@ -9,7 +9,7 @@ namespace GSS.Authentication.CAS
     {
         Task<string> StoreAsync(ServiceTicket ticket);
         Task RenewAsync(string key, ServiceTicket ticket);
-        Task<ServiceTicket> RetrieveAsync(string key);
+        Task<ServiceTicket?> RetrieveAsync(string key);
         Task RemoveAsync(string key);
     }
 }

@@ -73,11 +73,11 @@ namespace GSS.Authentication.CAS.Owin
 
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
-            AuthenticationProperties properties = null;
+            AuthenticationProperties? properties = null;
             try
             {
                 var query = Request.Query;
-                var state = query.GetValues("state")?.FirstOrDefault();
+                var state = query.GetValues("state")?.FirstOrDefault() ?? string.Empty;
                 if (!string.IsNullOrWhiteSpace(state))
                 {
                     properties = Options.StateDataFormat.Unprotect(state);
@@ -85,7 +85,7 @@ namespace GSS.Authentication.CAS.Owin
                 if (properties == null)
                 {
                     _logger.WriteWarning("Invalid return state");
-                    return null;
+                    return new AuthenticationTicket(null, properties);
                 }
 
                 // Anti-CSRF
@@ -94,7 +94,7 @@ namespace GSS.Authentication.CAS.Owin
                     return new AuthenticationTicket(null, properties);
                 }
 
-                var ticket = query.GetValues("ticket")?.FirstOrDefault();
+                var ticket = query.GetValues("ticket")?.FirstOrDefault() ?? string.Empty;
                 if (string.IsNullOrEmpty(ticket))
                 {
                     _logger.WriteWarning("Missing ticket parameter");
@@ -164,7 +164,7 @@ namespace GSS.Authentication.CAS.Owin
 
         private string BuildReturnTo(string state)
         {
-            var baseUrl = Options.ServiceUrlBase != null && Options.ServiceUrlBase.IsAbsoluteUri
+            var baseUrl = Options.ServiceUrlBase?.IsAbsoluteUri == true
                 ? Options.ServiceUrlBase.AbsoluteUri.TrimEnd('/')
                 : $"{Request.Scheme}://{Request.Host}{RequestPathBase}";
             return

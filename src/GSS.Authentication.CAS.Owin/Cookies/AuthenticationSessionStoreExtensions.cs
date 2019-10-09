@@ -1,4 +1,4 @@
-﻿using Microsoft.Owin.Security;
+using Microsoft.Owin.Security;
 
 namespace GSS.Authentication.CAS.Owin
 {
@@ -11,10 +11,10 @@ namespace GSS.Authentication.CAS.Owin
             properties.Dictionary.Add(ServiceTicketKey, ticket);
         }
 
-        public static string GetServiceTicket(this AuthenticationProperties properties)
+        public static string? GetServiceTicket(this AuthenticationProperties properties)
         {
             properties.Dictionary.TryGetValue(ServiceTicketKey, out var ticket);
-            return (string.IsNullOrWhiteSpace(ticket)) ? null : ticket;
+            return string.IsNullOrWhiteSpace(ticket) ? null : ticket;
         }
     }
 }

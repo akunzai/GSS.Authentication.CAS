@@ -15,8 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.AspNetCore" Version="3.0.0" />
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="3.0.0" />
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

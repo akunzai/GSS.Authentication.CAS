@@ -15,10 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.AspNetCore" Version="3.0.0" />
-    <PackageReference Include="GSS.Authentication.CAS.Core" Version="3.0.0" />
-    <PackageReference Include="GSS.Authentication.CAS.DistributedCache" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj" />
   </ItemGroup>
 
 </Project>

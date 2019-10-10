@@ -56,12 +56,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.Core">
-      <Version>3.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="GSS.Authentication.CAS.Owin">
-      <Version>3.0.0</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder">
       <Version>2.2.4</Version>
     </PackageReference>
@@ -86,6 +80,16 @@
     <PackageReference Include="Owin.OAuthGeneric">
       <Version>1.0.3</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">
+      <Project>{815a6fce-b2e2-4d56-98d5-db73731772d8}</Project>
+      <Name>GSS.Authentication.CAS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
+      <Project>{9a29d6a6-2b15-411f-bcb2-973991d0853b}</Project>
+      <Name>GSS.Authentication.CAS.Owin</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

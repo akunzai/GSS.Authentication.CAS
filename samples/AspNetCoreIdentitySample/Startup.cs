@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -110,8 +109,7 @@ namespace AspNetCoreIdentitySample
                     context.RunClaimActions(user.RootElement);
                 };
             });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -140,7 +138,6 @@ namespace AspNetCoreIdentitySample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
         }

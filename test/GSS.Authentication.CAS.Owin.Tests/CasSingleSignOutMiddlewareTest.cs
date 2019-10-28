@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Testing;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Owin.Testing;
 using Moq;
-using Newtonsoft.Json;
 using Owin;
 using Xunit;
 
@@ -49,7 +49,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
         {
             // Arrange
             var content = new StringContent(
-                JsonConvert.SerializeObject(new
+                JsonSerializer.Serialize(new
                 {
                     logoutRequest = new { ticket = Guid.NewGuid().ToString() }
                 }),

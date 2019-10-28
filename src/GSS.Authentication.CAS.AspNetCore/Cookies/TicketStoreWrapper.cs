@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Security.Principal;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -55,7 +54,7 @@ namespace GSS.Authentication.CAS.AspNetCore
                     principal.GetPrincipalName(),
                     null, properties.IssuedUtc,
                     properties.ExpiresUtc);
-            return new ServiceTicket(ticketId, assertion, principal.Claims.Select(x => new ClaimWrapper(x)), principal.Identity.AuthenticationType);
+            return new ServiceTicket(ticketId, assertion, principal.Claims, principal.Identity.AuthenticationType);
         }
 
         protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
@@ -74,12 +73,7 @@ namespace GSS.Authentication.CAS.AspNetCore
                    ticket.AuthenticationType);
             }
 
-            foreach (var claim in ticket.Claims)
-            {
-                if (identity.HasClaim(claim.Type, claim.Value))
-                    continue;
-                identity.AddClaim(claim.ToClaim());
-            }
+            identity.AddClaims(ticket.Claims);
 
             return new AuthenticationTicket(
                 principal,

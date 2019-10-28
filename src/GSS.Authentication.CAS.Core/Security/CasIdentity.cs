@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 namespace GSS.Authentication.CAS.Security
 {
@@ -8,7 +8,7 @@ namespace GSS.Authentication.CAS.Security
         {
             Assertion = assertion;
         }
-        
+
         public Assertion Assertion { get; protected set; }
     }
 }

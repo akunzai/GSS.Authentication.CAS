@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS
 {
     public class ServiceTicket
     {
-        public ServiceTicket(string ticketId, Assertion assertion, IEnumerable<ClaimWrapper> claims, string authenticationType)
+        public ServiceTicket(string ticketId, Assertion assertion, IEnumerable<Claim> claims, string authenticationType)
         {
             if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType)) throw new ArgumentNullException(nameof(authenticationType));
@@ -22,6 +23,6 @@ namespace GSS.Authentication.CAS
 
         public Assertion Assertion { get; }
 
-        public IEnumerable<ClaimWrapper> Claims { get; }
+        public IEnumerable<Claim> Claims { get; }
     }
 }

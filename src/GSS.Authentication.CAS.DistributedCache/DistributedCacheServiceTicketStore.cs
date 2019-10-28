@@ -1,7 +1,7 @@
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
-using System.Text;
-using Newtonsoft.Json;
+using GSS.Authentication.CAS.Internal;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace GSS.Authentication.CAS
@@ -18,17 +18,12 @@ namespace GSS.Authentication.CAS
 
         public static Func<string, string> CacheKeyFactory { get; set; } = (key) => $"{Prefix}:{key}";
 
-        public static JsonSerializerSettings SerializerSettings { get; set; } = new JsonSerializerSettings
-        {
-            Formatting = Formatting.None,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore
-        };
+        public static JsonSerializerOptions SerializerOptions { get; set; } = new JsonSerializerOptions();
 
         public async Task<string> StoreAsync(ServiceTicket ticket)
         {
-            var value = Serialize(ticket);
+            var holder = new ServiceTicketHolder(ticket);
+            var value = Serialize(holder);
             await _cache.SetAsync(
                 CacheKeyFactory(ticket.TicketId),
                 value,
@@ -41,39 +36,44 @@ namespace GSS.Authentication.CAS
 
         public async Task<ServiceTicket?> RetrieveAsync(string key)
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
             var value = await _cache.GetAsync(CacheKeyFactory(key)).ConfigureAwait(false);
-            return Deserialize<ServiceTicket>(value);
+            if (value == null || value.Length == 0)
+                return null;
+            return (ServiceTicket) Deserialize<ServiceTicketHolder>(value);
         }
 
         public async Task RenewAsync(string key, ServiceTicket ticket)
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            var value = Serialize(ticket);
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+            var holder = new ServiceTicketHolder(ticket);
+            var value = Serialize(holder);
             await _cache.RemoveAsync(CacheKeyFactory(key)).ConfigureAwait(false);
 
             await _cache.SetAsync(CacheKeyFactory(key), value, new DistributedCacheEntryOptions
-               {
-                   AbsoluteExpiration = ticket.Assertion.ValidUntil
-               }).ConfigureAwait(false);
+            {
+                AbsoluteExpiration = ticket.Assertion.ValidUntil
+            }).ConfigureAwait(false);
         }
 
         public Task RemoveAsync(string key)
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
             return _cache.RemoveAsync(CacheKeyFactory(key));
         }
 
         private static byte[] Serialize(object value)
         {
-            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, SerializerSettings));
+            return JsonSerializer.SerializeToUtf8Bytes(value, SerializerOptions);
         }
 
-        private static T? Deserialize<T>(byte[] value) where T : class
+        private static T Deserialize<T>(byte[] value)
         {
-            if (value == null) return default;
-            var json = Encoding.UTF8.GetString(value, 0, value.Length);
-            return JsonConvert.DeserializeObject<T>(json, SerializerSettings);
+            var readOnlySpan = new ReadOnlySpan<byte>(value);
+            return JsonSerializer.Deserialize<T>(readOnlySpan, SerializerOptions);
         }
     }
 }

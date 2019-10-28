@@ -1,18 +1,15 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.FileProviders
 {
     public static class FileProviderExtensions
     {
-        public const string JsonMediaType = "application/json";
-        public const string StreamMediaType = "application/octet-stream";
-
-        public static JsonSerializerSettings SerializerSettings { get; set; }
+        public static JsonSerializerOptions SerializerOptions { get; set; }
 
         public static Stream ReadAsStream(this IFileProvider fileProvider, string subpath)
         {
@@ -21,45 +18,36 @@ namespace Microsoft.Extensions.FileProviders
 
         public static string ReadAsString(this IFileProvider fileProvider, string subpath)
         {
-            using (var reader = new StreamReader(fileProvider.ReadAsStream(subpath)))
-            {
-                return reader.ReadToEnd();
-            }
+            using var reader = new StreamReader(fileProvider.ReadAsStream(subpath));
+            return reader.ReadToEnd();
         }
 
-        public static T ReadAsObject<T>(this IFileProvider fileProvider, string subpath, Action<T> configurer = null)
+        public static async Task<T> ReadAsObjectAsync<T>(this IFileProvider fileProvider, string subpath, Action<T> configurer = null)
         {
-            var json = fileProvider.ReadAsString(subpath);
-            var value = JsonConvert.DeserializeObject<T>(json, SerializerSettings);
+            var stream = fileProvider.ReadAsStream(subpath);
+            var value = await JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions).ConfigureAwait(false);
             configurer?.Invoke(value);
             return value;
         }
 
-        public static HttpContent ReadAsStreamContent(this IFileProvider fileProvider, string subpath, Action<HttpContentHeaders> headersCofigurer = null, string mediaType = StreamMediaType)
+        public static HttpContent ReadAsHttpContent(this IFileProvider fileProvider, string subpath, string mediaType, Action<HttpContentHeaders> headersCofigurer = null)
         {
-            return fileProvider.ReadAsHttpContent(subpath, headersCofigurer, mediaType);
-        }
-
-        public static HttpContent ReadAsStringContent(this IFileProvider fileProvider, string subpath, Action<HttpContentHeaders> headersCofigurer = null, string mediaType = JsonMediaType)
-        {
-            return fileProvider.ReadAsHttpContent(subpath, headersCofigurer, mediaType);
-        }
-
-        public static HttpContent ReadAsHttpContent(this IFileProvider fileProvider, string subpath, Action<HttpContentHeaders> headersCofigurer = null, string mediaType = JsonMediaType)
-        {
-            var httpContent = string.IsNullOrWhiteSpace(mediaType) || mediaType.Equals(StreamMediaType)
-                ? (HttpContent)new StreamContent(fileProvider.ReadAsStream(subpath))
-                : (HttpContent)new StringContent(fileProvider.ReadAsString(subpath), Encoding.UTF8, mediaType);
+            var stream = fileProvider.ReadAsStream(subpath);
+            var httpContent = new StreamContent(stream);
+            httpContent.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
             headersCofigurer?.Invoke(httpContent.Headers);
             return httpContent;
         }
 
-        public static HttpContent CreateHttpContent<T>(this IFileProvider fileProvider, T value, Action<HttpContentHeaders> headersCofigurer = null, string mediaType = JsonMediaType)
+        public static async Task<HttpContent> CreateHttpContentAsync<T>(this T value, string mediaType, Action<HttpContentHeaders> headersCofigurer = null)
         {
-            var content = value is string ? value.ToString() : JsonConvert.SerializeObject(value, SerializerSettings);
-            var httpContent = string.IsNullOrWhiteSpace(mediaType) || mediaType.Equals(StreamMediaType)
-                ? (HttpContent)new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(content)))
-                : (HttpContent)new StringContent(content, Encoding.UTF8, mediaType);
+            if (value == null)
+                return null;
+            var stream = new MemoryStream();
+            await JsonSerializer.SerializeAsync(stream, value, SerializerOptions).ConfigureAwait(false);
+            stream.Seek(0, SeekOrigin.Begin);
+            var httpContent = new StreamContent(stream);
+            httpContent.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
             headersCofigurer?.Invoke(httpContent.Headers);
             return httpContent;
         }

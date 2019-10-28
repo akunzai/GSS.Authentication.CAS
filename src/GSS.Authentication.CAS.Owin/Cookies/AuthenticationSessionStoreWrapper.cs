@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Security;
@@ -54,14 +53,14 @@ namespace GSS.Authentication.CAS.Owin
                     null,
                     properties?.IssuedUtc,
                     properties?.ExpiresUtc);
-            return new ServiceTicket(ticketId, assertion, identity.Claims.Select(x => new ClaimWrapper(x)), identity.AuthenticationType);
+            return new ServiceTicket(ticketId, assertion, identity.Claims, identity.AuthenticationType);
         }
 
         protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
             var assertion = ticket.Assertion;
             var identity = new CasIdentity(assertion, ticket.AuthenticationType);
-            identity.AddClaims(ticket.Claims.Select(x => x.ToClaim()));
+            identity.AddClaims(ticket.Claims);
             return new AuthenticationTicket(
                 identity,
                 new AuthenticationProperties

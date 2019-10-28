@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Testing;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.FileProviders;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace GSS.Authentication.CAS.AspNetCore.Tests
@@ -58,7 +58,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         {
             // Arrange
             var content = new StringContent(
-                JsonConvert.SerializeObject(new
+                JsonSerializer.Serialize(new
                 {
                     logoutRequest = new { ticket = Guid.NewGuid().ToString() }
                 }),

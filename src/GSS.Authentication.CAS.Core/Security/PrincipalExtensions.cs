@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GSS.Authentication.CAS.Security;
 
 namespace System.Security.Principal
@@ -41,7 +41,7 @@ namespace System.Security.Principal
                 }
             }
 
-            return principal.Identity.GetPrincipalName();
+            return principal.Identity?.GetPrincipalName() ?? string.Empty;
         }
     }
 }

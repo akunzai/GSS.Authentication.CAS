@@ -81,34 +81,34 @@ namespace AspNetCoreIdentitySample
                         return Task.CompletedTask;
                     };
                 })
-            .AddOAuth("OAuth", options =>
-            {
-                options.CallbackPath = "/signin-oauth";
-                options.ClientId = Configuration["Authentication:OAuth:ClientId"];
-                options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
-                options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
-                options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
-                options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-                options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
-                options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-                options.Events.OnCreatingTicket = async context =>
+                .AddOAuth("OAuth", options =>
                 {
-                    // Get the OAuth user
-                    var request =
-                        new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                    request.Headers.Authorization =
-                        new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                    var response =
-                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
-                    if (!response.IsSuccessStatusCode)
+                    options.CallbackPath = "/signin-oauth";
+                    options.ClientId = Configuration["Authentication:OAuth:ClientId"];
+                    options.ClientSecret = Configuration["Authentication:OAuth:ClientSecret"];
+                    options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                    options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
+                    options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
+                    options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                    options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
+                    options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
+                    options.Events.OnCreatingTicket = async context =>
                     {
-                        throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                    }
-                    using var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-                    context.RunClaimActions(user.RootElement);
-                };
-            });
+                        // Get the OAuth user
+                        var request =
+                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        var response =
+                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                        }
+                        using var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                        context.RunClaimActions(user.RootElement);
+                    };
+                });
             services.AddRazorPages();
         }
 

@@ -63,6 +63,7 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Views\Account\Me.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GSS.Authentication.CAS.Owin">

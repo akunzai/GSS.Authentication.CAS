@@ -1,19 +1,10 @@
-@using System.Security.Claims;
 @model AspNetMvcSample.Models.LoginViewModel
 @if (User.Identity.IsAuthenticated)
 {
-    <h1>Hello @User.Identity.Name</h1>
-    var identity = User.Identity as ClaimsIdentity;
-    if (identity != null)
-    {
-        <ul>
-        @foreach (var claim in identity.Claims)
-        {
-            <li>@claim.Type: @claim.Value</li>
-        }
-        </ul>
-    }
-    @Html.ActionLink("Logout", "Logout", "Account")
+    <ul>
+        <li>@Html.ActionLink("Account Information", "Me", "Account")</li>
+        <li>@Html.ActionLink("Logout", "Logout", "Account")</li>
+    </ul>
 }
 else
 {

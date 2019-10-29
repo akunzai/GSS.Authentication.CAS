@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using AspNetMvcSample.Models;
+using GSS.Authentication.CAS;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 
@@ -15,8 +16,8 @@ namespace AspNetMvcSample.Controllers
         [AllowAnonymous]
         public void Login(string authtype)
         {
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("Index","Home") };
-            AuthenticationManager.Challenge(properties, authtype);
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") };
+            AuthenticationManager.Challenge(properties, string.IsNullOrWhiteSpace(authtype) ? CasDefaults.AuthenticationType : authtype);
         }
 
         // POST: /Account/Login
@@ -32,13 +33,21 @@ namespace AspNetMvcSample.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
-        
+
         // GET: /Account/Logout
         [HttpGet]
         public ActionResult Logout()
         {
             AuthenticationManager.SignOut(CookieAuthenticationDefaults.AuthenticationType);
             return RedirectToAction("Index", "Home");
+        }
+
+        // GET: /Account/Me
+        [Authorize]
+        [HttpGet]
+        public ActionResult Me()
+        {
+            return View();
         }
 
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;

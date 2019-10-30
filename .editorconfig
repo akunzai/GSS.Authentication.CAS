@@ -165,3 +165,14 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
+
+# DotNet code analysis settings:
+[*.cs]
+# Microsoft.CodeQuality.Analyzers
+dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.CA1051.severity = none
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA2211.severity = none

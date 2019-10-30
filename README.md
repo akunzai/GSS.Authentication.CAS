@@ -23,7 +23,7 @@ Install-Package GSS.Authentication.CAS.Owin
 dotnet add package GSS.Authentication.CAS.Owin
 ```
 
-ASP.NET Core 2.x
+ASP.NET Core
 
 ```shell
 # Package Manager

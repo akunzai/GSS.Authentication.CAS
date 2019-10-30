@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2019-10-30
+
+### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.0.0
+
+- Support .NET Core 3.0
+- Replace Newtonsoft.Json by System.Text.Json
+- Refactoring ServiceTicket Serialization
+- Use nullable reference types
+- Delete obsolete methods
+
 ## 2019-02-04
 
 ### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache|RuntimeCache) 3.0.0

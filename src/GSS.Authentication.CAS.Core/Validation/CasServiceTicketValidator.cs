@@ -12,7 +12,7 @@ namespace GSS.Authentication.CAS.Validation
         protected HttpClient httpClient;
         protected ICasOptions options;
 
-        [Obsolete("Use constructor with validateUrlSuffix")]
+        [Obsolete("Use constructor with suffix parameter")]
         protected CasServiceTicketValidator(ICasOptions options, HttpClient? httpClient = null)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
@@ -21,14 +21,12 @@ namespace GSS.Authentication.CAS.Validation
 
         protected CasServiceTicketValidator(string suffix, ICasOptions options, HttpClient? httpClient = null)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             ValidateUrlSuffix = suffix;
-#pragma warning restore CS0618 // Type or member is obsolete
             this.options = options ?? throw new ArgumentNullException(nameof(options));
             this.httpClient = httpClient ?? new HttpClient();
         }
 
-        protected string ValidateUrlSuffix { get; [Obsolete("Use constructor")]set; } = default!;
+        protected string ValidateUrlSuffix { get; } = default!;
 
         public virtual async Task<ICasPrincipal?> ValidateAsync(string ticket, string service, CancellationToken cancellationToken)
         {

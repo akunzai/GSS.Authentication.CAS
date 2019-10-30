@@ -13,6 +13,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>")]
     public class CasSingleSignOutMiddlewareTest : IClassFixture<CasFixture>,IDisposable
     {
         private readonly IServiceTicketStore _store;

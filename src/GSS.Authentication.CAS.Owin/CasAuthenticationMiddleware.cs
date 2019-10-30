@@ -20,8 +20,10 @@ namespace GSS.Authentication.CAS.Owin
             IAppBuilder app,
             CasAuthenticationOptions options) : base(next, options)
         {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
             if (!Options.CallbackPath.HasValue) throw new ArgumentNullException(nameof(Options.CallbackPath));
             if (string.IsNullOrEmpty(Options.CasServerUrlBase)) throw new ArgumentNullException(nameof(Options.CasServerUrlBase));
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
             _logger = app.CreateLogger<CasAuthenticationMiddleware>();
             if (Options.Provider == null)
@@ -43,7 +45,9 @@ namespace GSS.Authentication.CAS.Owin
             if (Options.ServiceTicketValidator == null)
             {
 #pragma warning disable CA2000 // Dispose objects before losing scope
+#pragma warning disable IDE0067 // Dispose objects before losing scope
                 var httpClient = new HttpClient(Options.BackchannelHttpHandler ?? new HttpClientHandler())
+#pragma warning restore IDE0067 // Dispose objects before losing scope
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 {
                     Timeout = Options.BackchannelTimeout,

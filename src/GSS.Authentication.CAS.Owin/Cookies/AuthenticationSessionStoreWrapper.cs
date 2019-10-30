@@ -42,7 +42,7 @@ namespace GSS.Authentication.CAS.Owin
             return _store.RemoveAsync(key);
         }
 
-        protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
+        private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
             var identity = ticket.Identity;
             var properties = ticket.Properties;
@@ -56,7 +56,7 @@ namespace GSS.Authentication.CAS.Owin
             return new ServiceTicket(ticketId, assertion, identity.Claims, identity.AuthenticationType);
         }
 
-        protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
+        private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
             var assertion = ticket.Assertion;
             var identity = new CasIdentity(assertion, ticket.AuthenticationType);

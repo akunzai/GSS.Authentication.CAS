@@ -43,7 +43,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             return _store.RemoveAsync(key);
         }
 
-        protected ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
+        private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
             var ticketId = ticket.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
             var principal = ticket.Principal;
@@ -57,7 +57,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             return new ServiceTicket(ticketId, assertion, principal.Claims, principal.Identity.AuthenticationType);
         }
 
-        protected AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
+        private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
             var assertion = ticket.Assertion;
             var principal = new CasPrincipal(assertion, ticket.AuthenticationType);

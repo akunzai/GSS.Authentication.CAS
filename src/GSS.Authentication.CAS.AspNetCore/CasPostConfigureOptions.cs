@@ -26,7 +26,9 @@ namespace Microsoft.Extensions.DependencyInjection
             if (options.Backchannel == null)
             {
 #pragma warning disable CA2000 // Dispose objects before losing scope
+#pragma warning disable IDE0067 // Dispose objects before losing scope
                 options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
+#pragma warning restore IDE0067 // Dispose objects before losing scope
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core CAS handler");
                 options.Backchannel.Timeout = options.BackchannelTimeout;

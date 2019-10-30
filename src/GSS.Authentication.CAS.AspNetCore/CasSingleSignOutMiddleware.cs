@@ -49,7 +49,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             await _next.Invoke(context).ConfigureAwait(false);
         }
 
-        protected string ExtractSingleSignOutTicketFromSamlResponse(string text)
+        private static string ExtractSingleSignOutTicketFromSamlResponse(string text)
         {
             try
             {

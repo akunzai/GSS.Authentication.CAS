@@ -1,0 +1,5 @@
+@{
+    ViewData["Title"] = "External Login Failure";
+}
+
+<h1 class="text-danger">@(Request.QueryString.Get("failureMessage") ?? "Unsuccessful login with service.")</h1>

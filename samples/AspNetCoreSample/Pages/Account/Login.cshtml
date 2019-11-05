@@ -1,0 +1,18 @@
+@page
+@using Microsoft.Extensions.Options;
+@using Microsoft.AspNetCore.Authentication;
+@inject IOptions<AuthenticationOptions> authOptions;
+@model Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Choose an authentication scheme</h1>
+
+<div class="btn-group-vertical" role="group" aria-label="authentication scheme">
+    @foreach (var type in authOptions.Value.Schemes)
+    {
+        if (string.IsNullOrEmpty(type.DisplayName)) continue;
+        <a class="btn btn-outline-primary btn-lg" href="?scheme=@type.Name">@(type.DisplayName ?? type.Name)</a>
+    }
+</div>

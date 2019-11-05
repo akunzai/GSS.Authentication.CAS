@@ -66,23 +66,23 @@ namespace AspNetCoreIdentitySample
                     options.Events = new CasEvents
                     {
                         OnCreatingTicket = context =>
-                    {
-                        var assertion = context.Assertion;
-                        if (assertion == null)
-                            return Task.CompletedTask;
-                        if (!(context.Principal.Identity is ClaimsIdentity identity))
-                            return Task.CompletedTask;
-                        // Map claims from Assertion
-                        context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
                         {
-                            identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
-                        }
-                        if (assertion.Attributes.TryGetValue("email", out var email))
-                        {
-                            identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                        }
-                        return Task.CompletedTask;
+                            var assertion = context.Assertion;
+                            if (assertion == null)
+                                return Task.CompletedTask;
+                            if (!(context.Principal.Identity is ClaimsIdentity identity))
+                                return Task.CompletedTask;
+                            // Map claims from Assertion
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                            {
+                                identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                            }
+                            if (assertion.Attributes.TryGetValue("email", out var email))
+                            {
+                                identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                            }
+                            return Task.CompletedTask;
                         }
                     };
                 })
@@ -100,21 +100,21 @@ namespace AspNetCoreIdentitySample
                     options.Events = new OAuthEvents
                     {
                         OnCreatingTicket = async context =>
-                    {
-                        // Get the OAuth user
-                        var request =
-                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Authorization =
-                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        var response =
-                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
-                        if (!response.IsSuccessStatusCode)
                         {
-                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                        }
+                            // Get the OAuth user
+                            var request =
+                                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                            request.Headers.Authorization =
+                                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                            var response =
+                                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+                            if (!response.IsSuccessStatusCode)
+                            {
+                                throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                            }
                             using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            using var user = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                        context.RunClaimActions(user.RootElement);
+                            using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+                            context.RunClaimActions(json.RootElement);
                         }
                     };
                 });

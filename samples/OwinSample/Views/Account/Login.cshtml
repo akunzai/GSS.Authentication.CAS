@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Choose an authentication scheme</h1>
+
+<div class="btn-group-vertical" role="group" aria-label="authentication scheme">
+    @foreach (var type in Context.GetOwinContext().Authentication.GetAuthenticationTypes())
+    {
+        if (string.IsNullOrWhiteSpace(type.Caption)) { continue; }
+        @Html.ActionLink(type.Caption, "Login", "Account", new { scheme = type.AuthenticationType }, new { @class = "btn btn-outline-primary btn-lg" });
+    }
+</div>

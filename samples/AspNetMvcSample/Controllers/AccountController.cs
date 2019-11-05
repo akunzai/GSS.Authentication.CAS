@@ -9,6 +9,14 @@ namespace AspNetMvcSample.Controllers
 {
     public class AccountController : Controller
     {
+        // GET: /Account/ExternalLoginFailure
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult ExternalLoginFailure()
+        {
+            return View();
+        }
+
         // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]

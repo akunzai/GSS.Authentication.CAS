@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using NLog;
+using NLog.Owin.Logging;
 using Owin;
 using Owin.OAuthGeneric;
 
@@ -22,6 +24,8 @@ namespace AspNetMvcSample
 {
     public class Startup
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
         public void Configuration(IAppBuilder app)
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
@@ -39,6 +43,7 @@ namespace AspNetMvcSample
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
 
+            app.UseNLog();
             app.UseErrorPage();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
@@ -148,7 +153,7 @@ namespace AspNetMvcSample
                     OnRemoteFailure = context =>
                     {
                         var failure = context.Failure;
-                        context.OwinContext.TraceOutput.WriteLine(failure.Message);
+                        _logger.Error(failure, failure.Message);
                         context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
                         context.HandleResponse();
                         return Task.CompletedTask;

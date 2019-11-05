@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using NLog;
+using NLog.Owin.Logging;
 using Owin;
 using Owin.OAuthGeneric;
 
@@ -24,6 +26,10 @@ namespace OwinSingleSignOutSample
 {
     public class Startup
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
+        private static IServiceProvider _services;
+
         public void Configuration(IAppBuilder app)
         {
             var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
@@ -31,6 +37,23 @@ namespace OwinSingleSignOutSample
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .Build();
+
+            if (_services == null)
+            {
+                var serviceCollection = new ServiceCollection();
+                var redisConfiguration = configuration.GetConnectionString("Redis");
+                if (!string.IsNullOrWhiteSpace(redisConfiguration))
+                {
+                    serviceCollection.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
+                }
+                else
+                {
+                    serviceCollection.AddDistributedMemoryCache();
+                }
+                serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
+                serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
+                _services = serviceCollection.BuildServiceProvider();
+            }
 
             // MVC
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
@@ -41,28 +64,17 @@ namespace OwinSingleSignOutSample
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
 
+            app.UseNLog();
             app.UseErrorPage();
-            var serviceCollection = new ServiceCollection();
-            var redisConfiguration = configuration.GetConnectionString("Redis");
-            if (!string.IsNullOrWhiteSpace(redisConfiguration))
-            {
-                serviceCollection.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
-            }
-            else
-            {
-                serviceCollection.AddDistributedMemoryCache();
-            }
-            serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-            serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
-            var services = serviceCollection.BuildServiceProvider();
-            app.UseCasSingleSignOut(services.GetRequiredService<IAuthenticationSessionStore>());
+
+            app.UseCasSingleSignOut(_services.GetRequiredService<IAuthenticationSessionStore>());
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 LoginPath = CookieAuthenticationDefaults.LoginPath,
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
-                SessionStore = services.GetRequiredService<IAuthenticationSessionStore>(),
+                SessionStore = _services.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {
                     OnResponseSignOut = context =>
@@ -163,6 +175,14 @@ namespace OwinSingleSignOutSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
                         }
+                    },
+                    OnRemoteFailure = context =>
+                    {
+                        var failure = context.Failure;
+                        _logger.Error(failure, failure.Message);
+                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
                     }
                 };
             });

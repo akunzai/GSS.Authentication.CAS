@@ -18,6 +18,7 @@ namespace Owin
             CallbackPath = new PathString("/signin-cas");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
+            Provider = new CasAuthenticationProvider();
         }
 
         public TimeSpan BackchannelTimeout { get; set; }
@@ -52,6 +53,6 @@ namespace Owin
 
         public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
 
-        public ICasAuthenticationProvider Provider { get; set; } = default!;
+        public ICasAuthenticationProvider Provider { get; set; }
     }
 }

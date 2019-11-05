@@ -23,7 +23,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         protected new CasEvents Events
         {
-            get => base.Events as CasEvents ?? new CasEvents();
+            get => (CasEvents)base.Events;
             set => base.Events = value;
         }
 

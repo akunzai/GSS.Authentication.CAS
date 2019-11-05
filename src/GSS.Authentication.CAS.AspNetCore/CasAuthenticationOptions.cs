@@ -10,6 +10,7 @@ namespace GSS.Authentication.CAS
         public CasAuthenticationOptions()
         {
             CallbackPath = "/signin-cas";
+            Events = new CasEvents();
         }
 
         #region ICasOptions
@@ -26,7 +27,7 @@ namespace GSS.Authentication.CAS
 
         public new CasEvents Events
         {
-            get => base.Events as CasEvents ?? new CasEvents();
+            get => (CasEvents)base.Events;
             set => base.Events = value;
         }
 

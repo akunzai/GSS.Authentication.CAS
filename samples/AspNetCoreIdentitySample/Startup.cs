@@ -4,8 +4,10 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AspNetCoreIdentitySample.Data;
+using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -61,7 +63,9 @@ namespace AspNetCoreIdentitySample
                                 break;
                         }
                     }
-                    options.Events.OnCreatingTicket = context =>
+                    options.Events = new CasEvents
+                    {
+                        OnCreatingTicket = context =>
                     {
                         var assertion = context.Assertion;
                         if (assertion == null)
@@ -79,6 +83,7 @@ namespace AspNetCoreIdentitySample
                             identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
                         return Task.CompletedTask;
+                        }
                     };
                 })
                 .AddOAuth("OAuth", options =>
@@ -92,7 +97,9 @@ namespace AspNetCoreIdentitySample
                     options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                     options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
                     options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-                    options.Events.OnCreatingTicket = async context =>
+                    options.Events = new OAuthEvents
+                    {
+                        OnCreatingTicket = async context =>
                     {
                         // Get the OAuth user
                         var request =
@@ -105,8 +112,10 @@ namespace AspNetCoreIdentitySample
                         {
                             throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                         }
-                        using var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+                            using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            using var user = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                         context.RunClaimActions(user.RootElement);
+                        }
                     };
                 });
             services.AddRazorPages();

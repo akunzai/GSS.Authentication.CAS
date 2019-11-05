@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -49,6 +51,7 @@ namespace AspNetCoreSample
             {
                 options.LoginPath = CookieAuthenticationDefaults.LoginPath;
                 options.LogoutPath = CookieAuthenticationDefaults.LogoutPath;
+                options.AccessDeniedPath = CookieAuthenticationDefaults.AccessDeniedPath;
                 options.Events.OnSigningOut = context =>
                 {
                     // Single Sign-Out
@@ -108,6 +111,11 @@ namespace AspNetCoreSample
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                        }
+                        var managers = Configuration.GetSection("Managers").Get<IEnumerable<string>>();
+                        if (managers?.Any(x => x.Equals(email, StringComparison.OrdinalIgnoreCase)) == true)
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Role, "Manager"));
                         }
                         return Task.CompletedTask;
                     },

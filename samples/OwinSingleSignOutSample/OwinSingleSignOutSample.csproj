@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -43,13 +43,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Startup.cs" />
+    <Content Include="appsettings.json" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.*.json">
@@ -58,11 +64,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GSS.Authentication.CAS.DistributedCache">
-      <Version>4.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="GSS.Authentication.CAS.Owin">
-      <Version>4.0.0</Version>
+    <PackageReference Include="Microsoft.AspNet.Mvc">
+      <Version>5.2.7</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory">
       <Version>3.0.0</Version>
@@ -94,12 +97,23 @@
     <PackageReference Include="MSBuild.Microsoft.VisualStudio.Web.targets">
       <Version>14.0.0.3</Version>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.2</Version>
-    </PackageReference>
     <PackageReference Include="Owin.OAuthGeneric">
       <Version>1.0.3</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">
+      <Project>{7d78728a-b592-41e6-83bf-7a83d6e868ad}</Project>
+      <Name>GSS.Authentication.CAS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj">
+      <Project>{5e8f18a4-2648-4a87-b55d-092369b2f305}</Project>
+      <Name>GSS.Authentication.CAS.DistributedCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
+      <Project>{9cd61773-631d-4ba7-a723-2bc1fff31c66}</Project>
+      <Name>GSS.Authentication.CAS.Owin</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
-using Newtonsoft.Json.Linq;
 using Owin;
 using Owin.OAuthGeneric;
 
@@ -31,6 +31,7 @@ namespace AspNetMvcSample
                 .Build();
 
             // MVC
+            GlobalFilters.Filters.Add(new AuthorizeAttribute());
             GlobalFilters.Filters.Add(new HandleErrorAttribute());
             RouteTable.Routes.MapRoute(
                 name: "Default",
@@ -87,7 +88,8 @@ namespace AspNetMvcSample
                     OnCreatingTicket = context =>
                     {
                         var assertion = (context.Identity as CasIdentity)?.Assertion;
-                        if (assertion == null) return Task.CompletedTask;
+                        if (assertion == null)
+                            return Task.CompletedTask;
                         // Map claims from assertion
                         context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("display_name", out var displayName))
@@ -110,8 +112,8 @@ namespace AspNetMvcSample
                 options.CallbackPath = new PathString("/sign-oauth");
                 options.AuthorizationEndpoint = configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = configuration["Authentication:OAuth:TokenEndpoint"];
-                options.SaveTokensAsClaims = true;
                 options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.SaveTokensAsClaims = true;
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
@@ -124,25 +126,32 @@ namespace AspNetMvcSample
                         {
                             throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                         }
-                        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        var user = JObject.Parse(json);
-                        var identifier = user.Value<string>("id");
-                        if (!string.IsNullOrEmpty(identifier))
+                        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+                        var user = json.RootElement;
+                        if (user.TryGetProperty("id", out var identifier))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier.GetString()));
                         }
-                        var attributes = user.Value<JObject>("attributes");
-                        if (attributes == null) return;
-                        var displayName = attributes.Value<string>("display_name");
-                        if (!string.IsNullOrEmpty(displayName))
+                        if (!user.TryGetProperty("attributes", out var attributes))
+                            return;
+
+                        if (attributes.TryGetProperty("display_name", out var displayName))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
                         }
-                        var email = attributes.Value<string>("email");
-                        if (!string.IsNullOrEmpty(email))
+                        if (attributes.TryGetProperty("email", out var email))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
                         }
+                    },
+                    OnRemoteFailure = context =>
+                    {
+                        var failure = context.Failure;
+                        context.OwinContext.TraceOutput.WriteLine(failure.Message);
+                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
                     }
                 };
             });

@@ -2,27 +2,31 @@ using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using AspNetMvcSample.Models;
-using GSS.Authentication.CAS;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 
 namespace AspNetMvcSample.Controllers
 {
-    [Authorize]
     public class AccountController : Controller
     {
-        // GET: /Account/Login?authtype=xxx
+        // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public void Login(string authtype)
+        public ActionResult Login(string scheme)
         {
+            if (string.IsNullOrWhiteSpace(scheme))
+            {
+                return View();
+            }
             var properties = new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") };
-            AuthenticationManager.Challenge(properties, string.IsNullOrWhiteSpace(authtype) ? CasDefaults.AuthenticationType : authtype);
+            AuthenticationManager.Challenge(properties, scheme);
+            return new EmptyResult();
         }
 
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model)
         {
             if (ModelState.IsValid && model.Username == "test" && model.Password == "test")
@@ -40,14 +44,6 @@ namespace AspNetMvcSample.Controllers
         {
             AuthenticationManager.SignOut(CookieAuthenticationDefaults.AuthenticationType);
             return RedirectToAction("Index", "Home");
-        }
-
-        // GET: /Account/Me
-        [Authorize]
-        [HttpGet]
-        public ActionResult Me()
-        {
-            return View();
         }
 
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;

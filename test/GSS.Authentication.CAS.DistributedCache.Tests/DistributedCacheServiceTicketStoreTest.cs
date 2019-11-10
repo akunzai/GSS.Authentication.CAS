@@ -23,7 +23,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         }
 
         [Fact]
-        public async Task StoreAsync()
+        public async Task StoreServiceTicketSuccess_ShouldReturnNonEmptyKey()
         {
             // Arrange
             var expected = GenerateNewServiceTicket();
@@ -36,7 +36,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         }
 
         [Fact]
-        public async Task RenewNotExistAsync()
+        public async Task RenewServiceTicketWithNotExistKey_ShouldStoreNewEntry()
         {
             // Arrange
             var key = Guid.NewGuid().ToString();
@@ -53,25 +53,25 @@ namespace GSS.Authentication.CAS.Core.Tests
         }
 
         [Fact]
-        public async Task RenewAsync()
+        public async Task RenewServiceTicketWithExistKey_ShouldNotRemoveExistEntry()
         {
             // Arrange
-            var ticket = GenerateNewServiceTicket();
-            var key = await _serviceTickets.StoreAsync(ticket).ConfigureAwait(false);
-            var expected = GenerateNewServiceTicket();
+            var existEntry = GenerateNewServiceTicket();
+            var key = await _serviceTickets.StoreAsync(existEntry).ConfigureAwait(false);
+            var newEntry = GenerateNewServiceTicket();
 
             // Act
-            await _serviceTickets.RenewAsync(key, expected).ConfigureAwait(false);
+            await _serviceTickets.RenewAsync(key, newEntry).ConfigureAwait(false);
 
             // Assert
-            var ignored = await _serviceTickets.RetrieveAsync(expected.TicketId).ConfigureAwait(false);
-            Assert.Null(ignored);
+            var exist = await _serviceTickets.RetrieveAsync(existEntry.TicketId).ConfigureAwait(false);
+            Assert.NotNull(exist);
             var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
             Assert.NotNull(actual);
         }
 
         [Fact]
-        public async Task RetrieveAsync()
+        public async Task RetrieveServiceTicketWithExistKey_ShouldReturnEntry()
         {
             // Arrange
             var expected = GenerateNewServiceTicket();
@@ -91,7 +91,7 @@ namespace GSS.Authentication.CAS.Core.Tests
         }
 
         [Fact]
-        public async Task RemoveAsync()
+        public async Task RemoveServiceTicketWithExistKey_ShouldRemoveEntry()
         {
             // Arrange
             var expected = GenerateNewServiceTicket();

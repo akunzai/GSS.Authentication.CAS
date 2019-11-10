@@ -25,14 +25,18 @@ namespace OwinSample
     public class Startup
     {
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static IConfiguration _configuration;
 
         public void Configuration(IAppBuilder app)
         {
-            var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
-                .Build();
+            if (_configuration == null)
+            {
+                var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
+                _configuration = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json")
+                    .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+                    .Build();
+            }
 
             // MVC
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
@@ -57,7 +61,7 @@ namespace OwinSample
                     OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
-                        var casUrl = new Uri(configuration["Authentication:CAS:ServerUrlBase"]);
+                        var casUrl = new Uri(_configuration["Authentication:CAS:ServerUrlBase"]);
                         var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
@@ -74,9 +78,9 @@ namespace OwinSample
 
             app.UseCasAuthentication(options =>
             {
-                options.CasServerUrlBase = configuration["Authentication:CAS:ServerUrlBase"];
-                options.ServiceUrlBase = configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
-                var protocolVersion = configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+                options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
+                options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
                     switch (protocolVersion)
@@ -113,24 +117,25 @@ namespace OwinSample
 
             app.UseOAuthAuthentication(options =>
             {
-                options.ClientId = configuration["Authentication:OAuth:ClientId"];
-                options.ClientSecret = configuration["Authentication:OAuth:ClientSecret"];
-                options.CallbackPath = new PathString("/sign-oauth");
-                options.AuthorizationEndpoint = configuration["Authentication:OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = configuration["Authentication:OAuth:TokenEndpoint"];
-                options.UserInformationEndpoint = configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.ClientId = _configuration["Authentication:OAuth:ClientId"];
+                options.ClientSecret = _configuration["Authentication:OAuth:ClientSecret"];
+                options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
+                options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
                 options.SaveTokensAsClaims = true;
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
                     {
                         // Get the OAuth user
-                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
-                        if (!response.IsSuccessStatusCode)
+                        using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                         {
-                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). [{responseText}]");
+                            return;
                         }
                         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                         using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
@@ -139,16 +144,16 @@ namespace OwinSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier.GetString()));
                         }
-                        if (!user.TryGetProperty("attributes", out var attributes))
-                            return;
-
-                        if (attributes.TryGetProperty("display_name", out var displayName))
+                        if (user.TryGetProperty("attributes", out var attributes))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
-                        }
-                        if (attributes.TryGetProperty("email", out var email))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                            if (attributes.TryGetProperty("display_name", out var displayName))
+                            {
+                                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
+                            }
+                            if (attributes.TryGetProperty("email", out var email))
+                            {
+                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                            }
                         }
                     },
                     OnRemoteFailure = context =>

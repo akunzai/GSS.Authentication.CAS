@@ -62,28 +62,31 @@ namespace AspNetCoreSingleSignOutSample
             .AddCookie(options =>
             {
                 options.SessionStore = Services.GetRequiredService<ITicketStore>();
-                options.Events.OnSigningOut = context =>
+                options.Events = new CookieAuthenticationEvents
                 {
-                    // Single Sign-Out
-                    var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
-                    var serviceUrl = new Uri(context.Request.GetEncodedUrl())
-                        .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-                    var redirectUri = UriHelper.BuildAbsolute(
-                        casUrl.Scheme,
-                        new HostString(casUrl.Host, casUrl.Port),
-                        casUrl.LocalPath, "/logout",
-                        QueryString.Create("service", serviceUrl));
+                    OnSigningOut = context =>
+                    {
+                        // Single Sign-Out
+                        var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
+                        var serviceUrl = new Uri(context.Request.GetEncodedUrl())
+                            .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var redirectUri = UriHelper.BuildAbsolute(
+                            casUrl.Scheme,
+                            new HostString(casUrl.Host, casUrl.Port),
+                            casUrl.LocalPath, "/logout",
+                            QueryString.Create("service", serviceUrl));
 
-                    var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
-                        context.HttpContext,
-                        context.Scheme,
-                        context.Options,
-                        context.Properties,
-                        redirectUri
-                    );
-                    context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
-                    context.Options.Events.RedirectToLogout(logoutRedirectContext);
-                    return Task.CompletedTask;
+                        var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
+                            context.HttpContext,
+                            context.Scheme,
+                            context.Options,
+                            context.Properties,
+                            redirectUri
+                        );
+                        context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
+                        context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                        return Task.CompletedTask;
+                    }
                 };
             })
             .AddCAS(options =>
@@ -130,7 +133,7 @@ namespace AspNetCoreSingleSignOutSample
                         var failure = context.Failure;
                         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<CasEvents>>();
                         logger.LogError(failure, failure.Message);
-                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
                         context.HandleResponse();
                         return Task.CompletedTask;
                     }
@@ -148,32 +151,39 @@ namespace AspNetCoreSingleSignOutSample
                 options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-                options.Events.OnCreatingTicket = async context =>
+                options.Events = new OAuthEvents
                 {
-                    // Get the OAuth user
-                    using var request =
-                        new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                    request.Headers.Authorization =
-                        new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                    using var response =
-                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
-                    if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
+                    OnCreatingTicket = async context =>
                     {
-                        throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                    }
-                    using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                    context.RunClaimActions(json.RootElement);
-                };
-                options.Events.OnRemoteFailure = context =>
-                {
-                    var failure = context.Failure;
-                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
-                    logger.LogError(failure, failure.Message);
-                    context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
-                    context.HandleResponse();
-                    return Task.CompletedTask;
+                        // Get the OAuth user
+                        using var request =
+                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        using var response =
+                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
+                                .ConfigureAwait(false);
 
+                        if (!response.IsSuccessStatusCode ||
+                            response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
+                        {
+                            throw new HttpRequestException(
+                                $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                        }
+
+                        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+                        context.RunClaimActions(json.RootElement);
+                    },
+                    OnRemoteFailure = context =>
+                    {
+                        var failure = context.Failure;
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
+                        logger.LogError(failure, failure.Message);
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }
@@ -192,6 +202,7 @@ namespace AspNetCoreSingleSignOutSample
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 

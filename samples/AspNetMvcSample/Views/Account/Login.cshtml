@@ -1,36 +1,42 @@
 @model AspNetMvcSample.Models.LoginViewModel
 @{
     ViewData["Title"] = "Login";
+    var formClass = ViewData["formClass"] ?? "invisible";
 }
 
 <h1>Choose an authentication scheme</h1>
 
-<div class="btn-group-vertical" role="group" aria-label="authentication scheme">
-    @foreach (var type in Context.GetOwinContext().Authentication.GetAuthenticationTypes())
-    {
-        if (string.IsNullOrWhiteSpace(type.Caption)) { continue; }
-        @Html.ActionLink(type.Caption, "Login", "Account", new { scheme = type.AuthenticationType }, new { @class = "btn btn-outline-primary btn-lg" });
-    }
-</div>
+@foreach (var type in Context.GetOwinContext().Authentication.GetAuthenticationTypes())
+{
+    if (string.IsNullOrWhiteSpace(type.Caption)) { continue; }
+    <a class="btn btn-outline-primary btn-lg" href="?scheme=@type.AuthenticationType" role="button">@type.Caption</a>
+}
+<button class="btn btn-outline-primary btn-lg" id="form-login">Form</button>
 
-<h1>Or fill form to login</h1>
-
-@using (Html.BeginForm("Login", "Account"))
+@using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form " + formClass }))
 {
     @Html.AntiForgeryToken()
+
     <div class="form-group">
         @Html.LabelFor(model => model.Username)
         @Html.TextBoxFor(model => model.Username, new { @class = "form-control", @Value = "test", placeholder = "UserName" })
         @Html.ValidationMessageFor(model => model.Username)
-
     </div>
 
     <div class="form-group">
         @Html.LabelFor(model => model.Password)
-        @Html.PasswordFor(model => model.Password, new { @class = "form-control",  @Value = "test", placeholder = "Password" })
+        @Html.PasswordFor(model => model.Password, new { @class = "form-control", @Value = "test", placeholder = "Password" })
         @Html.ValidationMessageFor(model => model.Password)
     </div>
 
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
     <button type="submit" class="btn btn-primary">Login</button>
 }
-
+@section Scripts
+{
+    <script>
+        $('#form-login').on("click", function () {
+            $(".login-form").toggleClass('invisible');
+        });
+    </script>
+}

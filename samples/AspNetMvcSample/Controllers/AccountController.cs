@@ -9,15 +9,7 @@ namespace AspNetMvcSample.Controllers
 {
     public class AccountController : Controller
     {
-        // GET: /Account/ExternalLoginFailure
-        [HttpGet]
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
-        }
-
-        // GET: /Account/Login
+        // GET /Account/Login
         [HttpGet]
         [AllowAnonymous]
         public ActionResult Login(string scheme)
@@ -26,33 +18,49 @@ namespace AspNetMvcSample.Controllers
             {
                 return View();
             }
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") };
-            AuthenticationManager.Challenge(properties, scheme);
+
+            Request.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
             return new EmptyResult();
         }
 
-        // POST: /Account/Login
+        // POST /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model)
         {
-            if (ModelState.IsValid && model.Username == "test" && model.Password == "test")
+            ViewData["formClass"] = string.Empty;
+            if (!ModelState.IsValid)
             {
-                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationType);
-                identity.AddClaim(new Claim(identity.NameClaimType, model.Username));
-                AuthenticationManager.SignIn(identity);
+                return View();
             }
-            return RedirectToAction("Index", "Home");
+
+            if (!(model.Username == "test" && model.Password == "test"))
+            {
+                ModelState.AddModelError(string.Empty, "The username or password is incorrect");
+                return View();
+            }
+
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationType);
+            identity.AddClaim(new Claim(identity.NameClaimType, model.Username));
+            Request.GetOwinContext().Authentication.SignIn(identity);
+            return new EmptyResult();
         }
 
-        // GET: /Account/Logout
+        // GET /Account/Logout
         [HttpGet]
         public void Logout()
         {
-            AuthenticationManager.SignOut(new AuthenticationProperties { RedirectUri = "/" });
+            Request.GetOwinContext().Authentication.SignOut();
         }
 
-        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
+        // GET /Account/ExternalLoginFailure
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult ExternalLoginFailure()
+        {
+            Response.StatusCode = 401;
+            return View();
+        }
     }
 }

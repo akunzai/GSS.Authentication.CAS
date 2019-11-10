@@ -3,13 +3,13 @@
     ViewData["Title"] = "Home";
 }
 
-<h1>Hello @(User.Identity.Name ?? "anonymous")</h1>
+<h1>Hello @(User.Identity.IsAuthenticated ? User.Identity.Name : "anonymous")</h1>
 
 @if (User.Identity.IsAuthenticated)
 {
     <h2>Claims</h2>
     <dl>
-        @foreach (var claim in (User.Identity as ClaimsIdentity).Claims)
+        @foreach (var claim in ((ClaimsIdentity) User.Identity).Claims)
         {
             <dt>@claim.Type</dt>
             <dd>@claim.Value</dd>

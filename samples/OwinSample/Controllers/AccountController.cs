@@ -6,15 +6,7 @@ namespace OwinSample.Controllers
 {
     public class AccountController : Controller
     {
-        // GET: /Account/ExternalLoginFailure
-        [HttpGet]
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
-        }
-
-        // GET: /Account/Login
+        // GET /Account/Login
         [HttpGet]
         [AllowAnonymous]
         public ActionResult Login(string scheme)
@@ -23,18 +15,25 @@ namespace OwinSample.Controllers
             {
                 return View();
             }
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") };
-            AuthenticationManager.Challenge(properties, scheme);
+
+            Request.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
             return new EmptyResult();
         }
 
-        // GET: /Account/Logout
+        // GET /Account/Logout
         [HttpGet]
         public void Logout()
         {
-            AuthenticationManager.SignOut(new AuthenticationProperties { RedirectUri = "/" });
+            Request.GetOwinContext().Authentication.SignOut();
         }
 
-        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
+        // GET /Account/ExternalLoginFailure
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult ExternalLoginFailure()
+        {
+            Response.StatusCode = 401;
+            return View();
+        }
     }
 }

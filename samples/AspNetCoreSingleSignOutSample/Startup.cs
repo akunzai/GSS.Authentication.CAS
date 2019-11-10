@@ -61,8 +61,6 @@ namespace AspNetCoreSingleSignOutSample
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = CookieAuthenticationDefaults.LoginPath;
-                options.LogoutPath = CookieAuthenticationDefaults.LogoutPath;
                 options.SessionStore = Services.GetRequiredService<ITicketStore>();
                 options.Events.OnSigningOut = context =>
                 {
@@ -90,7 +88,6 @@ namespace AspNetCoreSingleSignOutSample
             })
             .AddCAS(options =>
             {
-                options.CallbackPath = "/signin-cas";
                 options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
                 // required for CasSingleSignOutMiddleware
                 options.SaveTokens = true;
@@ -139,7 +136,7 @@ namespace AspNetCoreSingleSignOutSample
                     }
                 };
             })
-            .AddOAuth("OAuth", options =>
+            .AddOAuth(OAuthDefaults.DisplayName, options =>
             {
                 options.CallbackPath = "/signin-oauth";
                 options.ClientId = Configuration["Authentication:OAuth:ClientId"];
@@ -151,34 +148,32 @@ namespace AspNetCoreSingleSignOutSample
                 options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-                options.Events = new OAuthEvents
+                options.Events.OnCreatingTicket = async context =>
                 {
-                    OnCreatingTicket = async context =>
+                    // Get the OAuth user
+                    using var request =
+                        new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                    request.Headers.Authorization =
+                        new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                    using var response =
+                        await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                     {
-                        // Get the OAuth user
-                        var request =
-                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Authorization =
-                            new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        var response =
-                            await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                        }
-                        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                        using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                        context.RunClaimActions(json.RootElement);
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        var failure = context.Failure;
-                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
-                        logger.LogError(failure, failure.Message);
-                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
+                        throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                     }
+                    using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+                    context.RunClaimActions(json.RootElement);
+                };
+                options.Events.OnRemoteFailure = context =>
+                {
+                    var failure = context.Failure;
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
+                    logger.LogError(failure, failure.Message);
+                    context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+
                 };
             });
         }

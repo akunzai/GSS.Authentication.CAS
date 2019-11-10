@@ -41,9 +41,11 @@ namespace GSS.Authentication.CAS.AspNetCore
 
             // CSRF
             GenerateCorrelationId(properties);
+
             var state = Options.StateDataFormat.Protect(properties);
             var service = BuildRedirectUri($"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
             var authorizationEndpoint = $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(service)}";
+
             var redirectContext = new RedirectContext<CasAuthenticationOptions>(
                 Context, Scheme, Options,
                 properties, authorizationEndpoint);
@@ -56,6 +58,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             var query = Request.Query;
             var state = query["state"];
             var properties = Options.StateDataFormat.Unprotect(state);
+
             if (properties == null)
             {
                 return HandleRequestResult.Fail("The state was missing or invalid.");
@@ -68,6 +71,7 @@ namespace GSS.Authentication.CAS.AspNetCore
             }
 
             var serviceTicket = query["ticket"];
+
             if (string.IsNullOrEmpty(serviceTicket))
             {
                 return HandleRequestResult.Fail("Missing CAS ticket.");
@@ -80,21 +84,30 @@ namespace GSS.Authentication.CAS.AspNetCore
             {
                 return HandleRequestResult.Fail("Missing Validate Principal.");
             }
+
             if (Options.SaveTokens)
             {
                 properties.StoreTokens(new List<AuthenticationToken>
                 {
-                    new AuthenticationToken {Name = "access_token", Value = serviceTicket}
+                    new AuthenticationToken
+                    {
+                        Name = "access_token",
+                        Value = serviceTicket
+                    }
                 });
             }
-            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),properties,principal.Assertion).ConfigureAwait(false);
+
+            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal), properties, principal.Assertion).ConfigureAwait(false);
+
             return ticket != null ? HandleRequestResult.Success(ticket) : HandleRequestResult.Fail("Failed to retrieve user information from remote server.");
         }
 
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal, AuthenticationProperties properties, Assertion assertion)
         {
             var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Backchannel, assertion);
+
             await Events.CreatingTicket(context).ConfigureAwait(false);
+
             return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
         }
     }

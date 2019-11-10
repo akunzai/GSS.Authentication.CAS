@@ -28,35 +28,19 @@ namespace OwinSingleSignOutSample
     {
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private static IConfiguration _configuration;
-        private static IServiceProvider _services;
+        private static IServiceProvider _resolver;
 
         public void Configuration(IAppBuilder app)
         {
-            if (_configuration == null)
-            {
-                var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
-                _configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json")
-                    .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
-                    .Build();
-            }
+            var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+                .Build();
 
-            if (_services == null)
-            {
-                var serviceCollection = new ServiceCollection();
-                var redisConfiguration = _configuration.GetConnectionString("Redis");
-                if (!string.IsNullOrWhiteSpace(redisConfiguration))
-                {
-                    serviceCollection.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
-                }
-                else
-                {
-                    serviceCollection.AddDistributedMemoryCache();
-                }
-                serviceCollection.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-                serviceCollection.AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>();
-                _services = serviceCollection.BuildServiceProvider();
-            }
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            _resolver = services.BuildServiceProvider();
 
             // MVC
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
@@ -70,7 +54,7 @@ namespace OwinSingleSignOutSample
             app.UseNLog();
             app.UseErrorPage();
 
-            app.UseCasSingleSignOut(_services.GetRequiredService<IAuthenticationSessionStore>());
+            app.UseCasSingleSignOut(_resolver.GetRequiredService<IAuthenticationSessionStore>());
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
@@ -78,9 +62,19 @@ namespace OwinSingleSignOutSample
             {
                 LoginPath = CookieAuthenticationDefaults.LoginPath,
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
-                SessionStore = _services.GetRequiredService<IAuthenticationSessionStore>(),
+                SessionStore = _resolver.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {
+                    OnResponseSignedIn = context =>
+                    {
+                        var loginRedirectContext = new CookieApplyRedirectContext
+                        (
+                            context.OwinContext,
+                            context.Options,
+                            context.Properties.RedirectUri ?? "/"
+                        );
+                        context.Options.Provider.ApplyRedirect(loginRedirectContext);
+                    },
                     OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
@@ -89,11 +83,12 @@ namespace OwinSingleSignOutSample
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
                         redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                        var logoutRedirectContext = new CookieApplyRedirectContext(
+                        var logoutRedirectContext = new CookieApplyRedirectContext
+                        (
                             context.OwinContext,
                             context.Options,
                             redirectUri.Uri.AbsoluteUri
-                            );
+                        );
                         context.Options.Provider.ApplyRedirect(logoutRedirectContext);
                     }
                 }
@@ -156,12 +151,16 @@ namespace OwinSingleSignOutSample
                         using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
                         using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+
                         if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                         {
-                            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). [{responseText}]");
+                            var responseText = response.Content == null
+                                ? string.Empty
+                                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). {responseText}");
                             return;
                         }
+
                         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                         using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                         var user = json.RootElement;
@@ -185,12 +184,30 @@ namespace OwinSingleSignOutSample
                     {
                         var failure = context.Failure;
                         _logger.Error(failure, failure.Message);
-                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
                         context.HandleResponse();
                         return Task.CompletedTask;
                     }
                 };
             });
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            var redisConfiguration = _configuration.GetConnectionString("Redis");
+            if (!string.IsNullOrWhiteSpace(redisConfiguration))
+            {
+                services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
+            }
+            else
+            {
+                services.AddDistributedMemoryCache();
+            }
+            services
+                .AddSingleton(_configuration)
+                .AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>()
+                .AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>()
+                .BuildServiceProvider();
         }
     }
 }

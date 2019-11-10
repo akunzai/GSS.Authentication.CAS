@@ -1,10 +1,11 @@
 using System.Web.Mvc;
 
-namespace OwinSample.Controllers
+namespace OwinSingleSignOutSample.Controllers
 {
     [AllowAnonymous]
     public class HomeController : Controller
     {
+        [HttpGet]
         public ActionResult Index()
         {
             return View();

@@ -107,11 +107,13 @@ namespace AspNetCoreIdentitySample
                                 new AuthenticationHeaderValue("Bearer", context.AccessToken);
                             using var response =
                                 await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
+
                             if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                             {
                                 throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
                             }
-                            using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+                            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                             using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                             context.RunClaimActions(json.RootElement);
                         }

@@ -29,14 +29,11 @@ namespace AspNetMvcSample
 
         public void Configuration(IAppBuilder app)
         {
-            if (_configuration == null)
-            {
-                var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
-                _configuration = new ConfigurationBuilder()
+            var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
+            _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .Build();
-            }
 
             // MVC
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
@@ -58,6 +55,16 @@ namespace AspNetMvcSample
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
                 Provider = new CookieAuthenticationProvider
                 {
+                    OnResponseSignedIn = context =>
+                    {
+                        var loginRedirectContext = new CookieApplyRedirectContext
+                        (
+                            context.OwinContext,
+                            context.Options,
+                            context.Properties.RedirectUri ?? "/"
+                        );
+                        context.Options.Provider.ApplyRedirect(loginRedirectContext);
+                    },
                     OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
@@ -66,11 +73,12 @@ namespace AspNetMvcSample
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
                         redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                        var logoutRedirectContext = new CookieApplyRedirectContext(
+                        var logoutRedirectContext = new CookieApplyRedirectContext
+                        (
                             context.OwinContext,
                             context.Options,
                             redirectUri.Uri.AbsoluteUri
-                            );
+                        );
                         context.Options.Provider.ApplyRedirect(logoutRedirectContext);
                     }
                 }
@@ -79,6 +87,7 @@ namespace AspNetMvcSample
             app.UseCasAuthentication(options =>
             {
                 options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
+                options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
@@ -130,12 +139,16 @@ namespace AspNetMvcSample
                         using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
                         using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+
                         if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                         {
-                            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). [{responseText}]");
+                            var responseText = response.Content == null
+                                ? string.Empty
+                                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). {responseText}");
                             return;
                         }
+
                         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                         using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                         var user = json.RootElement;
@@ -159,7 +172,7 @@ namespace AspNetMvcSample
                     {
                         var failure = context.Failure;
                         _logger.Error(failure, failure.Message);
-                        context.Response.Redirect($"/Account/ExternalLoginFailure?failureMessage={Uri.EscapeDataString(failure.Message)}");
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
                         context.HandleResponse();
                         return Task.CompletedTask;
                     }

@@ -69,16 +69,8 @@ namespace GSS.Authentication.CAS.AspNetCore
             }
 
             var service = BuildRedirectUri($"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
-            ICasPrincipal? principal;
-            try
-            {
-                principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                Logger.LogWarning(e.Message, e);
-                return HandleRequestResult.Fail("There was a problem validating ticket.");
-            }
+            var principal = await Options.ServiceTicketValidator.ValidateAsync(serviceTicket, service, Context.RequestAborted).ConfigureAwait(false);
+
             if (principal == null)
             {
                 return HandleRequestResult.Fail("Missing Validate Principal.");

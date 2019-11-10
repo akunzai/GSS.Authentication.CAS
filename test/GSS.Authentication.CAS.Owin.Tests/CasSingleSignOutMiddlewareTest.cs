@@ -13,42 +13,35 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "<Pending>")]
-    public class CasSingleSignOutMiddlewareTest : IClassFixture<CasFixture>,IDisposable
+    public class CasSingleSignOutMiddlewareTest : IClassFixture<CasFixture>
     {
-        private readonly IServiceTicketStore _store;
-        private readonly TestServer _server;
-        private readonly HttpClient _client;
-        private readonly CasFixture _fixture;
+        private readonly IFileProvider _files;
 
         public CasSingleSignOutMiddlewareTest(CasFixture fixture)
         {
-            _fixture = fixture;
-            // Arrange
-            _store = Mock.Of<IServiceTicketStore>();
-            _server = TestServer.Create(app => app.UseCasSingleSignOut(new AuthenticationSessionStoreWrapper(_store)));
-            _client = _server.HttpClient;
-        }
-
-        public void Dispose()
-        {
-            _server.Dispose();
+            _files = fixture.FileProvider;
         }
 
         [Fact]
-        public async Task RecievedSignoutRequest_FailAsync()
+        public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()
         {
+            // Arrange
+            var store = new Mock<IServiceTicketStore>();
+            using var server = CreateServer(store.Object);
+
             // Act
-            await _client.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>())).ConfigureAwait(false);
+            using var response = await server.HttpClient.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>())).ConfigureAwait(false);
 
             // Assert
-            Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+            store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task RecievedSignoutRequest_FailWithJsonContentAsync()
+        public async Task WithJsonLogoutRequest_ShouldNotRemoveTicket()
         {
             // Arrange
+            var store = new Mock<IServiceTicketStore>();
+            using var server = CreateServer(store.Object);
             var content = new StringContent(
                 JsonSerializer.Serialize(new
                 {
@@ -59,32 +52,39 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 );
 
             // Act
-            await _client.PostAsync("/", content).ConfigureAwait(false);
+            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
 
             // Assert
-            Mock.Get(_store).Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+            store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task RecievedSignoutRequest_SuccessAsync()
+        public async Task WithFormUrlEncodedLogoutRequest_ShouldRemoveTicket()
         {
             // Arrange
+            var store = new Mock<IServiceTicketStore>();
+            using var server = CreateServer(store.Object);
             var removedTicket = string.Empty;
-            Mock.Get(_store).Setup(x => x.RemoveAsync(It.IsAny<string>()))
+            store.Setup(x => x.RemoveAsync(It.IsAny<string>()))
                 .Callback<string>((x) => removedTicket = x)
                 .Returns(Task.CompletedTask);
             var ticket = Guid.NewGuid().ToString();
-            var parts = new Dictionary<string, string>
+            using var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["logoutRequest"] = _fixture.FileProvider.ReadAsString("SamlLogoutRequest.xml").Replace("$TICKET", ticket)
-            };
+                ["logoutRequest"] = _files.ReadAsString("SamlLogoutRequest.xml").Replace("$TICKET", ticket)
+            });
 
             // Act
-            await _client.PostAsync("/", new FormUrlEncodedContent(parts)).ConfigureAwait(false);
+            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(ticket, removedTicket);
-            Mock.Get(_store).Verify(x => x.RemoveAsync(ticket), Times.Once);
+            store.Verify(x => x.RemoveAsync(ticket), Times.Once);
+        }
+
+        private TestServer CreateServer(IServiceTicketStore store)
+        {
+            return TestServer.Create(app => app.UseCasSingleSignOut(new AuthenticationSessionStoreWrapper(store)));
         }
     }
 }

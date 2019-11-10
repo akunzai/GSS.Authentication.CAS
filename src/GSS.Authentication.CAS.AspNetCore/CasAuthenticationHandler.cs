@@ -27,6 +27,11 @@ namespace GSS.Authentication.CAS.AspNetCore
             set => base.Events = value;
         }
 
+        protected override Task<object> CreateEventsAsync()
+        {
+            return Task.FromResult((object)new CasEvents());
+        }
+
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
             if (string.IsNullOrEmpty(properties.RedirectUri))

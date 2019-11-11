@@ -140,9 +140,9 @@ namespace OwinSample
                         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                         using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                         var user = json.RootElement;
-                        if (user.TryGetProperty("id", out var identifier))
+                        if (user.TryGetProperty("id", out var id))
                         {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier.GetString()));
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
                         }
                         if (user.TryGetProperty("attributes", out var attributes))
                         {

@@ -1,7 +1,6 @@
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
 
 namespace OwinSample.Controllers
 {
@@ -31,10 +30,9 @@ namespace OwinSample.Controllers
 
         // GET: /Account/Logout
         [HttpGet]
-        public ActionResult Logout()
+        public void Logout()
         {
-            AuthenticationManager.SignOut(CookieAuthenticationDefaults.AuthenticationType);
-            return RedirectToAction("Index", "Home");
+            AuthenticationManager.SignOut(new AuthenticationProperties { RedirectUri = "/" });
         }
 
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;

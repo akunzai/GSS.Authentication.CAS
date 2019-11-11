@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AspNetCoreSample.Pages.Account
@@ -9,8 +8,7 @@ namespace AspNetCoreSample.Pages.Account
     {
         public async Task OnGet()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
-            RedirectToPage("/");
+            await HttpContext.SignOutAsync(new AuthenticationProperties { RedirectUri = "/" }).ConfigureAwait(false);
         }
     }
 }

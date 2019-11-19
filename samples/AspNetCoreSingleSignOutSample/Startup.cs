@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -68,8 +69,8 @@ namespace AspNetCoreSingleSignOutSample
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(Configuration["Authentication:CAS:ServerUrlBase"]);
-                        var serviceUrl = new Uri(context.Request.GetEncodedUrl())
-                            .GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+                        var serviceUrl = links.GetUriByPage(context.HttpContext, "/Index");
                         var redirectUri = UriHelper.BuildAbsolute(
                             casUrl.Scheme,
                             new HostString(casUrl.Host, casUrl.Port),

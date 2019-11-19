@@ -11,6 +11,32 @@
 
 @foreach (var type in AuthOptions.Value.Schemes)
 {
-    if (string.IsNullOrEmpty(type.DisplayName)) continue;
-    <a class="btn btn-outline-primary btn-lg" href="?scheme=@type.Name" role="button">@(type.DisplayName ?? type.Name)</a>
+    if (string.IsNullOrEmpty(type.DisplayName)) { continue; }
+    <a class="btn btn-outline-primary btn-lg" href="?scheme=@type.Name" role="button">@type.DisplayName</a>
+}
+<button class="btn btn-outline-primary btn-lg" id="form-login">Form</button>
+
+<form method="post" class="login-form @Model.FormClass">
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <input asp-for="Username" class="form-control" placeholder="Username" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" class="form-control" placeholder="Password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+@section Scripts
+{
+    <script>
+        $('#form-login').on("click", function () {
+            $(".login-form").toggleClass('invisible');
+        });
+    </script>
 }

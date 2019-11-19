@@ -30,20 +30,64 @@ namespace GSS.Authentication.CAS.Owin
 
         public async Task<bool> InvokeReturnPathAsync()
         {
-            var model = await AuthenticateAsync().ConfigureAwait(false);
-            if (model == null)
+            AuthenticationTicket? ticket = null;
+            Exception? exception = null;
+            AuthenticationProperties? properties = null;
+            try
             {
-                _logger.WriteWarning("Invalid return state, unable to redirect.");
-                Response.StatusCode = 500;
-                return true;
+                ticket = await AuthenticateAsync().ConfigureAwait(false);
+                if (ticket?.Identity == null || !ticket.Identity.IsAuthenticated)
+                {
+                    exception = new InvalidOperationException("Invalid return state, unable to redirect.");
+                    properties = ticket?.Properties;
+                }
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
             }
 
-            var context = new CasRedirectToAuthorizationEndpointContext(Context, model)
+            if (exception != null)
+            {
+                _logger.WriteWarning(exception.Message);
+
+                var errorContext = new CasRemoteFailureContext(Context, exception)
+                {
+                    Properties = properties
+                };
+
+                await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
+
+                if (errorContext.Handled)
+                {
+                    return true;
+                }
+
+                if (errorContext.Skipped)
+                {
+                    return false;
+                }
+
+                Response.StatusCode = 500;
+
+                if (errorContext.Failure != null)
+                {
+                    throw new Exception("An error was encountered while handling the remote login.", errorContext.Failure);
+                }
+            }
+
+#pragma warning disable CS8604 // Possible null reference argument.
+            var context = new CasRedirectToAuthorizationEndpointContext(Context, ticket)
+#pragma warning restore CS8604 // Possible null reference argument.
             {
                 SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
-                RedirectUri = model.Properties.RedirectUri
+                RedirectUri = ticket?.Properties.RedirectUri
             };
-            model.Properties.RedirectUri = null;
+
+            if (ticket != null)
+            {
+                ticket.Properties.RedirectUri = null;
+            }
 
             await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
 
@@ -74,59 +118,56 @@ namespace GSS.Authentication.CAS.Owin
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             AuthenticationProperties? properties = null;
-            try
+            var query = Request.Query;
+            var state = query.GetValues("state")?.FirstOrDefault() ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(state))
             {
-                var query = Request.Query;
-                var state = query.GetValues("state")?.FirstOrDefault() ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(state))
-                {
-                    properties = Options.StateDataFormat.Unprotect(state);
-                }
-                if (properties == null)
-                {
-                    _logger.WriteWarning("Invalid return state");
-                    return new AuthenticationTicket(null, properties);
-                }
-
-                // Anti-CSRF
-                if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
-                {
-                    return new AuthenticationTicket(null, properties);
-                }
-
-                var ticket = query.GetValues("ticket")?.FirstOrDefault() ?? string.Empty;
-                if (string.IsNullOrEmpty(ticket))
-                {
-                    _logger.WriteWarning("Missing ticket parameter");
-                    return new AuthenticationTicket(null, properties);
-                }
-
-                var service = BuildReturnTo(state);
-                var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
-                if (principal == null)
-                {
-                    _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
-                    return new AuthenticationTicket(null, properties);
-                }
-                if (Options.UseAuthenticationSessionStore)
-                {
-                    // store serviceTicket for single sign out
-                    properties.SetServiceTicket(ticket);
-                }
-                var context = new CasCreatingTicketContext(
-                    Context,
-                    principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
-                    properties);
-
-                await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
-
-                return new AuthenticationTicket(context.Identity, context.Properties);
+                properties = Options.StateDataFormat.Unprotect(state);
             }
-            catch (Exception ex)
+
+            if (properties == null)
             {
-                _logger.WriteError("Authentication failed", ex);
+                return new AuthenticationTicket(null, null);
+            }
+
+            // Anti-CSRF
+            if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
+            {
                 return new AuthenticationTicket(null, properties);
             }
+
+            var ticket = query.GetValues("ticket")?.FirstOrDefault() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(ticket))
+            {
+                _logger.WriteWarning("Missing ticket parameter");
+                return new AuthenticationTicket(null, properties);
+            }
+
+            var service = BuildReturnTo(state);
+            var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
+
+            if (principal == null)
+            {
+                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
+                return new AuthenticationTicket(null, properties);
+            }
+
+            if (Options.UseAuthenticationSessionStore)
+            {
+                // store serviceTicket for single sign out
+                properties.SetServiceTicket(ticket);
+            }
+
+            var context = new CasCreatingTicketContext(
+                Context,
+                principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
+                properties);
+
+            await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
+
+            return new AuthenticationTicket(context.Identity, context.Properties);
         }
 
         protected override Task ApplyResponseChallengeAsync()

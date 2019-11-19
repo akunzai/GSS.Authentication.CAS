@@ -109,6 +109,118 @@ namespace GSS.Authentication.CAS.Owin.Tests
             ticketValidator.Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Fact]
+        public async Task ValidatingTicketFailureWithoutHandledResponse_ShouldThrows()
+        {
+            // Arrange
+            var ticketValidator = new Mock<IServiceTicketValidator>();
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator.Object;
+                options.CasServerUrlBase = _options.CasServerUrlBase;
+            });
+            var ticket = Guid.NewGuid().ToString();
+            ticketValidator
+                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Throws(new NotSupportedException("test"));
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+
+            Exception exception = null;
+            try
+            {
+                // Act
+                using var signinRequest = challengeResponse.GetRequest(validateUrl);
+                await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+            Assert.IsType<NotSupportedException>(exception.InnerException);
+        }
+
+        [Fact]
+        public async Task CreatingTicketFailureWithoutHandledResponse_ShouldThrows()
+        {
+            // Arrange
+            var ticketValidator = new Mock<IServiceTicketValidator>();
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator.Object;
+                options.CasServerUrlBase = _options.CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnCreatingTicket = _ => throw new NotSupportedException("test")
+                };
+            });
+            var ticket = Guid.NewGuid().ToString();
+            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+            ticketValidator
+                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(principal);
+
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+
+            Exception exception = null;
+            try
+            {
+                // Act
+                using var signinRequest = challengeResponse.GetRequest(validateUrl);
+                await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+            Assert.IsType<NotSupportedException>(exception.InnerException);
+        }
+
+        [Fact]
+        public async Task CreatingTicketFailureWithHandledResponse_ShouldRedirectToAcccessDeniedPath()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = _options.CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnCreatingTicket = _ => throw new NotSupportedException("test"),
+                    OnRemoteFailure = context =>
+                    {
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+            var ticket = Guid.NewGuid().ToString();
+
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+
+            // Act
+            using var signinRequest = challengeResponse.GetRequest(validateUrl);
+            using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
+            Assert.Equal("/Account/ExternalLoginFailure", signinResponse.Headers.Location.OriginalString);
+        }
+
         private TestServer CreateServer(Action<CasAuthenticationOptions> configureOptions)
         {
             var options = new CasAuthenticationOptions();

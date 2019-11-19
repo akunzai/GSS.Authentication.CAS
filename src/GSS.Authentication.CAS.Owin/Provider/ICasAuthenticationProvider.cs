@@ -20,5 +20,12 @@ namespace GSS.Authentication.CAS.Owin
         /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge.</param>
         /// <returns></returns>
         Task RedirectToAuthorizationEndpoint(CasRedirectToAuthorizationEndpointContext context);
+
+        /// <summary>
+        /// Invoked when there is a remote failure.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task RemoteFailure(CasRemoteFailureContext context);
     }
 }

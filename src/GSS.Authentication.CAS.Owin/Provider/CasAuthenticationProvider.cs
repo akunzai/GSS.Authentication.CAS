@@ -23,8 +23,12 @@ namespace GSS.Authentication.CAS.Owin
             return Task.CompletedTask;
         };
 
+        public Func<CasRemoteFailureContext, Task> OnRemoteFailure { get; set; } = context => Task.CompletedTask;
+
         public virtual Task CreatingTicket(CasCreatingTicketContext context) => OnCreatingTicket(context);
 
         public virtual Task RedirectToAuthorizationEndpoint(CasRedirectToAuthorizationEndpointContext context) => OnRedirectToAuthorizationEndpoint(context);
+
+        public Task RemoteFailure(CasRemoteFailureContext context) => OnRemoteFailure(context);
     }
 }

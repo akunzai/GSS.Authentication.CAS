@@ -117,6 +117,14 @@ namespace OwinSample
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
                         return Task.CompletedTask;
+                    },
+                    OnRemoteFailure = context =>
+                    {
+                        var failure = context.Failure;
+                        _logger.Error(failure, failure.Message);
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
                     }
                 };
             });

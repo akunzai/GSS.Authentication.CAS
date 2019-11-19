@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace GSS.Authentication.CAS
 {
+    /// <summary>
+    /// Configuration options for <see cref="CasAuthenticationHandler{TOptions}"/>
+    /// </summary>
     public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
     {
         public CasAuthenticationOptions()
@@ -13,13 +16,9 @@ namespace GSS.Authentication.CAS
             Events = new CasEvents();
         }
 
-        #region ICasOptions
-
         public string CasServerUrlBase { get; set; } = default!;
 
         public string AuthenticationType => CasDefaults.AuthenticationType;
-
-        #endregion
 
         public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
 

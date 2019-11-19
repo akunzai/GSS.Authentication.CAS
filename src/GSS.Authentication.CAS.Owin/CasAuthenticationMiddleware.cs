@@ -11,6 +11,9 @@ using Owin;
 
 namespace GSS.Authentication.CAS.Owin
 {
+    /// <summary>
+    /// OWIN middleware for authenticating users using CAS protocol
+    /// </summary>
     public class CasAuthenticationMiddleware : AuthenticationMiddleware<CasAuthenticationOptions>
     {
         private readonly ILogger _logger;
@@ -26,10 +29,12 @@ namespace GSS.Authentication.CAS.Owin
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
             _logger = app.CreateLogger<CasAuthenticationMiddleware>();
+
             if (Options.Provider == null)
             {
                 Options.Provider = new CasAuthenticationProvider();
             }
+
             if (Options.StateDataFormat == null)
             {
                 var dataProtecter = app.CreateDataProtector(
@@ -37,6 +42,7 @@ namespace GSS.Authentication.CAS.Owin
                     Options.AuthenticationType, "v1");
                 Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
             }
+
             if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))
             {
                 Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();

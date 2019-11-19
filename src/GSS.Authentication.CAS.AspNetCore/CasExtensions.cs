@@ -7,6 +7,9 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Extension methods for using <see cref="CasAuthenticationHandler{TOptions}"/>
+    /// </summary>
     public static class CasExtensions
     {
         public static AuthenticationBuilder AddCAS(this AuthenticationBuilder builder)

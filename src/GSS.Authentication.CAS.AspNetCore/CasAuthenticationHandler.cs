@@ -27,6 +27,10 @@ namespace GSS.Authentication.CAS.AspNetCore
             set => base.Events = value;
         }
 
+        /// <summary>
+        /// Creates a new instance of the events instance.
+        /// </summary>
+        /// <returns>A new instance of the events instance.</returns>
         protected override Task<object> CreateEventsAsync()
         {
             return Task.FromResult((object)new CasEvents());

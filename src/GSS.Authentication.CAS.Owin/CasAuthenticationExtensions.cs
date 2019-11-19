@@ -3,6 +3,9 @@ using GSS.Authentication.CAS.Owin;
 
 namespace Owin
 {
+    /// <summary>
+    /// Extension methods for using <see cref="CasAuthenticationMiddleware"/>
+    /// </summary>
     public static class CasAuthenticationExtensions
     {
         public static IAppBuilder UseCasAuthentication(this IAppBuilder app, Action<CasAuthenticationOptions>? configureOptions = null)

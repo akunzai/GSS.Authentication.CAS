@@ -4,6 +4,8 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Routing;
 using GSS.Authentication.CAS;
@@ -50,6 +52,7 @@ namespace OwinSingleSignOutSample
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
 
             app.UseNLog();
             app.UseErrorPage();
@@ -65,21 +68,12 @@ namespace OwinSingleSignOutSample
                 SessionStore = _resolver.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {
-                    OnResponseSignedIn = context =>
-                    {
-                        var loginRedirectContext = new CookieApplyRedirectContext
-                        (
-                            context.OwinContext,
-                            context.Options,
-                            context.Properties.RedirectUri ?? "/"
-                        );
-                        context.Options.Provider.ApplyRedirect(loginRedirectContext);
-                    },
                     OnResponseSignOut = context =>
                     {
                         // Single Sign-Out
                         var casUrl = new Uri(_configuration["Authentication:CAS:ServerUrlBase"]);
-                        var serviceUrl = context.Request.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
+                        var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+                        var serviceUrl = urlHelper.Action("Index", "Home", null, HttpContext.Current.Request.Url.Scheme);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
                         redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";

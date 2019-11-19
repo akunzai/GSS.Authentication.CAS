@@ -8,7 +8,7 @@ namespace AspNetCoreSample.Pages.Account
     {
         public async Task OnGet()
         {
-            await HttpContext.SignOutAsync(new AuthenticationProperties { RedirectUri = "/" }).ConfigureAwait(false);
+            await HttpContext.SignOutAsync().ConfigureAwait(false);
         }
     }
 }

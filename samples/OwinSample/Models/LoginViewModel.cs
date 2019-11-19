@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AspNetMvcSample.Models
+namespace OwinSample.Models
 {
     public class LoginViewModel
     {

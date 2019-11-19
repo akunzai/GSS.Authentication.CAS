@@ -41,6 +41,5 @@ Check out these [samples](./samples/) to learn the basics and key features.
 - [ASP.NET Core app](./samples/AspNetCoreSample/)
 - [ASP.NET Core app with Single-Sign-Out](./samples/AspNetCoreSingleSignOutSample/)
 - [ASP.NET Core Identity app](./samples/AspNetCoreIdentitySample/)
-- [ASP.NET MVC app](./samples/AspNetMvcSample/)
 - [OWIN app](./samples/OwinSample/)
 - [OWIN app with Single-Sign-Out](./samples/OwinSingleSignOutSample/)

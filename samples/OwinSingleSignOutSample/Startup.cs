@@ -140,7 +140,6 @@ namespace OwinSingleSignOutSample
                 options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
-                options.SaveTokensAsClaims = true;
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>

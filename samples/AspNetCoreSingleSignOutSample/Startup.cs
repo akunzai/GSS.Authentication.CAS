@@ -148,7 +148,6 @@ namespace AspNetCoreSingleSignOutSample
                 options.AuthorizationEndpoint = Configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = Configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = Configuration["Authentication:OAuth:UserInformationEndpoint"];
-                options.SaveTokens = true;
                 options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
                 options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");

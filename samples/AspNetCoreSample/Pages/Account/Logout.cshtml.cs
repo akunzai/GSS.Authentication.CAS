@@ -1,14 +1,13 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AspNetCoreSample.Pages.Account
 {
     public class LogoutModel : PageModel
     {
-        public async Task OnGet()
+        public IActionResult OnGet()
         {
-            await HttpContext.SignOutAsync().ConfigureAwait(false);
+            return SignOut();
         }
     }
 }

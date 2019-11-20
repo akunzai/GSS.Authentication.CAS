@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -35,6 +36,7 @@ namespace OwinSample
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             // MVC
@@ -47,8 +49,10 @@ namespace OwinSample
             );
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
 
+            // configure nlog.config per environment
+            var configFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"NLog.{env}.config"));
+            LogManager.LoadConfiguration(configFile.Exists ? configFile.Name : "NLog.config");
             app.UseNLog();
-            app.UseErrorPage();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 

@@ -8,7 +8,6 @@ namespace AspNetCoreSingleSignOutSample.Pages
     {
         public void OnGet()
         {
-
         }
     }
 }

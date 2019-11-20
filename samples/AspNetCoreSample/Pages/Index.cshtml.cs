@@ -8,7 +8,6 @@ namespace AspNetCoreSample.Pages
     {
         public void OnGet()
         {
-
         }
     }
 }

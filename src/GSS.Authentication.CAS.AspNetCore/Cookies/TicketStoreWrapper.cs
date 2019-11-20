@@ -27,9 +27,7 @@ namespace GSS.Authentication.CAS.AspNetCore
         public async Task<AuthenticationTicket?> RetrieveAsync(string key)
         {
             var ticket = await _store.RetrieveAsync(key).ConfigureAwait(false);
-            if (ticket == null)
-                return null;
-            return BuildAuthenticationTicket(ticket);
+            return ticket == null ? null : BuildAuthenticationTicket(ticket);
         }
 
         public Task RenewAsync(string key, AuthenticationTicket ticket)

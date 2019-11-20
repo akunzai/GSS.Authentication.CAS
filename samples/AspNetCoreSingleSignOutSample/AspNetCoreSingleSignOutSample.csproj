@@ -12,6 +12,9 @@
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="NLog.*.config" CopyToPublishDirectory="Never">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

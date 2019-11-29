@@ -7,11 +7,11 @@ using OwinSample.Models;
 
 namespace OwinSample.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         // GET /Account/Login
         [HttpGet]
-        [AllowAnonymous]
         public ActionResult Login(string scheme)
         {
             if (string.IsNullOrWhiteSpace(scheme))
@@ -25,7 +25,6 @@ namespace OwinSample.Controllers
 
         // POST /Account/Login
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model)
         {
@@ -56,7 +55,6 @@ namespace OwinSample.Controllers
 
         // GET /Account/ExternalLoginFailure
         [HttpGet]
-        [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
             Response.StatusCode = 401;

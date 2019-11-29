@@ -9,7 +9,8 @@ namespace AspNetCoreSingleSignOutSample.Pages.Account
     {
         public IActionResult OnGet()
         {
-            return StatusCode(401);
+            Response.StatusCode = 401;
+            return Page();
         }
     }
 }

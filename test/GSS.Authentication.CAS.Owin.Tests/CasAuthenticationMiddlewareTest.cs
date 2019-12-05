@@ -147,6 +147,43 @@ namespace GSS.Authentication.CAS.Owin.Tests
         }
 
         [Fact]
+        public async Task ValidatingTicketFailureWithHandledResponse_ShouldRedirectToAccessDeniedPath()
+        {
+            // Arrange
+            var ticketValidator = new Mock<IServiceTicketValidator>();
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator.Object;
+                options.CasServerUrlBase = _options.CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnRemoteFailure = context =>
+                    {
+                        context.Response.Redirect("/Account/ExternalLoginFailure");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+            var ticket = Guid.NewGuid().ToString();
+            ticketValidator
+                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Throws(new NotSupportedException("test"));
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+
+            // Act
+            using var signinRequest = challengeResponse.GetRequest(validateUrl);
+            using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
+            Assert.Equal("/Account/ExternalLoginFailure", signinResponse.Headers.Location.OriginalString);
+        }
+
+        [Fact]
         public async Task CreatingTicketFailureWithoutHandledResponse_ShouldThrows()
         {
             // Arrange

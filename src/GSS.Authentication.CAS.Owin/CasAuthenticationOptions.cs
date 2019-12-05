@@ -91,6 +91,6 @@ namespace Owin
         /// <summary>
         /// Gets or sets the <see cref="ICasAuthenticationProvider"/> used to handle authentication events.
         /// </summary>
-        public ICasAuthenticationProvider Provider { get; set; }
+        public ICasAuthenticationProvider Provider { get; set; } = default!;
     }
 }

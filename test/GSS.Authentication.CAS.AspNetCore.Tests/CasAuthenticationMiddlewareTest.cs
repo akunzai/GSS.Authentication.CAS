@@ -32,7 +32,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         }
 
         [Fact]
-        public async Task AnonumousRequest_ShouldRedirectToLoginPath()
+        public async Task AnonymousRequest_ShouldRedirectToLoginPath()
         {
             // Arrange
             var ticketValidator = new Mock<IServiceTicketValidator>();
@@ -158,7 +158,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         }
 
         [Fact]
-        public async Task ValidatingTicketFailureWithHandledResponse_ShouldRedirectToAcccessDeniedPath()
+        public async Task ValidatingTicketFailureWithHandledResponse_ShouldRedirectToAccessDeniedPath()
         {
             // Arrange
             var ticketValidator = new Mock<IServiceTicketValidator>();
@@ -239,7 +239,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         }
 
         [Fact]
-        public async Task CreatingTicketFailureWithHandledResponse_ShouldRedirectToAcccessDeniedPath()
+        public async Task CreatingTicketFailureWithHandledResponse_ShouldRedirectToAccessDeniedPath()
         {
             // Arrange
             using var server = CreateServer(options =>

@@ -37,10 +37,10 @@ namespace GSS.Authentication.CAS.Owin
 
             if (Options.StateDataFormat == null)
             {
-                var dataProtecter = app.CreateDataProtector(
+                var dataProtector = app.CreateDataProtector(
                     typeof(CasAuthenticationMiddleware).FullName,
                     Options.AuthenticationType, "v1");
-                Options.StateDataFormat = new PropertiesDataFormat(dataProtecter);
+                Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
 
             if (string.IsNullOrEmpty(Options.SignInAsAuthenticationType))

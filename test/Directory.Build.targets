@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(OS)' != 'Windows_NT' ">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

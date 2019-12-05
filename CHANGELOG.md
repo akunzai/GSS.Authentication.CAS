@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2019-12-05
+
+### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.1.0
+
+- Simplify targeting and dependencies (#31)
+- Improve error handling (#33)
+- Use ICookieManager to Read/Write CSRF Tokens (#37)
+- Add remote failure event support (#38)
+
 ## 2019-10-30
 
 ### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.0.0

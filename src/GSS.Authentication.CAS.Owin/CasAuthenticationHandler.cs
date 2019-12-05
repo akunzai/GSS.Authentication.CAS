@@ -89,7 +89,7 @@ namespace GSS.Authentication.CAS.Owin
                 }
 
                 // Anti-CSRF
-                if (!ValidateCorrelationId(properties, _logger))
+                if (!ValidateCorrelationId(Options.CookieManager, properties, _logger))
                 {
                     return new AuthenticationTicket(null, properties);
                 }
@@ -149,7 +149,7 @@ namespace GSS.Authentication.CAS.Owin
                 }
 
                 // Anti-CSRF
-                GenerateCorrelationId(state);
+                GenerateCorrelationId(Options.CookieManager, state);
 
                 var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
 

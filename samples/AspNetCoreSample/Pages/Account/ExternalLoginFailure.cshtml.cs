@@ -9,7 +9,7 @@ namespace AspNetCoreSample.Pages.Account
     {
         public IActionResult OnGet()
         {
-            Response.StatusCode = 401;
+            Response.StatusCode = 500;
             return Page();
         }
     }

@@ -57,7 +57,7 @@ namespace OwinSingleSignOutSample.Controllers
         [HttpGet]
         public ActionResult ExternalLoginFailure()
         {
-            Response.StatusCode = 401;
+            Response.StatusCode = 500;
             return View();
         }
     }

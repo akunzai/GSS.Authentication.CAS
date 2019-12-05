@@ -132,7 +132,6 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             });
             using var client = server.CreateClient();
             var ticket = Guid.NewGuid().ToString();
-            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
             ticketValidator
                 .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Throws(new NotSupportedException("test"));
@@ -146,7 +145,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             {
                 // Act
                 using var signinRequest = challengeResponse.GetRequest(validateUrl);
-                using var signinResponse = await client.SendAsync(signinRequest).ConfigureAwait(false);
+                await client.SendAsync(signinRequest).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -179,7 +178,6 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             });
             using var client = server.CreateClient();
             var ticket = Guid.NewGuid().ToString();
-            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
             ticketValidator
                 .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Throws(new NotSupportedException("test"));
@@ -227,12 +225,13 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             {
                 // Act
                 using var signinRequest = challengeResponse.GetRequest(validateUrl);
-                using var signinResponse = await client.SendAsync(signinRequest).ConfigureAwait(false);
+                await client.SendAsync(signinRequest).ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 exception = e;
             }
+
             // Assert
             Assert.NotNull(exception);
             Assert.Equal("An error was encountered while handling the remote login.", exception.Message);

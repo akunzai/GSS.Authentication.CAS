@@ -23,9 +23,7 @@ namespace Owin
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             CookieManager = new CookieManager();
-            Provider = new CasAuthenticationProvider();
         }
-
 
         /// <summary>
         /// Gets or sets timeout value in milliseconds for back channel communications with CAS server.

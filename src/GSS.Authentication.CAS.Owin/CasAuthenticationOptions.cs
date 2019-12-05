@@ -4,6 +4,7 @@ using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Owin;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
 
 namespace Owin
@@ -21,6 +22,7 @@ namespace Owin
             CallbackPath = new PathString("/signin-cas");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
+            CookieManager = new CookieManager();
             Provider = new CasAuthenticationProvider();
         }
 
@@ -67,6 +69,11 @@ namespace Owin
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
+
+        /// <summary>
+        /// An abstraction for reading and setting cookies during the authentication process.
+        /// </summary>
+        public ICookieManager CookieManager { get; set; }
 
         /// <inheritdoc />
         public string CasServerUrlBase { get; set; } = default!;

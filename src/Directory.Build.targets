@@ -1,19 +1,21 @@
 <Project>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
-    <PackageTags>CAS</PackageTags>
-    <PackageProjectUrl>https://github.com/akunzai/GSS.Authentication.CAS</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+  
+  <!-- Workaround. Remove once we're on 3.1.300+
+https://github.com/dotnet/sourcelink/issues/572 -->
+  <PropertyGroup>
     <TargetFrameworkMonikerAssemblyAttributesPath>$([System.IO.Path]::Combine('$(IntermediateOutputPath)','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(Configuration)' == 'Release' ">
-    <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  <ItemGroup>
+    <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>  
+  </ItemGroup>
+  
+  <!-- Workaround for https://github.com/NuGet/Home/issues/9431 -->
+  <ItemGroup>
+    <SourceRoot Include="$(NuGetPackageRoot)" Condition="'$(NuGetPackageRoot)' != ''" />
   </ItemGroup>
 
 </Project>

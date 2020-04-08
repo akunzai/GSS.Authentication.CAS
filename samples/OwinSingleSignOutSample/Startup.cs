@@ -16,6 +16,7 @@ using GSS.Authentication.CAS.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using NLog;
@@ -69,6 +70,8 @@ namespace OwinSingleSignOutSample
             {
                 LoginPath = CookieAuthenticationDefaults.LoginPath,
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
+                // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
+                CookieManager = new SystemWebCookieManager(),
                 SessionStore = _resolver.GetRequiredService<IAuthenticationSessionStore>(),
                 Provider = new CookieAuthenticationProvider
                 {

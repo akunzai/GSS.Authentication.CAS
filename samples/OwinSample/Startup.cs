@@ -33,7 +33,7 @@ namespace OwinSample
 
         public void Configuration(IAppBuilder app)
         {
-            var env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Production";
+            var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)

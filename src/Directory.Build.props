@@ -13,7 +13,11 @@
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
   <!-- https://www.appveyor.com/docs/environment-variables/ -->
   <PropertyGroup Condition="'$(APPVEYOR)' == 'True' ">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

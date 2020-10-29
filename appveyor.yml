@@ -4,6 +4,7 @@ nuget:
   disable_publish_on_pr: true
 build_script:
 - ps: |
+    dotnet --info
     dotnet build -c Release
     msbuild samples\Samples.sln -noLogo -verbosity:minimal -restore -p:Configuration=Release
 test_script:

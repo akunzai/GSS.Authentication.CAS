@@ -3,6 +3,12 @@
     ViewData["Title"] = "Login";
     var formClass = ViewData["formClass"] ?? "invisible";
 }
+@if (!Request.IsSecureConnection)
+{
+    <div class="alert alert-danger" role="alert">
+        <a href="https://web.dev/samesite-cookies-explained/#samesitenone-must-be-secure">HTTPS</a> is required for authentication cookies validation in modern browsers (<a href="https://www.chromium.org/updates/same-site">since Chrome version 80</a>)
+    </div>
+}
 
 <h1>Choose an authentication scheme</h1>
 

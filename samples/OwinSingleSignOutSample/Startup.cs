@@ -99,6 +99,8 @@ namespace OwinSingleSignOutSample
             {
                 options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
                 options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
+                options.CookieManager = new SystemWebCookieManager();
                 // required for CasSingleSignOutMiddleware
                 options.UseAuthenticationSessionStore = true;
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);

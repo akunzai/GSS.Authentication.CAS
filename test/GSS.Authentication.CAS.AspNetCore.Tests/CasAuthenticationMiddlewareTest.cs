@@ -106,7 +106,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var cookies = signinResponse.Headers.GetValues("Set-Cookie");
             Assert.Equal(2, cookies.Count());
             Assert.Contains(cookies, x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme));
-            Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation.{CasDefaults.AuthenticationType}"));
+            Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation"));
             Assert.Equal("/", signinResponse.Headers.Location.OriginalString);
 
             using var authorizedRequest = signinResponse.GetRequest("/");

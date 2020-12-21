@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.1.1" />
-    <PackageReference Include="Moq" Version="4.14.7" />
+    <PackageReference Include="Moq" Version="4.15.2" />
   </ItemGroup>
 
 </Project>

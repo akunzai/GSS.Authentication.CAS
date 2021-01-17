@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core 3.1
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Setup MSBuild
+        if: matrix.os == 'windows-latest'
+        uses: microsoft/setup-msbuild@v1.0.2
+      # Workaround for NU1101 errors: https://github.com/actions/setup-dotnet/issues/155
+      - name: Clear NuGet cache
+        if: matrix.os == 'windows-latest'
+        run: dotnet nuget locals all --clear
+      - name: Build
+        run: |
+          dotnet --info
+          dotnet build -c Release
+      - name: Build Samples
+        if: matrix.os == 'windows-latest'
+        run: msbuild samples/Samples.sln -noLogo -verbosity:minimal -restore -p:Configuration=Release
+      - name: Test
+        run: |
+          dotnet test --collect:"XPlat Code Coverage"
+          dotnet tool restore
+          dotnet tool run reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coverlet/reports" "-reporttypes:Cobertura"
+      - uses: codecov/codecov-action@v1
+        with:
+          name: unittests-${{ matrix.os }}
+          fail_ci_if_error: true

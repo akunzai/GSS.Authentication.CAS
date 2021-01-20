@@ -1,8 +1,13 @@
 # GSS.Authentication.CAS
 
-CAS Authentication Middleware for OWIN & ASP.NET Core
+[![Build Status][ci-badge]][ci] [![Code Coverage][codecov-badge]][codecov]
 
-[![Build status](https://ci.appveyor.com/api/projects/status/uk7kwjvo1e6yl33m?svg=true)](https://ci.appveyor.com/project/akunzai/gss-authentication-cas)
+[ci]: https://github.com/akunzai/GSS.Authentication.CAS/actions?query=workflow%3ACI
+[ci-badge]: https://github.com/akunzai/GSS.Authentication.CAS/workflows/CI/badge.svg
+[codecov]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS
+[codecov-badge]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS/branch/main/graph/badge.svg?token=JGG7Y07SR0
+
+CAS Authentication Middleware for OWIN & ASP.NET Core
 
 ## NuGet Packages
 

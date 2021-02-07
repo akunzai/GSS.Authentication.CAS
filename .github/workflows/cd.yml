@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup .NET 5
+      - name: Set up .NET SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
@@ -21,5 +21,5 @@ jobs:
         run: |
           dotnet --info
           dotnet pack -c Release -o packages
-      - name: Push to NuGet.org
-        run: dotnet nuget push "packages/*.nupkg" -k ${{secrets.NUGET_AUTH_TOKEN}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to NuGet.org
+        run: dotnet nuget push "packages/*.nupkg" -k ${{ secrets.NUGET_AUTH_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate

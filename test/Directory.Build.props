@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
-    <PackageReference Include="coverlet.collector" Version="3.0.2" />
+    <PackageReference Include="coverlet.collector" Version="3.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.8.3" Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'" />
     <PackageReference Include="xunit" Version="2.4.1" />

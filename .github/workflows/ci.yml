@@ -31,10 +31,6 @@ jobs:
       - name: Set up MSBuild
         if: matrix.os == 'windows-latest'
         uses: microsoft/setup-msbuild@v1
-      # Workaround for NU1101 errors: https://github.com/actions/setup-dotnet/issues/155
-      - name: Clear NuGet cache
-        if: matrix.os == 'windows-latest'
-        run: dotnet nuget locals all --clear
       - name: Build
         run: |
           dotnet --info

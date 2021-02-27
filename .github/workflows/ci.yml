@@ -31,17 +31,17 @@ jobs:
       - name: Set up MSBuild
         if: matrix.os == 'windows-latest'
         uses: microsoft/setup-msbuild@v1
-      # Workaround for NU1101 errors: https://github.com/actions/setup-dotnet/issues/155
-      - name: Clear NuGet cache
-        if: matrix.os == 'windows-latest'
-        run: dotnet nuget locals all --clear
       - name: Build
         run: |
           dotnet --info
           dotnet build -c Release
       - name: Build Samples
-        if: matrix.os == 'windows-latest'
-        run: msbuild samples/Samples.sln -noLogo -verbosity:minimal -restore -p:Configuration=Release
+        run: |
+          dotnet build samples/AspNetCoreIdentitySample/AspNetCoreIdentitySample.csproj -c Release
+          dotnet build samples/AspNetCoreSample/AspNetCoreSample.csproj -c Release
+          dotnet build samples/AspNetCoreSingleSignOutSample/AspNetCoreSingleSignOutSample.csproj -c Release
+          msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
+          msbuild samples/OwinSingleSignOutSample/OwinSingleSignOutSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
       - name: Test
         run: |
           dotnet test --collect:"XPlat Code Coverage"

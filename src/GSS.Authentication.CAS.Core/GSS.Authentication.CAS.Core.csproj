@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Core components for CAS Authentication</Description>
-    <Version>4.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

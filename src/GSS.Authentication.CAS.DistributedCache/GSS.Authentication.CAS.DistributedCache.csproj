@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Distributed cache implementation of the IServiceTicketStore for Single sign-out</Description>
-    <Version>4.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

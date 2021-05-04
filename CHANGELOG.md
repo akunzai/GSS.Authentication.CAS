@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2021-05-05
+
+### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.1.1
+
+- Fixed single sign-out with null content-type (#68)
+
 ## 2019-12-05
 
 ### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.1.0

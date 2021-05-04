@@ -28,9 +28,11 @@ namespace GSS.Authentication.CAS.Owin.Tests
             // Arrange
             var store = new Mock<IServiceTicketStore>();
             using var server = CreateServer(store.Object);
+            using var content = new StringContent("TEST");
+            content.Headers.ContentType = null;
 
             // Act
-            using var response = await server.HttpClient.PostAsync("/", new FormUrlEncodedContent(new Dictionary<string, string>())).ConfigureAwait(false);
+            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
 
             // Assert
             store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);

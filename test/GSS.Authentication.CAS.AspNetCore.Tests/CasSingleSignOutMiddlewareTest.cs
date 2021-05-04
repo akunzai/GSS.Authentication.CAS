@@ -31,7 +31,8 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var store = new Mock<ITicketStore>();
             using var server = CreateServer(store.Object);
             using var client = server.CreateClient();
-            using var content = new FormUrlEncodedContent(new Dictionary<string, string>());
+            using var content = new StringContent("TEST");
+            content.Headers.ContentType = null;
 
             // Act
             using var response = await client.PostAsync("/", content).ConfigureAwait(false);

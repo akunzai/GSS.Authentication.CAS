@@ -29,7 +29,7 @@ namespace GSS.Authentication.CAS.AspNetCore
         public async Task Invoke(HttpContext context)
         {
             if (context?.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) == true
-                && context.Request.ContentType.Equals(RequestContentType, StringComparison.OrdinalIgnoreCase))
+                && string.Equals(context.Request.ContentType, RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
                 if (formData.ContainsKey("logoutRequest")){

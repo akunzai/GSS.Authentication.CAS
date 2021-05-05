@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using NLog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using NLog.Web;
 
 namespace AspNetCoreIdentitySample
 {
@@ -10,22 +11,38 @@ namespace AspNetCoreIdentitySample
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            // configure nlog.config per environment
+            var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.config"));
+            var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
+            try
+            {
+                logger.Debug("init main");
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception exception)
+            {
+                //NLog: catch setup errors
+                logger.Error(exception, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>()
-                        .ConfigureLogging((context, logging) =>
-                        {
-                            // configure nlog.config per environment
-                            var configFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"NLog.{context.HostingEnvironment.EnvironmentName}.config"));
-                            NLog.Web.NLogBuilder.ConfigureNLog(configFile.Exists ? configFile.Name : "NLog.config");
-
-                            logging.AddNLog();
-                        });
-                });
+                    webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                })
+                .UseNLog();  // NLog: Setup NLog for Dependency injection
     }
 }

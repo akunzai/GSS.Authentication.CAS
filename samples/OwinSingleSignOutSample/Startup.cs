@@ -58,8 +58,8 @@ namespace OwinSingleSignOutSample
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
 
             // configure nlog.config per environment
-            var configFile = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"NLog.{env}.config"));
-            LogManager.LoadConfiguration(configFile.Exists ? configFile.Name : "NLog.config");
+            var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{env}.config"));
+            LogManager.LoadConfiguration(envLogConfig.Exists ? envLogConfig.Name : "nlog.config");
             app.UseNLog();
 
             app.UseCasSingleSignOut(_resolver.GetRequiredService<IAuthenticationSessionStore>());

@@ -70,7 +70,7 @@ namespace GSS.Authentication.CAS
             return JsonSerializer.SerializeToUtf8Bytes(value, SerializerOptions);
         }
 
-        private static T Deserialize<T>(byte[] value)
+        private static T? Deserialize<T>(byte[] value)
         {
             var readOnlySpan = new ReadOnlySpan<byte>(value);
             return JsonSerializer.Deserialize<T>(readOnlySpan, SerializerOptions);

@@ -2,24 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
-## 2021-05-05
+## 4.1.2 (2021-05-26)
 
-### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.1.1
+- Add System.Text.Encodings.Web 4.7.2 to fix [#77](https://github.com/akunzai/GSS.Authentication.CAS/issues/77)
+- Bump System.Text.Json from 4.6.0 to 4.7.2
+- Bump Microsoft.Owin.Security.Cookies from 3.1.0 to 4.1.1 to fix [#75](https://github.com/akunzai/GSS.Authentication.CAS/issues/75)
+- Bump Microsoft.AspNetCore.Authentication.Cookies from 2.1.2 to 2.2.0 [#79](https://github.com/akunzai/GSS.Authentication.CAS/pull/79)
 
-- Fixed single sign-out with null content-type (#68)
+## 4.1.1 (2021-05-05)
 
-## 2019-12-05
+- Fixed single sign-out with null content-type [#68](https://github.com/akunzai/GSS.Authentication.CAS/issues/68)
 
-### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.1.0
+## 4.1.0 (2019-12-05)
 
-- Simplify targeting and dependencies (#31)
-- Improve error handling (#33)
-- Use ICookieManager to Read/Write CSRF Tokens (#37)
-- Add remote failure event support (#38)
+- Simplify targeting and dependencies [#31](https://github.com/akunzai/GSS.Authentication.CAS/pull/31)
+- Improve error handling [#33](https://github.com/akunzai/GSS.Authentication.CAS/pull/33)
+- Use ICookieManager to Read/Write CSRF Tokens [#37](https://github.com/akunzai/GSS.Authentication.CAS/pull/37)
+- Add remote failure event support [#38](https://github.com/akunzai/GSS.Authentication.CAS/pull/38)
 
-## 2019-10-30
-
-### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache) 4.0.0
+## 4.0.0 (2019-10-30)
 
 - Support .NET Core 3.0
 - Replace Newtonsoft.Json by System.Text.Json
@@ -27,9 +28,7 @@ All notable changes to this project will be documented in this file.
 - Use nullable reference types
 - Delete obsolete methods
 
-## 2019-02-04
-
-### GSS.Authentication.CAS.(Core|AspNetCore|Owin|DistributedCache|RuntimeCache) 3.0.0
+## 3.0.0 (2019-02-04)
 
 - Signing assembly with Strong Name
 - Aligning assembly version numbers

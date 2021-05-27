@@ -48,3 +48,7 @@ Check out these [samples](./samples/) to learn the basics and key features.
 - [ASP.NET Core Identity app](./samples/AspNetCoreIdentitySample/)
 - [OWIN app](./samples/OwinSample/)
 - [OWIN app with Single-Sign-Out](./samples/OwinSingleSignOutSample/)
+
+## FAQ
+
+Before you ask questions, please check out these [issues](https://github.com/akunzai/GSS.Authentication.CAS/issues?q=is%3Aissue+label%3Aquestion), or read the [FAQ](https://github.com/akunzai/GSS.Authentication.CAS/wiki/FAQ) first.

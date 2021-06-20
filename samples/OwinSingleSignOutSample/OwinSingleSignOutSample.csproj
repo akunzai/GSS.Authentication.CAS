@@ -62,8 +62,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Web.config" />
-    <Content Include="Web.config" />
+    <Content Include="Views\web.config" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.*.json">
@@ -117,6 +117,9 @@
     </PackageReference>
     <PackageReference Include="Owin.OAuthGeneric">
       <Version>1.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encodings.Web">
+      <Version>5.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

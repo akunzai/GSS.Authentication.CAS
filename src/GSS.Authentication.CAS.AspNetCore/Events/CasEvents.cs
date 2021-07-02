@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.AspNetCore
 {
     /// <summary>

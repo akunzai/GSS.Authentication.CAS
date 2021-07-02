@@ -1,8 +1,8 @@
 ﻿using System;
-using GSS.Authentication.CAS.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Owin;
 
-namespace Owin
+namespace GSS.Authentication.CAS.Owin
 {
     public static class CasSingleSignOutExtensions
     {

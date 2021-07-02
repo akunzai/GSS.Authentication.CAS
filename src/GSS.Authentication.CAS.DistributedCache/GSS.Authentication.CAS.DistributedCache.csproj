@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Distributed cache implementation of the IServiceTicketStore for Single sign-out</Description>
+    <RootNamespace>GSS.Authentication.CAS</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

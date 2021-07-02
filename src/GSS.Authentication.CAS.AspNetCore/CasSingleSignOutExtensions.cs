@@ -1,8 +1,8 @@
 using System;
-using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 
-namespace Microsoft.AspNetCore.Builder
+namespace GSS.Authentication.CAS.AspNetCore
 {
     /// <summary>
     /// Extension methods for using <see cref="CasSingleSignOutMiddleware"/>

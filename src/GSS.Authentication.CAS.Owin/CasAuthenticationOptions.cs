@@ -1,13 +1,11 @@
 using System;
 using System.Net.Http;
-using GSS.Authentication.CAS;
-using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
 
-namespace Owin
+namespace GSS.Authentication.CAS.Owin
 {
     /// <summary>
     /// Configuration options for <see cref="CasAuthenticationMiddleware"/>

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.Owin
 {
     /// <inheritdoc />
@@ -12,7 +13,7 @@ namespace GSS.Authentication.CAS.Owin
         /// <summary>
         /// Gets or sets the function that is invoked when the CreatingTicket method is invoked.
         /// </summary>
-        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = context => Task.CompletedTask;
+        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = _ => Task.CompletedTask;
 
         /// <summary>
         /// Gets or sets the delegate that is invoked when the RedirectToAuthorizationEndpoint method is invoked.
@@ -23,7 +24,7 @@ namespace GSS.Authentication.CAS.Owin
             return Task.CompletedTask;
         };
 
-        public Func<CasRemoteFailureContext, Task> OnRemoteFailure { get; set; } = context => Task.CompletedTask;
+        public Func<CasRemoteFailureContext, Task> OnRemoteFailure { get; set; } = _ => Task.CompletedTask;
 
         public virtual Task CreatingTicket(CasCreatingTicketContext context) => OnCreatingTicket(context);
 

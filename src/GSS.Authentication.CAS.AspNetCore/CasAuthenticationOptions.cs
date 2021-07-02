@@ -1,9 +1,8 @@
 using System;
-using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 
-namespace GSS.Authentication.CAS
+namespace GSS.Authentication.CAS.AspNetCore
 {
     /// <summary>
     /// Configuration options for <see cref="CasAuthenticationHandler{TOptions}"/>

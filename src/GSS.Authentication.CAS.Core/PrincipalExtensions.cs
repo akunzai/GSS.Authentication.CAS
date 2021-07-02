@@ -1,7 +1,8 @@
 using System.Security.Claims;
+using System.Security.Principal;
 using GSS.Authentication.CAS.Security;
 
-namespace System.Security.Principal
+namespace GSS.Authentication.CAS
 {
     public static class PrincipalExtensions
     {

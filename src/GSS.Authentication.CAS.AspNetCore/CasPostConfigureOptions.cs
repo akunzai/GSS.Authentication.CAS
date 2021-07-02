@@ -1,12 +1,10 @@
 using System.Net.Http;
-using GSS.Authentication.CAS;
-using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace GSS.Authentication.CAS.AspNetCore
 {
     internal class CasPostConfigureOptions<TOptions, THandler> : IPostConfigureOptions<TOptions>
         where TOptions : CasAuthenticationOptions, new()
@@ -40,10 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     typeof(THandler).FullName, name, "v1");
                 options.StateDataFormat = new PropertiesDataFormat(dataProtector);
             }
-            if (options.ServiceTicketValidator == null)
-            {
-                options.ServiceTicketValidator = new Cas30ServiceTicketValidator(options, options.Backchannel);
-            }
+            options.ServiceTicketValidator ??= new Cas30ServiceTicketValidator(options, options.Backchannel);
         }
     }
 }

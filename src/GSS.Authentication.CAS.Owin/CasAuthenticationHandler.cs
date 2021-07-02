@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GSS.Authentication.CAS.Security;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
-using Owin;
 
 namespace GSS.Authentication.CAS.Owin
 {

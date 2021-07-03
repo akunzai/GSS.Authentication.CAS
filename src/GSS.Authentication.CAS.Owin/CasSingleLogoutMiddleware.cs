@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Owin;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 
@@ -17,13 +18,15 @@ namespace GSS.Authentication.CAS.Owin
         private const string LogoutRequest = "logoutRequest";
         private static readonly XmlNamespaceManager _xmlNamespaceManager = InitializeXmlNamespaceManager();
         private readonly IAuthenticationSessionStore _store;
+        private readonly ILogger _logger;
 
         public CasSingleLogoutMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
             IAuthenticationSessionStore store
-            ) : base(next)
+        ) : base(next)
         {
+            _logger = app.CreateLogger<CasSingleLogoutMiddleware>();
             _store = store;
         }
 
@@ -36,17 +39,18 @@ namespace GSS.Authentication.CAS.Owin
                 var logoutRequest = formData.FirstOrDefault(x => x.Key == LogoutRequest).Value?[0] ?? string.Empty;
                 if (!string.IsNullOrEmpty(logoutRequest))
                 {
-                    var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logoutRequest);
+                    var serviceTicket = ExtractServiceTicketFromLogoutRequest(logoutRequest);
                     if (!string.IsNullOrEmpty(serviceTicket))
                     {
                         await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                     }
                 }
             }
+
             await Next.Invoke(context).ConfigureAwait(false);
         }
 
-        private static string ExtractSingleSignOutTicketFromSamlResponse(string text)
+        private string ExtractServiceTicketFromLogoutRequest(string text)
         {
             try
             {
@@ -69,10 +73,11 @@ namespace GSS.Authentication.CAS.Owin
                     return node.Value;
                 }
             }
-            catch (XmlException)
+            catch (XmlException e)
             {
-                //logoutRequest was not xml
+                _logger.WriteWarning(e.Message, e);
             }
+
             return string.Empty;
         }
 

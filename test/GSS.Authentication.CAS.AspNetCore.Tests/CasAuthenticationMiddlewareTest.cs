@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +33,6 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
         public async Task AnonymousRequest_ShouldRedirectToLoginPath()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
             using var server = CreateServer(options => options.CasServerUrlBase = _options.CasServerUrlBase);
             using var client = server.CreateClient();
 
@@ -76,9 +74,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
                     OnCreatingTicket = context =>
                     {
                         var assertion = context.Assertion;
-                        if (assertion == null)
-                            return Task.CompletedTask;
-                        if (!(context.Principal.Identity is ClaimsIdentity identity))
+                        if (context.Principal.Identity is not ClaimsIdentity identity)
                             return Task.CompletedTask;
                         identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
                         return Task.CompletedTask;
@@ -102,8 +98,8 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-            var cookies = signinResponse.Headers.GetValues("Set-Cookie");
-            Assert.Equal(2, cookies.Count());
+            var cookies = signinResponse.Headers.GetValues("Set-Cookie").ToList();
+            Assert.Equal(2, cookies.Count);
             Assert.Contains(cookies, x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationScheme));
             Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation"));
             Assert.Equal("/", signinResponse.Headers.Location.OriginalString);

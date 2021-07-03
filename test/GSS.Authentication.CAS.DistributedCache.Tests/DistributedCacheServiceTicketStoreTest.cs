@@ -81,6 +81,7 @@ namespace GSS.Authentication.CAS.DistributedCache.Tests
             var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
 
             // Assert
+            Assert.NotNull(actual);
             Assert.Equal(expected.TicketId, actual.TicketId);
             Assert.Equal(expected.AuthenticationType, actual.AuthenticationType);
             Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value, actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);
@@ -105,7 +106,7 @@ namespace GSS.Authentication.CAS.DistributedCache.Tests
             Assert.Null(actual);
         }
 
-        private ServiceTicket GenerateNewServiceTicket(Action<ServiceTicket> setupAction = null)
+        private static ServiceTicket GenerateNewServiceTicket(Action<ServiceTicket> setupAction = null)
         {
             var ticket = new ServiceTicket(Guid.NewGuid().ToString(),
                 new Assertion("test",

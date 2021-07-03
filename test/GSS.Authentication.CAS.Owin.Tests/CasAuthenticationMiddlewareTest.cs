@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +31,6 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task AnonymousRequest_ShouldRedirectToLoginPath()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
             using var server = CreateServer(options => options.CasServerUrlBase = _options.CasServerUrlBase);
 
             // Act
@@ -94,7 +92,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
 
             // Assert
-            var cookies = signinResponse.Headers.GetValues("Set-Cookie");
+            var cookies = signinResponse.Headers.GetValues("Set-Cookie").ToList();
             Assert.Contains(cookies, x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationType));
             Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation.{CasDefaults.AuthenticationType}"));
             Assert.Equal("/", signinResponse.Headers.Location.OriginalString);

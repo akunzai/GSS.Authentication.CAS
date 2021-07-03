@@ -17,13 +17,11 @@ namespace GSS.Authentication.CAS.Security
             this.roles = roles;
         }
 
-        #region ICasPrincipal
         public Assertion Assertion { get; protected set; }
 
         public override bool IsInRole(string role)
         {
             return roles?.Contains(role) == true || Assertion.Attributes.Keys.Any(attr => Assertion.Attributes[attr].Contains(role));
         }
-        #endregion
     }
 }

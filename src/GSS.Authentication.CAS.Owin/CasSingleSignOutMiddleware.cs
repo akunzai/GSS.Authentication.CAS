@@ -31,7 +31,7 @@ namespace GSS.Authentication.CAS.Owin
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context?.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) == true
+            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Request.ContentType, RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);
@@ -39,11 +39,11 @@ namespace GSS.Authentication.CAS.Owin
                 if (!string.IsNullOrEmpty(logOutRequest))
                 {
                     _logger.WriteVerbose($"logOutRequest: {logOutRequest}");
-                    var servieTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
-                    if (!string.IsNullOrEmpty(servieTicket))
+                    var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                    if (!string.IsNullOrEmpty(serviceTicket))
                     {
-                        _logger.WriteInformation($"removing ServiceTicket: {servieTicket} ... from[{context.Request.RemoteIpAddress}]");
-                        await _store.RemoveAsync(servieTicket).ConfigureAwait(false);
+                        _logger.WriteInformation($"removing ServiceTicket: {serviceTicket} ... from[{context.Request.RemoteIpAddress}]");
+                        await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                     }
                 }
             }

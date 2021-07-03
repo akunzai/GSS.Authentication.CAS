@@ -1,7 +1,7 @@
 using System;
-using GSS.Authentication.CAS.Owin;
+using Owin;
 
-namespace Owin
+namespace GSS.Authentication.CAS.Owin
 {
     /// <summary>
     /// Extension methods for using <see cref="CasAuthenticationMiddleware"/>

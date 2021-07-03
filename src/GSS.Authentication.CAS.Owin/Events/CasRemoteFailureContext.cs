@@ -3,6 +3,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Provider;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.Owin
 {
     /// <summary>

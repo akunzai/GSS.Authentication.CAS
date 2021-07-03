@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
-namespace GSS.Authentication.CAS.Core.Tests
+namespace GSS.Authentication.CAS.DistributedCache.Tests
 {
     public class DistributedCacheServiceTicketStoreTest
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 
-namespace System.Net.Http
+namespace GSS.Authentication.CAS.Testing
 {
     public static class HttpResponseExtensions
     {
@@ -14,7 +15,7 @@ namespace System.Net.Http
         public static HttpRequestMessage GetRequest(this HttpResponseMessage response, string path, HttpMethod method = null)
         {
             var request = new HttpRequestMessage(method ?? HttpMethod.Get, path);
-            if (!response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> values)) return request;
+            if (!response.Headers.TryGetValues("Set-Cookie", out var values)) return request;
             var cookies = new List<string>();
             foreach (var value in values)
             {

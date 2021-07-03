@@ -5,7 +5,7 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
-    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html#25-servicevalidate-cas-20
+    // see https://apereo.github.io/cas/development/protocol/CAS-Protocol-Specification.html#25-servicevalidate-cas-20
     public class Cas20ServiceTicketValidator : CasServiceTicketValidator
     {
         protected static XNamespace Namespace = "http://www.yale.edu/tp/cas";
@@ -13,7 +13,6 @@ namespace GSS.Authentication.CAS.Validation
         protected static XName AuthenticationSuccess = Namespace + "authenticationSuccess";
         protected static XName AuthenticationFailure = Namespace + "authenticationFailure";
         protected static XName User = Namespace + "user";
-        protected const string Code = "code";
 
         public Cas20ServiceTicketValidator(
             ICasOptions options,
@@ -56,7 +55,7 @@ namespace GSS.Authentication.CAS.Validation
             var principalName = doc.Element(AuthenticationSuccess).Element(User)?.Value ?? string.Empty;
             if (string.IsNullOrWhiteSpace(principalName)) return null;
             var assertion = new Assertion(principalName);
-            return new CasPrincipal(assertion, options.AuthenticationType);
+            return new CasPrincipal(assertion, Options.AuthenticationType);
         }
     }
 }

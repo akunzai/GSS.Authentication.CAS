@@ -1,11 +1,10 @@
 using System;
-using GSS.Authentication.CAS;
-using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace GSS.Authentication.CAS.AspNetCore
 {
     /// <summary>
     /// Extension methods for using <see cref="CasAuthenticationHandler{TOptions}"/>

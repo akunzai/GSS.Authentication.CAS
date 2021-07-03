@@ -1,9 +1,8 @@
 using System;
-using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 
-namespace GSS.Authentication.CAS
+namespace GSS.Authentication.CAS.AspNetCore
 {
     /// <summary>
     /// Configuration options for <see cref="CasAuthenticationHandler{TOptions}"/>
@@ -20,9 +19,9 @@ namespace GSS.Authentication.CAS
 
         public string AuthenticationType => CasDefaults.AuthenticationType;
 
-        public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
+        public IServiceTicketValidator? ServiceTicketValidator { get; set; }
 
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
+        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
 
         public new CasEvents Events
         {

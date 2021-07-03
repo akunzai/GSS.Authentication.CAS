@@ -6,39 +6,33 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
-    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html
+    // see https://apereo.github.io/cas/development/protocol/CAS-Protocol-Specification.html
     public abstract class CasServiceTicketValidator : IServiceTicketValidator
     {
-        protected HttpClient httpClient;
-        protected ICasOptions options;
-
-        [Obsolete("Use constructor with suffix parameter")]
-        protected CasServiceTicketValidator(ICasOptions options, HttpClient? httpClient = null)
-        {
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
-            this.httpClient = httpClient ?? new HttpClient();
-        }
-
+        private readonly HttpClient _httpClient;
+        
         protected CasServiceTicketValidator(string suffix, ICasOptions options, HttpClient? httpClient = null)
         {
             ValidateUrlSuffix = suffix;
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
-            this.httpClient = httpClient ?? new HttpClient();
+            Options = options ?? throw new ArgumentNullException(nameof(options));
+            _httpClient = httpClient ?? new HttpClient();
         }
+        
+        protected ICasOptions Options { get; }
 
-        protected string ValidateUrlSuffix { get; } = default!;
+        protected string ValidateUrlSuffix { get; }
 
         public virtual async Task<ICasPrincipal?> ValidateAsync(string ticket, string service, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(ticket)) throw new ArgumentNullException(nameof(ticket));
             if (string.IsNullOrEmpty(service)) throw new ArgumentNullException(nameof(service));
-            var baseUri = new Uri(options.CasServerUrlBase + (options.CasServerUrlBase.EndsWith("/", StringComparison.Ordinal) ? string.Empty : "/"));
+            var baseUri = new Uri(Options.CasServerUrlBase + (Options.CasServerUrlBase.EndsWith("/", StringComparison.Ordinal) ? string.Empty : "/"));
             var validateUri = new Uri(baseUri, ValidateUrlSuffix);
             // unescape first to prevent double escape
             var escapedService = Uri.EscapeDataString(Uri.UnescapeDataString(service));
             var escapedTicket = Uri.EscapeDataString(ticket);
             var requestUri = new Uri($"{validateUri.AbsoluteUri}?service={escapedService}&ticket={escapedTicket}");
-            var response = await httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
+            var response = await _httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return BuildPrincipal(responseBody);

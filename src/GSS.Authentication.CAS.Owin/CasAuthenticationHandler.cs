@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GSS.Authentication.CAS.Security;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
-using Owin;
 
 namespace GSS.Authentication.CAS.Owin
 {
@@ -28,7 +28,7 @@ namespace GSS.Authentication.CAS.Owin
             return false;
         }
 
-        public async Task<bool> InvokeReturnPathAsync()
+        private async Task<bool> InvokeReturnPathAsync()
         {
             AuthenticationTicket? ticket = null;
             Exception? exception = null;
@@ -56,7 +56,10 @@ namespace GSS.Authentication.CAS.Owin
                     Properties = properties
                 };
 
-                await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
+                if (Options.Provider != null)
+                {
+                    await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
+                }
 
                 if (errorContext.Handled)
                 {
@@ -76,9 +79,7 @@ namespace GSS.Authentication.CAS.Owin
                 }
             }
 
-#pragma warning disable CS8604 // Possible null reference argument.
             var context = new CasRedirectToAuthorizationEndpointContext(Context, ticket)
-#pragma warning restore CS8604 // Possible null reference argument.
             {
                 SignInAsAuthenticationType = Options.SignInAsAuthenticationType,
                 RedirectUri = ticket?.Properties.RedirectUri
@@ -89,7 +90,10 @@ namespace GSS.Authentication.CAS.Owin
                 ticket.Properties.RedirectUri = null;
             }
 
-            await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
+            if (Options.Provider != null)
+            {
+                await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
+            }
 
             if (context.SignInAsAuthenticationType != null && context.Identity != null)
             {
@@ -123,7 +127,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (!string.IsNullOrWhiteSpace(state))
             {
-                properties = Options.StateDataFormat.Unprotect(state);
+                properties = Options.StateDataFormat?.Unprotect(state);
             }
 
             if (properties == null)
@@ -146,11 +150,16 @@ namespace GSS.Authentication.CAS.Owin
             }
 
             var service = BuildReturnTo(state);
-            var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
+            ICasPrincipal? principal = null;
 
+            if (Options.ServiceTicketValidator != null)
+            {
+                principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
+            }
+            
             if (principal == null)
             {
-                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
+                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator?.GetType().FullName}]");
                 return new AuthenticationTicket(null, properties);
             }
 
@@ -165,7 +174,10 @@ namespace GSS.Authentication.CAS.Owin
                 principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
                 properties);
 
-            await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
+            if (Options.Provider != null)
+            {
+                await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
+            }
 
             return new AuthenticationTicket(context.Identity, context.Properties);
         }
@@ -192,7 +204,7 @@ namespace GSS.Authentication.CAS.Owin
                 // Anti-CSRF
                 GenerateCorrelationId(Options.CookieManager, state);
 
-                var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
+                var returnTo = BuildReturnTo(Options.StateDataFormat?.Protect(state));
 
                 var authorizationEndpoint =
                     $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";
@@ -203,13 +215,13 @@ namespace GSS.Authentication.CAS.Owin
             return Task.CompletedTask;
         }
 
-        private string BuildReturnTo(string state)
+        private string BuildReturnTo(string? state)
         {
             var baseUrl = Options.ServiceUrlBase?.IsAbsoluteUri == true
                 ? Options.ServiceUrlBase.AbsoluteUri.TrimEnd('/')
                 : $"{Request.Scheme}://{Request.Host}{RequestPathBase}";
             return
-                $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
+                state == null || string.IsNullOrWhiteSpace(state) ? $"{baseUrl}{Options.CallbackPath}" : $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
         }
     }
 }

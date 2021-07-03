@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace GSS.Authentication.CAS.Validation
 {
-    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html#28-p3servicevalidate-cas-30
+    // see https://apereo.github.io/cas/development/protocol/CAS-Protocol-Specification.html#28-p3servicevalidate-cas-30
     public class Cas30ServiceTicketValidator : Cas20ServiceTicketValidator
     {
         public Cas30ServiceTicketValidator(
@@ -58,7 +58,7 @@ namespace GSS.Authentication.CAS.Validation
                 }
             }
             var assertion = new Assertion(principalName, attributes);
-            return new CasPrincipal(assertion, options.AuthenticationType);
+            return new CasPrincipal(assertion, Options.AuthenticationType);
         }
     }
 }

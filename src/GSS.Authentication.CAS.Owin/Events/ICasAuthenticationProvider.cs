@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
+using Microsoft.Owin.Security;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.Owin
 {
     /// <summary>

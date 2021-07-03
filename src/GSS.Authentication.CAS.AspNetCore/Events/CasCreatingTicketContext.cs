@@ -5,6 +5,7 @@ using GSS.Authentication.CAS.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.AspNetCore
 {
     public class CasCreatingTicketContext : ResultContext<CasAuthenticationOptions>

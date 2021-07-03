@@ -1,13 +1,11 @@
 using System;
 using System.Net.Http;
-using GSS.Authentication.CAS;
-using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
 
-namespace Owin
+namespace GSS.Authentication.CAS.Owin
 {
     /// <summary>
     /// Configuration options for <see cref="CasAuthenticationMiddleware"/>
@@ -35,7 +33,7 @@ namespace Owin
         /// This cannot be set at the same time as BackchannelCertificateValidator unless the value 
         /// can be downcast to a WebRequestHandler.
         /// </summary>
-        public HttpMessageHandler BackchannelHttpHandler { get; set; } = default!;
+        public HttpMessageHandler? BackchannelHttpHandler { get; set; }
 
         /// <summary>
         /// Get or sets the text that the user can display on a sign in user interface.
@@ -66,7 +64,7 @@ namespace Owin
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
+        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
@@ -86,11 +84,11 @@ namespace Owin
         /// Gets or sets the <see cref="IServiceTicketValidator"/> used to validate service ticket.
         /// Default is <see cref="Cas30ServiceTicketValidator"/>.
         /// </summary>
-        public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
+        public IServiceTicketValidator? ServiceTicketValidator { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICasAuthenticationProvider"/> used to handle authentication events.
         /// </summary>
-        public ICasAuthenticationProvider Provider { get; set; } = default!;
+        public ICasAuthenticationProvider? Provider { get; set; }
     }
 }

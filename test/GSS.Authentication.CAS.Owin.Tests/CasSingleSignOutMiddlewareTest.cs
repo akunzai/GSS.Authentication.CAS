@@ -8,7 +8,6 @@ using GSS.Authentication.CAS.Testing;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Owin.Testing;
 using Moq;
-using Owin;
 using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests

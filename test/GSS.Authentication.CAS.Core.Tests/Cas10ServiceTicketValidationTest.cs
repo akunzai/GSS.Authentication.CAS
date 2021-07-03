@@ -1,14 +1,14 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using GSS.Authentication.CAS.Testing;
 using GSS.Authentication.CAS.Validation;
 using RichardSzalay.MockHttp;
 using Xunit;
 
-namespace GSS.Authentication.CAS.Testing.Validation
+namespace GSS.Authentication.CAS.Core.Tests
 {
     public class Cas10ServiceTicketValidationTest : IClassFixture<CasFixture>
     {

@@ -93,7 +93,7 @@ namespace AspNetCoreSingleSignOutSample
             .AddCAS(options =>
             {
                 options.CasServerUrlBase = Configuration["Authentication:CAS:ServerUrlBase"];
-                // required for CasSingleSignOutMiddleware
+                // required for CasSingleLogoutMiddleware
                 options.SaveTokens = true;
                 var protocolVersion = Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace GSS.Authentication.CAS
 {
     /// <summary>
-    /// preserve service ticket for single sign-out
+    /// preserve service ticket for Single Logout
     /// </summary>
     public interface IServiceTicketStore
     {

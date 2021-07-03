@@ -39,11 +39,11 @@ namespace GSS.Authentication.CAS.Owin
                 if (!string.IsNullOrEmpty(logOutRequest))
                 {
                     _logger.WriteVerbose($"logOutRequest: {logOutRequest}");
-                    var servieTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
-                    if (!string.IsNullOrEmpty(servieTicket))
+                    var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                    if (!string.IsNullOrEmpty(serviceTicket))
                     {
-                        _logger.WriteInformation($"removing ServiceTicket: {servieTicket} ... from[{context.Request.RemoteIpAddress}]");
-                        await _store.RemoveAsync(servieTicket).ConfigureAwait(false);
+                        _logger.WriteInformation($"removing ServiceTicket: {serviceTicket} ... from[{context.Request.RemoteIpAddress}]");
+                        await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                     }
                 }
             }

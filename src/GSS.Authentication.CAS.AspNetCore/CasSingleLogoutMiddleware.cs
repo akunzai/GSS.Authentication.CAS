@@ -11,18 +11,21 @@ using Microsoft.Extensions.Logging;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
-    public class CasSingleSignOutMiddleware
+    public class CasSingleLogoutMiddleware
     {
         private const string RequestContentType = "application/x-www-form-urlencoded";
         private const string LogoutRequest = "logoutRequest";
         private static readonly XmlNamespaceManager _xmlNamespaceManager = InitializeXmlNamespaceManager();
         private readonly ITicketStore _store;
         private readonly RequestDelegate _next;
+        private readonly ILogger<CasSingleLogoutMiddleware> _logger;
 
-        public CasSingleSignOutMiddleware(RequestDelegate next, ITicketStore store)
+        public CasSingleLogoutMiddleware(RequestDelegate next, ITicketStore store,
+            ILogger<CasSingleLogoutMiddleware> logger)
         {
             _next = next;
             _store = store;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -31,11 +34,12 @@ namespace GSS.Authentication.CAS.AspNetCore
                 && string.Equals(context.Request.ContentType, RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
-                if (formData.ContainsKey(LogoutRequest)){
-                    var logOutRequest = formData.First(x => x.Key == LogoutRequest).Value[0];
-                    if (!string.IsNullOrEmpty(logOutRequest))
+                if (formData.ContainsKey(LogoutRequest))
+                {
+                    var logoutRequest = formData.First(x => x.Key == LogoutRequest).Value[0];
+                    if (!string.IsNullOrEmpty(logoutRequest))
                     {
-                        var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                        var serviceTicket = ExtractServiceTicketFromLogoutRequest(logoutRequest);
                         if (!string.IsNullOrEmpty(serviceTicket))
                         {
                             await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
@@ -43,10 +47,11 @@ namespace GSS.Authentication.CAS.AspNetCore
                     }
                 }
             }
+
             await _next.Invoke(context).ConfigureAwait(false);
         }
 
-        private static string ExtractSingleSignOutTicketFromSamlResponse(string text)
+        private string ExtractServiceTicketFromLogoutRequest(string text)
         {
             try
             {
@@ -69,10 +74,11 @@ namespace GSS.Authentication.CAS.AspNetCore
                     return node.Value;
                 }
             }
-            catch (XmlException)
+            catch (XmlException e)
             {
-                //logoutRequest was not xml
+                _logger.LogWarning(e, e.Message);
             }
+
             return string.Empty;
         }
 

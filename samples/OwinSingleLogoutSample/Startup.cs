@@ -24,9 +24,9 @@ using NLog.Owin.Logging;
 using Owin;
 using Owin.OAuthGeneric;
 
-[assembly: OwinStartup(typeof(OwinSingleSignOutSample.Startup))]
+[assembly: OwinStartup(typeof(OwinSingleLogoutSample.Startup))]
 
-namespace OwinSingleSignOutSample
+namespace OwinSingleLogoutSample
 {
     public class Startup
     {
@@ -62,7 +62,7 @@ namespace OwinSingleSignOutSample
             LogManager.LoadConfiguration(envLogConfig.Exists ? envLogConfig.Name : "nlog.config");
             app.UseNLog();
 
-            app.UseCasSingleSignOut(_resolver.GetRequiredService<IAuthenticationSessionStore>());
+            app.UseCasSingleLogout(_resolver.GetRequiredService<IAuthenticationSessionStore>());
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 

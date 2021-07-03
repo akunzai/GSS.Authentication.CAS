@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreIdentitySample", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample", "AspNetCoreSample\AspNetCoreSample.csproj", "{7BE837C9-5265-45E7-9BE8-5F92A461E88C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSingleSignOutSample", "AspNetCoreSingleSignOutSample\AspNetCoreSingleSignOutSample.csproj", "{48D7BC51-7FC2-41F0-88D6-E785B39A0751}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSingleLogoutSample", "AspNetCoreSingleLogoutSample\AspNetCoreSingleLogoutSample.csproj", "{48D7BC51-7FC2-41F0-88D6-E785B39A0751}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSample", "OwinSample\OwinSample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSingleSignOutSample", "OwinSingleSignOutSample\OwinSingleSignOutSample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSingleLogoutSample", "OwinSingleLogoutSample\OwinSingleLogoutSample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Core", "..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj", "{7D78728A-B592-41E6-83BF-7A83D6E868AD}"
 EndProject

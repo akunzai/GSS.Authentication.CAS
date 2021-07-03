@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OwinSingleSignOutSample.Models
+namespace OwinSingleLogoutSample.Models
 {
     public class LoginViewModel
     {

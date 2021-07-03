@@ -12,21 +12,22 @@ using Owin;
 
 namespace GSS.Authentication.CAS.Owin
 {
-    public class CasSingleSignOutMiddleware : OwinMiddleware
+    public class CasSingleLogoutMiddleware : OwinMiddleware
     {
         private const string RequestContentType = "application/x-www-form-urlencoded";
+        private const string LogoutRequest = "logoutRequest";
         private static readonly XmlNamespaceManager _xmlNamespaceManager = InitializeXmlNamespaceManager();
         private readonly IAuthenticationSessionStore _store;
         private readonly ILogger _logger;
 
-        public CasSingleSignOutMiddleware(
+        public CasSingleLogoutMiddleware(
             OwinMiddleware next,
             IAppBuilder app,
             IAuthenticationSessionStore store
-            ) : base(next)
+        ) : base(next)
         {
+            _logger = app.CreateLogger<CasSingleLogoutMiddleware>();
             _store = store;
-            _logger = app.CreateLogger<CasSingleSignOutMiddleware>();
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -35,22 +36,21 @@ namespace GSS.Authentication.CAS.Owin
                 && string.Equals(context.Request.ContentType, RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);
-                var logOutRequest = formData.FirstOrDefault(x => x.Key == "logoutRequest").Value?[0] ?? string.Empty;
-                if (!string.IsNullOrEmpty(logOutRequest))
+                var logoutRequest = formData.FirstOrDefault(x => x.Key == LogoutRequest).Value?[0] ?? string.Empty;
+                if (!string.IsNullOrEmpty(logoutRequest))
                 {
-                    _logger.WriteVerbose($"logOutRequest: {logOutRequest}");
-                    var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                    var serviceTicket = ExtractServiceTicketFromLogoutRequest(logoutRequest);
                     if (!string.IsNullOrEmpty(serviceTicket))
                     {
-                        _logger.WriteInformation($"removing ServiceTicket: {serviceTicket} ... from[{context.Request.RemoteIpAddress}]");
                         await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);
                     }
                 }
             }
+
             await Next.Invoke(context).ConfigureAwait(false);
         }
 
-        private static string ExtractSingleSignOutTicketFromSamlResponse(string text)
+        private string ExtractServiceTicketFromLogoutRequest(string text)
         {
             try
             {
@@ -73,10 +73,11 @@ namespace GSS.Authentication.CAS.Owin
                     return node.Value;
                 }
             }
-            catch (XmlException)
+            catch (XmlException e)
             {
-                //logoutRequest was not xml
+                _logger.WriteWarning(e.Message, e);
             }
+
             return string.Empty;
         }
 

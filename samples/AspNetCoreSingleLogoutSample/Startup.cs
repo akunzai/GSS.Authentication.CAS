@@ -210,7 +210,7 @@ namespace AspNetCoreSingleSignOutSample
 
             app.UseRouting();
 
-            app.UseCasSingleSignOut();
+            app.UseCasSingleLogout();
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.0.0 (2021-07-03)
+
+- Removed obsolete constructor [#91](https://github.com/akunzai/GSS.Authentication.CAS/pull/91)
+- Fixes nullable property handling
+- Fixes namespace
+- Renamed Single Sign-Out to Single Logout (SLO) [#92](https://github.com/akunzai/GSS.Authentication.CAS/pull/92)
+
 ## 4.1.2 (2021-05-26)
 
 - Add System.Text.Encodings.Web 4.7.2 to fix [#77](https://github.com/akunzai/GSS.Authentication.CAS/issues/77)

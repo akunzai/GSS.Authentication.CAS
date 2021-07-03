@@ -3,7 +3,7 @@ using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Validation
 {
-    // see https://apereo.github.io/cas/5.2.x/protocol/CAS-Protocol-Specification.html#24-validate-cas-10
+    // see https://apereo.github.io/cas/development/protocol/CAS-Protocol-Specification.html#24-validate-cas-10
     public class Cas10ServiceTicketValidator : CasServiceTicketValidator
     {
         public Cas10ServiceTicketValidator(
@@ -19,7 +19,7 @@ namespace GSS.Authentication.CAS.Validation
             if (responseParts.Length >= 2 && responseParts[0] == "yes")
             {
                 var assertion = new Assertion(responseParts[1]);
-                return new CasPrincipal(assertion, options.AuthenticationType);
+                return new CasPrincipal(assertion, Options.AuthenticationType);
             }
             return null;
         }

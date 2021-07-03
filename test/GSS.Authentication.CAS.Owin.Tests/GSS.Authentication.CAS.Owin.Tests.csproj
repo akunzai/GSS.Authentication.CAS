@@ -4,17 +4,17 @@
     <TargetFramework>net472</TargetFramework>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.0" />
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.2.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
 </Project>

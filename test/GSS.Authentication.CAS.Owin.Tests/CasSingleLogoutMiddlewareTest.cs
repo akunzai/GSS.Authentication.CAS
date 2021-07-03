@@ -12,11 +12,11 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
 {
-    public class CasSingleSignOutMiddlewareTest : IClassFixture<CasFixture>
+    public class CasSingleLogoutMiddlewareTest : IClassFixture<CasFixture>
     {
         private readonly IFileProvider _files;
 
-        public CasSingleSignOutMiddlewareTest(CasFixture fixture)
+        public CasSingleLogoutMiddlewareTest(CasFixture fixture)
         {
             _files = fixture.FileProvider;
         }
@@ -83,9 +83,9 @@ namespace GSS.Authentication.CAS.Owin.Tests
             store.Verify(x => x.RemoveAsync(ticket), Times.Once);
         }
 
-        private TestServer CreateServer(IServiceTicketStore store)
+        private static TestServer CreateServer(IServiceTicketStore store)
         {
-            return TestServer.Create(app => app.UseCasSingleSignOut(new AuthenticationSessionStoreWrapper(store)));
+            return TestServer.Create(app => app.UseCasSingleLogout(new AuthenticationSessionStoreWrapper(store)));
         }
     }
 }

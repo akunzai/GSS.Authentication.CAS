@@ -3,9 +3,9 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
-using OwinSingleSignOutSample.Models;
+using OwinSingleLogoutSample.Models;
 
-namespace OwinSingleSignOutSample.Controllers
+namespace OwinSingleLogoutSample.Controllers
 {
     [AllowAnonymous]
     public class AccountController : Controller

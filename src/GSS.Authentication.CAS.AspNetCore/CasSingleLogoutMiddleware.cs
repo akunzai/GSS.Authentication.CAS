@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GSS.Authentication.CAS.AspNetCore
 {
-    public class CasSingleSignOutMiddleware
+    public class CasSingleLogoutMiddleware
     {
         private const string RequestContentType = "application/x-www-form-urlencoded";
         private const string LogoutRequest = "logoutRequest";
@@ -19,7 +19,7 @@ namespace GSS.Authentication.CAS.AspNetCore
         private readonly ITicketStore _store;
         private readonly RequestDelegate _next;
 
-        public CasSingleSignOutMiddleware(RequestDelegate next, ITicketStore store)
+        public CasSingleLogoutMiddleware(RequestDelegate next, ITicketStore store)
         {
             _next = next;
             _store = store;
@@ -32,10 +32,10 @@ namespace GSS.Authentication.CAS.AspNetCore
             {
                 var formData = await context.Request.ReadFormAsync(context.RequestAborted).ConfigureAwait(false);
                 if (formData.ContainsKey(LogoutRequest)){
-                    var logOutRequest = formData.First(x => x.Key == LogoutRequest).Value[0];
-                    if (!string.IsNullOrEmpty(logOutRequest))
+                    var logoutRequest = formData.First(x => x.Key == LogoutRequest).Value[0];
+                    if (!string.IsNullOrEmpty(logoutRequest))
                     {
-                        var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logOutRequest);
+                        var serviceTicket = ExtractSingleSignOutTicketFromSamlResponse(logoutRequest);
                         if (!string.IsNullOrEmpty(serviceTicket))
                         {
                             await _store.RemoveAsync(serviceTicket).ConfigureAwait(false);

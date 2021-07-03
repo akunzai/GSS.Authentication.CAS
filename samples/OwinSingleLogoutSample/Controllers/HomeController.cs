@@ -1,6 +1,6 @@
 using System.Web.Mvc;
 
-namespace OwinSingleSignOutSample.Controllers
+namespace OwinSingleLogoutSample.Controllers
 {
     [AllowAnonymous]
     public class HomeController : Controller

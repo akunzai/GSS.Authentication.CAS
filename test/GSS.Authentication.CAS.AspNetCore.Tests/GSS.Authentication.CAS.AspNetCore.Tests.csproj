@@ -4,11 +4,6 @@
     <TargetFrameworks>net5.0;netcoreapp3.1;net472</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
@@ -27,6 +22,11 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
+    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
 </Project>

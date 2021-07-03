@@ -31,7 +31,7 @@ namespace GSS.Authentication.CAS.Owin
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context?.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase) == true
+            if (context.Request.Method.Equals(HttpMethod.Post.Method, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Request.ContentType, RequestContentType, StringComparison.OrdinalIgnoreCase))
             {
                 var formData = await context.Request.ReadFormAsync().ConfigureAwait(false);

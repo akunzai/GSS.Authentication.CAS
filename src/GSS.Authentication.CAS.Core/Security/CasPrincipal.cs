@@ -22,11 +22,7 @@ namespace GSS.Authentication.CAS.Security
 
         public override bool IsInRole(string role)
         {
-            if (roles?.Contains(role) == true)
-            {
-                return true;
-            }
-            return Assertion.Attributes.Keys.Any(attr => Assertion.Attributes[attr].Contains(role));
+            return roles?.Contains(role) == true || Assertion.Attributes.Keys.Any(attr => Assertion.Attributes[attr].Contains(role));
         }
         #endregion
     }

@@ -13,7 +13,7 @@ namespace GSS.Authentication.CAS.AspNetCore
         /// <summary>
         /// Gets or sets the function that is invoked when the CreatingTicket method is invoked.
         /// </summary>
-        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = context => Task.CompletedTask;
+        public Func<CasCreatingTicketContext, Task> OnCreatingTicket { get; set; } = _ => Task.CompletedTask;
 
         /// <summary>
         /// Gets or sets the delegate that is invoked when the RedirectToAuthorizationEndpoint method is invoked.

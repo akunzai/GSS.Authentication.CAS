@@ -96,9 +96,7 @@ namespace AspNetCoreSample
                     OnCreatingTicket = context =>
                     {
                         var assertion = context.Assertion;
-                        if (assertion == null)
-                            return Task.CompletedTask;
-                        if (!(context.Principal.Identity is ClaimsIdentity identity))
+                        if (context.Principal?.Identity is not ClaimsIdentity identity)
                             return Task.CompletedTask;
                         // Map claims from assertion
                         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
@@ -116,7 +114,10 @@ namespace AspNetCoreSample
                     {
                         var failure = context.Failure;
                         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<CasEvents>>();
-                        logger.LogError(failure, failure.Message);
+                        if (!string.IsNullOrWhiteSpace(failure?.Message))
+                        {
+                            logger.LogError(failure, failure.Message);
+                        }
                         context.Response.Redirect("/Account/ExternalLoginFailure");
                         context.HandleResponse();
                         return Task.CompletedTask;
@@ -148,7 +149,7 @@ namespace AspNetCoreSample
                                 .ConfigureAwait(false);
 
                         if (!response.IsSuccessStatusCode ||
-                            response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
+                            response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
                         {
                             throw new HttpRequestException(
                                 $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
@@ -162,7 +163,10 @@ namespace AspNetCoreSample
                     {
                         var failure = context.Failure;
                         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
-                        logger.LogError(failure, failure.Message);
+                        if (!string.IsNullOrWhiteSpace(failure?.Message))
+                        {
+                            logger.LogError(failure, failure.Message);
+                        }
                         context.Response.Redirect("/Account/ExternalLoginFailure");
                         context.HandleResponse();
                         return Task.CompletedTask;

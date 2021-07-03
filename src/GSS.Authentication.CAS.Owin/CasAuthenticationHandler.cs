@@ -28,7 +28,7 @@ namespace GSS.Authentication.CAS.Owin
             return false;
         }
 
-        public async Task<bool> InvokeReturnPathAsync()
+        private async Task<bool> InvokeReturnPathAsync()
         {
             AuthenticationTicket? ticket = null;
             Exception? exception = null;

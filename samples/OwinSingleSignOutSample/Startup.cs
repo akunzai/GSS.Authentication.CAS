@@ -106,15 +106,12 @@ namespace OwinSingleSignOutSample
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
-                    switch (protocolVersion)
+                    options.ServiceTicketValidator = protocolVersion switch
                     {
-                        case 1:
-                            options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
-                            break;
-                        case 2:
-                            options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
-                            break;
-                    }
+                        1 => new Cas10ServiceTicketValidator(options),
+                        2 => new Cas20ServiceTicketValidator(options),
+                        _ => options.ServiceTicketValidator
+                    };
                 }
                 options.Provider = new CasAuthenticationProvider
                 {

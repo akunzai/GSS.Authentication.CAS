@@ -8,37 +8,35 @@ namespace GSS.Authentication.CAS
     {
         public static string GetPrincipalName(this IIdentity identity)
         {
-            if (identity is CasIdentity casIdentity
-                && !string.IsNullOrEmpty(casIdentity.Assertion.PrincipalName))
+            return identity switch
             {
-                return casIdentity.Assertion.PrincipalName;
-            }
-
-            if (identity is ClaimsIdentity claimsIdentity
-                && claimsIdentity.HasClaim(claim => claim.Type == claimsIdentity.NameClaimType))
-            {
-                return claimsIdentity.FindFirst(claimsIdentity.NameClaimType).Value;
-            }
-
-            return string.Empty;
+                CasIdentity casIdentity when !string.IsNullOrEmpty(casIdentity.Assertion.PrincipalName) => casIdentity
+                    .Assertion.PrincipalName,
+                ClaimsIdentity claimsIdentity when claimsIdentity.HasClaim(claim =>
+                    claim.Type == claimsIdentity.NameClaimType) => claimsIdentity
+                    .FindFirst(claimsIdentity.NameClaimType)
+                    .Value,
+                _ => string.Empty
+            };
         }
 
         public static string GetPrincipalName(this IPrincipal principal)
         {
-            if (principal is ICasPrincipal casPrincipal
-                && !string.IsNullOrEmpty(casPrincipal.Assertion.PrincipalName))
+            switch (principal)
             {
-                return casPrincipal.Assertion.PrincipalName;
-            }
-
-            if (principal is ClaimsPrincipal claimsPrincipal)
-            {
-                foreach (var identity in claimsPrincipal.Identities)
+                case ICasPrincipal casPrincipal when !string.IsNullOrEmpty(casPrincipal.Assertion.PrincipalName):
+                    return casPrincipal.Assertion.PrincipalName;
+                case ClaimsPrincipal claimsPrincipal:
                 {
-                    if (identity is ClaimsIdentity claimsIdentity && claimsIdentity.HasClaim(x => x.Type == claimsIdentity.NameClaimType))
+                    foreach (var identity in claimsPrincipal.Identities)
                     {
-                        return claimsIdentity.FindFirst(claimsIdentity.NameClaimType).Value;
+                        if (identity.HasClaim(x => x.Type == identity.NameClaimType))
+                        {
+                            return identity.FindFirst(identity.NameClaimType).Value;
+                        }
                     }
+
+                    break;
                 }
             }
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -19,8 +18,6 @@ namespace GSS.Authentication.CAS.AspNetCore
             : base(options, logger, encoder, clock)
         {
         }
-
-        protected HttpClient Backchannel => Options.Backchannel;
 
         protected new CasEvents Events
         {
@@ -116,7 +113,7 @@ namespace GSS.Authentication.CAS.AspNetCore
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal,
             AuthenticationProperties properties, Assertion assertion)
         {
-            var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Backchannel,
+            var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Options.Backchannel,
                 assertion);
 
             await Events.CreatingTicket(context).ConfigureAwait(false);

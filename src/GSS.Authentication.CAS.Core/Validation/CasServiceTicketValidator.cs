@@ -10,14 +10,14 @@ namespace GSS.Authentication.CAS.Validation
     public abstract class CasServiceTicketValidator : IServiceTicketValidator
     {
         private readonly HttpClient _httpClient;
-        
+
         protected CasServiceTicketValidator(string suffix, ICasOptions options, HttpClient? httpClient = null)
         {
             ValidateUrlSuffix = suffix;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _httpClient = httpClient ?? new HttpClient();
         }
-        
+
         protected ICasOptions Options { get; }
 
         protected string ValidateUrlSuffix { get; }

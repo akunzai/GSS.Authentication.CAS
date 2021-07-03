@@ -156,7 +156,7 @@ namespace GSS.Authentication.CAS.Owin
             {
                 principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
             }
-            
+
             if (principal == null)
             {
                 _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator?.GetType().FullName}]");

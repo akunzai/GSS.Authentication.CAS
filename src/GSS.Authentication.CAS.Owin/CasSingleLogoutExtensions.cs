@@ -13,7 +13,7 @@ namespace GSS.Authentication.CAS.Owin
             if (store == null) throw new ArgumentNullException(nameof(store));
             return app.Use<CasSingleLogoutMiddleware>(app, store);
         }
-        
+
         public static IAppBuilder UseCasSingleLogout(this IAppBuilder app, IAuthenticationSessionStore store)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));

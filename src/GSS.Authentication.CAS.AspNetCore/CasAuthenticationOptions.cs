@@ -19,9 +19,9 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         public string AuthenticationType => CasDefaults.AuthenticationType;
 
-        public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
+        public IServiceTicketValidator? ServiceTicketValidator { get; set; }
 
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
+        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
 
         public new CasEvents Events
         {

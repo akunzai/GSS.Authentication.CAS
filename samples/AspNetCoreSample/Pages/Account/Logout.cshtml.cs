@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AspNetCoreSample.Pages.Account
+namespace AspNetCoreSample.Pages.Account;
+
+public class LogoutModel : PageModel
 {
-    public class LogoutModel : PageModel
+    public IActionResult OnGet()
     {
-        public IActionResult OnGet()
-        {
-            return SignOut();
-        }
+        return SignOut();
     }
 }

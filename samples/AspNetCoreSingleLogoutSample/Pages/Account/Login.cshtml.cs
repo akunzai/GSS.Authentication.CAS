@@ -15,11 +15,11 @@ namespace AspNetCoreSingleSignOutSample.Pages.Account
 
         [Required]
         [BindProperty]
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
 
         [Required]
         [BindProperty]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
 
         public IActionResult OnGet(string scheme)
         {
@@ -49,7 +49,7 @@ namespace AspNetCoreSingleSignOutSample.Pages.Account
             identity.AddClaim(new Claim(identity.NameClaimType, Username));
             return SignIn(new ClaimsPrincipal(identity),
                 new AuthenticationProperties { RedirectUri = "/" },
-                identity.AuthenticationType);
+                identity.AuthenticationType ?? CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }
 }

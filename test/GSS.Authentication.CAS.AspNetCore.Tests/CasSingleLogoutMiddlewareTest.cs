@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
@@ -82,6 +83,25 @@ public class CasSingleLogoutMiddlewareTest
         // Assert
         Assert.Equal(ticket, removedTicket);
         store.Verify(x => x.RemoveAsync(ticket), Times.Once);
+    }
+
+    [Fact]
+    public async Task RetrievedTicketStoreFromDI_ShouldNotThrows()
+    {
+        // Arrange
+        var host = new HostBuilder()
+            .ConfigureWebHostDefaults(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(Mock.Of<ITicketStore>());
+                });
+                builder.Configure(app => app.UseCasSingleLogout());
+            })
+            .Build();
+
+        // Act & Assert
+        await host.StartAsync().ConfigureAwait(false);
     }
 
     private static IHost CreateHost(ITicketStore store)

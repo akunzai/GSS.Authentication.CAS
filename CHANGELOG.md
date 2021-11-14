@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.0.1 (2021-11-14)
+
+- Fixed System.InvalidOperationException: A suitable constructor for type 'GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware' could not be located
+
 ## 5.0.0 (2021-07-03)
 
 - Removed obsolete constructor [#91](https://github.com/akunzai/GSS.Authentication.CAS/pull/91)

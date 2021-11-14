@@ -1,91 +1,79 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using GSS.Authentication.CAS.Testing;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Owin.Testing;
 using Moq;
 using Xunit;
 
-namespace GSS.Authentication.CAS.Owin.Tests
+namespace GSS.Authentication.CAS.Owin.Tests;
+
+public class CasSingleLogoutMiddlewareTest
 {
-    public class CasSingleLogoutMiddlewareTest : IClassFixture<CasFixture>
+    [Fact]
+    public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()
     {
-        private readonly IFileProvider _files;
+        // Arrange
+        var store = new Mock<IServiceTicketStore>();
+        using var server = CreateServer(store.Object);
+        using var content = new StringContent("TEST");
+        content.Headers.ContentType = null;
 
-        public CasSingleLogoutMiddlewareTest(CasFixture fixture)
-        {
-            _files = fixture.FileProvider;
-        }
+        // Act
+        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
 
-        [Fact]
-        public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()
-        {
-            // Arrange
-            var store = new Mock<IServiceTicketStore>();
-            using var server = CreateServer(store.Object);
-            using var content = new StringContent("TEST");
-            content.Headers.ContentType = null;
+        // Assert
+        store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
 
-            // Act
-            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
-
-            // Assert
-            store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task WithJsonLogoutRequest_ShouldNotRemoveTicket()
-        {
-            // Arrange
-            var store = new Mock<IServiceTicketStore>();
-            using var server = CreateServer(store.Object);
-            var content = new StringContent(
-                JsonSerializer.Serialize(new
-                {
-                    logoutRequest = new { ticket = Guid.NewGuid().ToString() }
-                }),
-                Encoding.UTF8,
-                "application/json"
-                );
-
-            // Act
-            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
-
-            // Assert
-            store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task WithFormUrlEncodedLogoutRequest_ShouldRemoveTicket()
-        {
-            // Arrange
-            var store = new Mock<IServiceTicketStore>();
-            using var server = CreateServer(store.Object);
-            var removedTicket = string.Empty;
-            store.Setup(x => x.RemoveAsync(It.IsAny<string>()))
-                .Callback<string>((x) => removedTicket = x)
-                .Returns(Task.CompletedTask);
-            var ticket = Guid.NewGuid().ToString();
-            using var content = new FormUrlEncodedContent(new Dictionary<string, string>
+    [Fact]
+    public async Task WithJsonLogoutRequest_ShouldNotRemoveTicket()
+    {
+        // Arrange
+        var store = new Mock<IServiceTicketStore>();
+        using var server = CreateServer(store.Object);
+        var content = new StringContent(
+            JsonSerializer.Serialize(new
             {
-                ["logoutRequest"] = _files.ReadAsString("SamlLogoutRequest.xml").Replace("$TICKET", ticket)
-            });
+                logoutRequest = new { ticket = Guid.NewGuid().ToString() }
+            }),
+            Encoding.UTF8,
+            "application/json"
+            );
 
-            // Act
-            using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
+        // Act
+        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
 
-            // Assert
-            Assert.Equal(ticket, removedTicket);
-            store.Verify(x => x.RemoveAsync(ticket), Times.Once);
-        }
+        // Assert
+        store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+    }
 
-        private static TestServer CreateServer(IServiceTicketStore store)
+    [Fact]
+    public async Task WithFormUrlEncodedLogoutRequest_ShouldRemoveTicket()
+    {
+        // Arrange
+        var store = new Mock<IServiceTicketStore>();
+        using var server = CreateServer(store.Object);
+        var removedTicket = string.Empty;
+        store.Setup(x => x.RemoveAsync(It.IsAny<string>()))
+            .Callback<string>((x) => removedTicket = x)
+            .Returns(Task.CompletedTask);
+        var ticket = Guid.NewGuid().ToString();
+        using var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            return TestServer.Create(app => app.UseCasSingleLogout(new AuthenticationSessionStoreWrapper(store)));
-        }
+            ["logoutRequest"] = $@"<samlp:LogoutRequest xmlns:samlp=""urn:oasis:names:tc:SAML:2.0:protocol"" ID=""{Guid.NewGuid()}"" Version=""2.0"" IssueInstant=""{DateTime.UtcNow:o}"">
+    <saml:NameID xmlns:saml=""urn:oasis:names:tc:SAML:2.0:assertion"">@NOT_USED@</saml:NameID>
+    <samlp:SessionIndex>{ticket}</samlp:SessionIndex></samlp:LogoutRequest>"
+        });
+
+        // Act
+        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
+
+        // Assert
+        Assert.Equal(ticket, removedTicket);
+        store.Verify(x => x.RemoveAsync(ticket), Times.Once);
+    }
+
+    private static TestServer CreateServer(IServiceTicketStore store)
+    {
+        return TestServer.Create(app => app.UseCasSingleLogout(new AuthenticationSessionStoreWrapper(store)));
     }
 }

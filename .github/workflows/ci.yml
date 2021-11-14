@@ -24,13 +24,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
-      - name: Set up .NET 5 SDK
+      - name: Set up .NET 6 SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: 6.0.x
       - name: Set up MSBuild
         if: matrix.os == 'windows-latest'
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
       - name: Build
         run: |
           dotnet --info

@@ -5,9 +5,9 @@
     ViewData["Title"] = "Home";
     var accessToken = await HttpContext.GetTokenAsync("access_token");
 }
-<h1>Hello @(User.Identity.IsAuthenticated ? User.Identity.Name : "anonymous")</h1>
+<h1>Hello @(User.Identity?.IsAuthenticated == true ? User.Identity.Name : "anonymous")</h1>
 
-@if (User.Identity.IsAuthenticated)
+@if (User.Identity?.IsAuthenticated == true)
 {
     <h2>Claims</h2>
     <dl>

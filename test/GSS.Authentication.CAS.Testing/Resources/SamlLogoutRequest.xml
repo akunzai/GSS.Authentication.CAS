@@ -1,4 +1,0 @@
-﻿<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="LR-61-wsHFOFjjBPD3Eb4pZc4oJzT3yNiMB0wZru9" Version="2.0" IssueInstant="2014-12-05T17:22:20Z">
-    <saml:NameID xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">@NOT_USED@</saml:NameID>
-    <samlp:SessionIndex>$TICKET</samlp:SessionIndex>
-</samlp:LogoutRequest>

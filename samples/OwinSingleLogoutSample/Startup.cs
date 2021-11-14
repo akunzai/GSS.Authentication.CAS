@@ -201,14 +201,11 @@ namespace OwinSingleLogoutSample
 
         private static void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedMemoryCache();
             var redisConfiguration = _configuration.GetConnectionString("Redis");
             if (!string.IsNullOrWhiteSpace(redisConfiguration))
             {
                 services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
-            }
-            else
-            {
-                services.AddDistributedMemoryCache();
             }
             services
                 .AddSingleton(_configuration)

@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AspNetCoreSample.Pages
+namespace AspNetCoreSample.Pages;
+
+[AllowAnonymous]
+public class IndexModel : PageModel
 {
-    [AllowAnonymous]
-    public class IndexModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }

@@ -12,7 +12,6 @@ using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddAuthorization(options =>
 {
@@ -152,7 +151,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Logging
     .ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
-    .AddNLogWeb(); // NLog: Setup NLog for Dependency injection
+    .AddNLogWeb();
 
 var app = builder.Build();
 
@@ -181,7 +180,6 @@ var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{a
 var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {
-    logger.Debug("init main");
     app.Run();
 }
 catch (Exception exception)

@@ -1,33 +1,34 @@
-using System.Security.Claims;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
 using AspNetCoreIdentitySample.Data;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// https://docs.microsoft.com/aspnet/core/security/authentication/identity
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
-    // .AddDefaultUI();
+
 builder.Services.AddRazorPages();
-// builder.Services.Configure<CookiePolicyOptions>(options =>
-// {
-//     // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-//     options.CheckConsentNeeded = _ => true;
-//     options.MinimumSameSitePolicy = SameSiteMode.None;
-// });
+builder.Services.AddAuthorization(options =>
+{
+    // Globally Require Authenticated Users
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+});
 builder.Services.AddAuthentication()
 .AddCAS(options =>
 {
@@ -103,7 +104,7 @@ builder.Services.AddAuthentication()
 builder.Logging
     .ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
-    .AddNLogWeb(); // NLog: Setup NLog for Dependency injection
+    .AddNLogWeb();
 
 var app = builder.Build();
 
@@ -135,7 +136,6 @@ var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{a
 var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {
-    logger.Debug("init main");
     app.Run();
 }
 catch (Exception exception)

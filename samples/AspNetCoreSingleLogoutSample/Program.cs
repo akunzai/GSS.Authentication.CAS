@@ -9,22 +9,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 IServiceProvider? services = null;
 
-// Add services to the container.
-builder.Services.AddControllers(options =>
-{
-    // Global Authorize Filter
-    var policy = new AuthorizationPolicyBuilder()
-    .RequireAuthenticatedUser()
-    .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
-});
-builder.Services.AddRazorPages();
 builder.Services.AddDistributedMemoryCache();
 var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrWhiteSpace(redisConfiguration))
@@ -33,6 +22,15 @@ if (!string.IsNullOrWhiteSpace(redisConfiguration))
 }
 builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
 builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
+
+builder.Services.AddRazorPages();
+builder.Services.AddAuthorization(options =>
+{
+    // Globally Require Authenticated Users
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddCookie(options =>
 {
@@ -167,7 +165,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Logging
     .ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
-    .AddNLogWeb(); // NLog: Setup NLog for Dependency injection
+    .AddNLogWeb();
 
 var app = builder.Build();
 services = app.Services;
@@ -199,7 +197,6 @@ var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{a
 var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {
-    logger.Debug("init main");
     app.Run();
 }
 catch (Exception exception)

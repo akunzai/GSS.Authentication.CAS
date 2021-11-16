@@ -8,21 +8,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers(options =>
+builder.Services.AddRazorPages();
+builder.Services.AddAuthorization(options =>
 {
-    // Global Authorize Filter
-    var policy = new AuthorizationPolicyBuilder()
+    // Globally Require Authenticated Users
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
     .RequireAuthenticatedUser()
     .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
 });
-builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddCookie(options =>
 {
@@ -154,7 +151,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Logging
     .ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
-    .AddNLogWeb(); // NLog: Setup NLog for Dependency injection
+    .AddNLogWeb();
 
 var app = builder.Build();
 
@@ -183,7 +180,6 @@ var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{a
 var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {
-    logger.Debug("init main");
     app.Run();
 }
 catch (Exception exception)

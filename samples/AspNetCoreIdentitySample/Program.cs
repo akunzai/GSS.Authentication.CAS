@@ -1,11 +1,12 @@
-using System.Security.Claims;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text.Json;
 using AspNetCoreIdentitySample.Data;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NLog.Web;
@@ -28,6 +29,13 @@ builder.Services.AddRazorPages();
 //     options.CheckConsentNeeded = _ => true;
 //     options.MinimumSameSitePolicy = SameSiteMode.None;
 // });
+builder.Services.AddAuthorization(options =>
+{
+    // Globally Require Authenticated Users
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+});
 builder.Services.AddAuthentication()
 .AddCAS(options =>
 {

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace AspNetCoreIdentitySample.Pages;
 
 [AllowAnonymous]
-[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 [IgnoreAntiforgeryToken]
+[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class ErrorModel : PageModel
 {
     public string? RequestId { get; set; }

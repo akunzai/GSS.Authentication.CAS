@@ -70,7 +70,8 @@ namespace OwinSample
                         // Single Sign-Out
                         var casUrl = new Uri(_configuration["Authentication:CAS:ServerUrlBase"]);
                         var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                        var serviceUrl = urlHelper.Action("Index", "Home", null, HttpContext.Current.Request.Url.Scheme);
+                        var serviceUrl =
+                            urlHelper.Action("Index", "Home", null, HttpContext.Current.Request.Url.Scheme);
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
                         redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
@@ -101,6 +102,7 @@ namespace OwinSample
                         _ => options.ServiceTicketValidator
                     };
                 }
+
                 options.Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = context =>
@@ -114,10 +116,12 @@ namespace OwinSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
+
                         if (assertion.Attributes.TryGetValue("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
+
                         return Task.CompletedTask;
                     },
                     OnRemoteFailure = context =>
@@ -143,16 +147,20 @@ namespace OwinSample
                     OnCreatingTicket = async context =>
                     {
                         // Get the OAuth user
-                        using var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        using var request =
+                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled).ConfigureAwait(false);
+                        using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled)
+                            .ConfigureAwait(false);
 
-                        if (!response.IsSuccessStatusCode || response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
+                        if (!response.IsSuccessStatusCode ||
+                            response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
                         {
                             var responseText = response.Content == null
                                 ? string.Empty
                                 : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            _logger.Error($"An error occurred when retrieving OAuth user information ({response.StatusCode}). {responseText}");
+                            _logger.Error(
+                                $"An error occurred when retrieving OAuth user information ({response.StatusCode}). {responseText}");
                             return;
                         }
 
@@ -163,12 +171,14 @@ namespace OwinSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
                         }
+
                         if (user.TryGetProperty("attributes", out var attributes))
                         {
                             if (attributes.TryGetProperty("display_name", out var displayName))
                             {
                                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
                             }
+
                             if (attributes.TryGetProperty("email", out var email))
                             {
                                 context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));

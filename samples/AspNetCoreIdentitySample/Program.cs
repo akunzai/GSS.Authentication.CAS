@@ -26,81 +26,84 @@ builder.Services.AddAuthorization(options =>
 {
     // Globally Require Authenticated Users
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
-    .RequireAuthenticatedUser()
-    .Build();
+        .RequireAuthenticatedUser()
+        .Build();
 });
 builder.Services.AddAuthentication()
-.AddCAS(options =>
-{
-    options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
-    var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
-    if (protocolVersion != 3)
+    .AddCAS(options =>
     {
-        switch (protocolVersion)
+        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
+        var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+        if (protocolVersion != 3)
         {
-            case 1:
-                options.ServiceTicketValidator = new Cas10ServiceTicketValidator(options);
-                break;
-            case 2:
-                options.ServiceTicketValidator = new Cas20ServiceTicketValidator(options);
-                break;
+            options.ServiceTicketValidator = protocolVersion switch
+            {
+                1 => new Cas10ServiceTicketValidator(options),
+                2 => new Cas20ServiceTicketValidator(options),
+                _ => null
+            };
         }
-    }
-    options.Events = new CasEvents
-    {
-        OnCreatingTicket = context =>
+
+        options.Events = new CasEvents
         {
-            var assertion = context.Assertion;
-            if (context.Principal?.Identity is not ClaimsIdentity identity)
+            OnCreatingTicket = context =>
+            {
+                if (context.Identity == null)
+                    return Task.CompletedTask;
+                // Map claims from assertion
+                var assertion = context.Assertion;
+                context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+                if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                }
+
+                if (assertion.Attributes.TryGetValue("email", out var email))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                }
+
                 return Task.CompletedTask;
-            // Map claims from assertion
-            context.Identity?.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
             }
-            if (assertion.Attributes.TryGetValue("email", out var email))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Email, email));
-            }
-            return Task.CompletedTask;
-        }
-    };
-})
-.AddOAuth(OAuthDefaults.DisplayName, options =>
-{
-    options.CallbackPath = "/signin-oauth";
-    options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"];
-    options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
-    options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
-    options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
-    options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-    options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
-    options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-    options.Events = new OAuthEvents
+        };
+    })
+    .AddOAuth(OAuthDefaults.DisplayName, options =>
     {
-        OnCreatingTicket = async context =>
+        options.CallbackPath = "/signin-oauth";
+        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"];
+        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
+        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
+        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+        options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
+        options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
+        options.Events = new OAuthEvents
         {
-            // Get the OAuth user
-            using var request =
-                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", context.AccessToken);
-            using var response =
-                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted).ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
+            OnCreatingTicket = async context =>
             {
-                throw new HttpRequestException($"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-            }
+                // Get the OAuth user
+                using var request =
+                    new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                request.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                using var response =
+                    await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
+                        .ConfigureAwait(false);
 
-            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-            context.RunClaimActions(json.RootElement);
-        }
-    };
-});
+                if (!response.IsSuccessStatusCode ||
+                    response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
+                {
+                    throw new HttpRequestException(
+                        $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
+                }
+
+                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+                context.RunClaimActions(json.RootElement);
+            }
+        };
+    });
 builder.Logging
     .ClearProviders()
     .SetMinimumLevel(LogLevel.Trace)
@@ -131,7 +134,8 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 // configure nlog.config per environment
-var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{app.Environment.EnvironmentName}.config"));
+var envLogConfig =
+    new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{app.Environment.EnvironmentName}.config"));
 var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {

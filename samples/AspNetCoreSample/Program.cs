@@ -91,7 +91,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<CasEvents>>();
                 if (!string.IsNullOrWhiteSpace(failure?.Message))
                 {
-                    logger.LogError(failure, failure.Message);
+                    logger.LogError(failure, "{Exception}", failure.Message);
                 }
 
                 context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -141,7 +141,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
                 if (!string.IsNullOrWhiteSpace(failure?.Message))
                 {
-                    logger.LogError(failure, failure.Message);
+                    logger.LogError(failure, "{Exception}", failure.Message);
                 }
 
                 context.Response.Redirect("/Account/ExternalLoginFailure");

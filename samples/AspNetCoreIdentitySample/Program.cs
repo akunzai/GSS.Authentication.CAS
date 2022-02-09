@@ -6,9 +6,11 @@ using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -101,6 +103,34 @@ builder.Services.AddAuthentication()
                 await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                 context.RunClaimActions(json.RootElement);
+            }
+        };
+    })
+    .AddOpenIdConnect(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:OIDC:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:OIDC:ClientSecret"];
+        options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
+        options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
+        options.ResponseType = builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
+        options.ResponseMode = builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.Scope.Clear();
+        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRemoteFailure = context =>
+            {
+                var failure = context.Failure;
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
+                if (!string.IsNullOrWhiteSpace(failure?.Message))
+                {
+                    logger.LogError(failure, "{Exception}", failure.Message);
+                }
+
+                context.Response.Redirect("/Account/ExternalLoginFailure");
+                context.HandleResponse();
+                return Task.CompletedTask;
             }
         };
     });

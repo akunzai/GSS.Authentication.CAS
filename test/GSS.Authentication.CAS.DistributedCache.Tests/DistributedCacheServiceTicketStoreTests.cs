@@ -8,12 +8,12 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.DistributedCache.Tests;
 
-public class DistributedCacheServiceTicketStoreTest
+public class DistributedCacheServiceTicketStoreTests
 {
     private static readonly IDistributedCache _cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
     private readonly IServiceTicketStore _serviceTickets;
 
-    public DistributedCacheServiceTicketStoreTest()
+    public DistributedCacheServiceTicketStoreTests()
     {
         _serviceTickets = new DistributedCacheServiceTicketStore(_cache);
     }

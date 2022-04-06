@@ -5,7 +5,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Core.Tests;
 
-public class Cas10ServiceTicketValidationTest
+public class Cas10ServiceTicketValidationTests
 {
     private readonly ICasOptions _options = new CasOptions
     {

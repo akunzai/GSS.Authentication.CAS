@@ -7,7 +7,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Core.Tests;
 
-public class Cas20ServiceTicketValidationTest
+public class Cas30ServiceTicketValidationTests
 {
     private readonly ICasOptions _options = new CasOptions
     {
@@ -20,17 +20,24 @@ public class Cas20ServiceTicketValidationTest
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl = $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
         var mockHttp = new MockHttpMessageHandler();
-
         mockHttp.Expect(HttpMethod.Get, requestUrl)
             .Respond(new StringContent(@$"<cas:serviceResponse xmlns:cas=""http://www.yale.edu/tp/cas"">
     <cas:authenticationSuccess>
         <cas:user>username</cas:user>
+        <cas:attributes>
+            <cas:firstname>John</cas:firstname>
+            <cas:lastname>Doe</cas:lastname>
+            <cas:title>Mr.</cas:title>
+            <cas:email>jdoe@example.org</cas:email>
+            <cas:affiliation>staff</cas:affiliation>
+            <cas:affiliation>faculty</cas:affiliation>
+        </cas:attributes>
         <cas:proxyGrantingTicket>{Guid.NewGuid()}</cas:proxyGrantingTicket>
     </cas:authenticationSuccess>
 </cas:serviceResponse>", Encoding.UTF8, "application/xml"));
-        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+        var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act
         var principal = await validator.ValidateAsync(ticket, _service, CancellationToken.None).ConfigureAwait(false);
@@ -39,7 +46,7 @@ public class Cas20ServiceTicketValidationTest
         Assert.NotNull(principal);
         Assert.NotNull(principal!.Assertion);
         Assert.Equal(principal.GetPrincipalName(), principal.Assertion.PrincipalName);
-        Assert.Empty(principal.Assertion.Attributes);
+        Assert.NotEmpty(principal.Assertion.Attributes);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }
@@ -49,7 +56,7 @@ public class Cas20ServiceTicketValidationTest
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl = $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.Expect(HttpMethod.Get, requestUrl)
             .Respond(new StringContent(@$"<cas:serviceResponse xmlns:cas=""http://www.yale.edu/tp/cas"">
@@ -57,7 +64,7 @@ public class Cas20ServiceTicketValidationTest
         Ticket {ticket} not recognized
     </cas:authenticationFailure>
 </cas:serviceResponse>", Encoding.UTF8, "application/xml"));
-        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+        var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act & Assert
         await Assert.ThrowsAsync<AuthenticationException>(() => validator.ValidateAsync(ticket, _service, CancellationToken.None)).ConfigureAwait(false);
@@ -70,11 +77,11 @@ public class Cas20ServiceTicketValidationTest
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl = $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.Expect(HttpMethod.Get, requestUrl)
           .Respond(HttpStatusCode.BadRequest);
-        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+        var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() => validator.ValidateAsync(ticket, _service, CancellationToken.None)).ConfigureAwait(false);

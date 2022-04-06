@@ -49,6 +49,23 @@ public class Cas30ServiceTicketValidationTests
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }
+    
+    [Fact]
+    public async Task ValidateServiceTicketWithUnsupportedCasServer_ShouldThrowsHttpRequestException()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var requestUrl = $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(HttpStatusCode.InternalServerError);
+        var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None)).ConfigureAwait(false);
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
 
     [Fact]
     public async Task ValidateServiceTicketWithFailXmlResponse_ShouldThrowsAuthenticationException()

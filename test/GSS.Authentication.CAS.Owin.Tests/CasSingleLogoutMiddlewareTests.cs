@@ -6,7 +6,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests;
 
-public class CasSingleLogoutMiddlewareTest
+public class CasSingleLogoutMiddlewareTests
 {
     [Fact]
     public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()

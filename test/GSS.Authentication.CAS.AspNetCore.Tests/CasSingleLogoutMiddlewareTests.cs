@@ -10,7 +10,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.AspNetCore.Tests;
 
-public class CasSingleLogoutMiddlewareTest
+public class CasSingleLogoutMiddlewareTests
 {
     [Fact]
     public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()

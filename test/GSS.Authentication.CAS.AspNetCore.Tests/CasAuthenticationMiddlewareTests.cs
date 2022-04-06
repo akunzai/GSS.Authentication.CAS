@@ -17,7 +17,7 @@ using Xunit;
 
 namespace GSS.Authentication.CAS.AspNetCore.Tests;
 
-public class CasAuthenticationMiddlewareTest
+public class CasAuthenticationMiddlewareTests
 {
     private const string CasServerUrlBase = "https://cas.example.org/cas";
 

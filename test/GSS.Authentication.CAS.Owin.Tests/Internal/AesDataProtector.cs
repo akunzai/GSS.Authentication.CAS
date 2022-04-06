@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Owin.Security.DataProtection;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.Owin.Tests;
 
 internal class AesDataProtector : IDataProtector
@@ -16,11 +17,10 @@ internal class AesDataProtector : IDataProtector
             using var sha = SHA256.Create();
             _key = sha.ComputeHash(Encoding.UTF8.GetBytes(key));
         }
+
         using var aes = Aes.Create();
-        if (_key == null)
-        {
-            _key = aes.Key;
-        }
+        _key ??= aes.Key;
+
         _iv = aes.IV;
     }
 

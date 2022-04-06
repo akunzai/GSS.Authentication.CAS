@@ -9,18 +9,17 @@ namespace GSS.Authentication.CAS.Core.Tests;
 
 public class Cas20ServiceTicketValidationTests
 {
-    private readonly ICasOptions _options = new CasOptions
-    {
-        CasServerUrlBase = "https://cas.example.org/cas"
-    };
-    private readonly string _service = "https://dev.example.test";
+    private readonly ICasOptions _options = new CasOptions { CasServerUrlBase = "https://cas.example.org/cas" };
+
+    private const string ServiceUrl = "https://dev.example.test";
 
     [Fact]
     public async Task ValidateServiceTicketWithSuccessXmlResponse_ShouldReturnPrincipal()
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
         var mockHttp = new MockHttpMessageHandler();
 
         mockHttp.Expect(HttpMethod.Get, requestUrl)
@@ -33,7 +32,7 @@ public class Cas20ServiceTicketValidationTests
         var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act
-        var principal = await validator.ValidateAsync(ticket, _service, CancellationToken.None).ConfigureAwait(false);
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None).ConfigureAwait(false);
 
         //Assert
         Assert.NotNull(principal);
@@ -49,7 +48,8 @@ public class Cas20ServiceTicketValidationTests
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.Expect(HttpMethod.Get, requestUrl)
             .Respond(new StringContent(@$"<cas:serviceResponse xmlns:cas=""http://www.yale.edu/tp/cas"">
@@ -60,7 +60,9 @@ public class Cas20ServiceTicketValidationTests
         var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act & Assert
-        await Assert.ThrowsAsync<AuthenticationException>(() => validator.ValidateAsync(ticket, _service, CancellationToken.None)).ConfigureAwait(false);
+        await Assert
+            .ThrowsAsync<AuthenticationException>(() =>
+                validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None)).ConfigureAwait(false);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }
@@ -70,14 +72,17 @@ public class Cas20ServiceTicketValidationTests
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
-        var requestUrl = $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(_service)}";
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
         var mockHttp = new MockHttpMessageHandler();
         mockHttp.Expect(HttpMethod.Get, requestUrl)
-          .Respond(HttpStatusCode.BadRequest);
+            .Respond(HttpStatusCode.BadRequest);
         var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(() => validator.ValidateAsync(ticket, _service, CancellationToken.None)).ConfigureAwait(false);
+        await Assert
+            .ThrowsAsync<HttpRequestException>(
+                () => validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None)).ConfigureAwait(false);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

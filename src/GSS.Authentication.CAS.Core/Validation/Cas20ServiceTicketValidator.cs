@@ -46,6 +46,7 @@ namespace GSS.Authentication.CAS.Validation
             {
                 throw new AuthenticationException(failureElement.Value);
             }
+
             /* On ticket validation success
             <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
                 <cas:authenticationSuccess>
@@ -86,6 +87,7 @@ namespace GSS.Authentication.CAS.Validation
                         : new StringValues(attr.Value);
                 }
             }
+
             var assertion = new Assertion(principalName, attributes);
             return new CasPrincipal(assertion, Options.AuthenticationType);
         }

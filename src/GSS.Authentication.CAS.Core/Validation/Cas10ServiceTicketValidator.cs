@@ -16,12 +16,9 @@ namespace GSS.Authentication.CAS.Validation
         protected override ICasPrincipal? BuildPrincipal(string responseBody)
         {
             var responseParts = responseBody.Split('\n');
-            if (responseParts.Length >= 2 && responseParts[0] == "yes")
-            {
-                var assertion = new Assertion(responseParts[1]);
-                return new CasPrincipal(assertion, Options.AuthenticationType);
-            }
-            return null;
+            if (responseParts.Length < 2 || responseParts[0] != "yes") return null;
+            var assertion = new Assertion(responseParts[1]);
+            return new CasPrincipal(assertion, Options.AuthenticationType);
         }
     }
 }

@@ -31,13 +31,10 @@ public class CasSingleLogoutMiddlewareTests
         var store = new Mock<IServiceTicketStore>();
         using var server = CreateServer(store.Object);
         var content = new StringContent(
-            JsonSerializer.Serialize(new
-            {
-                logoutRequest = new { ticket = Guid.NewGuid().ToString() }
-            }),
+            JsonSerializer.Serialize(new { logoutRequest = new { ticket = Guid.NewGuid().ToString() } }),
             Encoding.UTF8,
             "application/json"
-            );
+        );
 
         // Act
         using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
@@ -59,7 +56,8 @@ public class CasSingleLogoutMiddlewareTests
         var ticket = Guid.NewGuid().ToString();
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            ["logoutRequest"] = $@"<samlp:LogoutRequest xmlns:samlp=""urn:oasis:names:tc:SAML:2.0:protocol"" ID=""{Guid.NewGuid()}"" Version=""2.0"" IssueInstant=""{DateTime.UtcNow:o}"">
+            ["logoutRequest"] =
+                $@"<samlp:LogoutRequest xmlns:samlp=""urn:oasis:names:tc:SAML:2.0:protocol"" ID=""{Guid.NewGuid()}"" Version=""2.0"" IssueInstant=""{DateTime.UtcNow:o}"">
     <saml:NameID xmlns:saml=""urn:oasis:names:tc:SAML:2.0:assertion"">@NOT_USED@</saml:NameID>
     <samlp:SessionIndex>{ticket}</samlp:SessionIndex></samlp:LogoutRequest>"
         });

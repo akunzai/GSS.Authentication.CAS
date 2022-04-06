@@ -29,7 +29,9 @@ public class CasAuthenticationMiddlewareTests
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, response.StatusCode);
-        var loginUri = QueryHelpers.AddQueryString(new Uri(server.BaseAddress, CookieAuthenticationDefaults.LoginPath.Value).AbsoluteUri, CookieAuthenticationDefaults.ReturnUrlParameter, "/");
+        var loginUri = QueryHelpers.AddQueryString(
+            new Uri(server.BaseAddress, CookieAuthenticationDefaults.LoginPath.Value).AbsoluteUri,
+            CookieAuthenticationDefaults.ReturnUrlParameter, "/");
         Assert.Equal(loginUri, response.Headers.Location.AbsoluteUri);
     }
 
@@ -40,7 +42,8 @@ public class CasAuthenticationMiddlewareTests
         using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase);
 
         // Act
-        using var response = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var response = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -73,7 +76,8 @@ public class CasAuthenticationMiddlewareTests
         ticketValidator
             .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
-        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
@@ -84,8 +88,12 @@ public class CasAuthenticationMiddlewareTests
 
         // Assert
         var cookies = signinResponse.Headers.GetValues("Set-Cookie").ToList();
-        Assert.Contains(cookies, x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix + CookieAuthenticationDefaults.AuthenticationType));
-        Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation.{CasDefaults.AuthenticationType}"));
+        Assert.Contains(cookies,
+            x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix +
+                              CookieAuthenticationDefaults.AuthenticationType));
+        Assert.Contains(cookies,
+            x => x.StartsWith(
+                $"{CookieAuthenticationDefaults.CookiePrefix}Correlation.{CasDefaults.AuthenticationType}"));
         Assert.Equal("/", signinResponse.Headers.Location.OriginalString);
 
         using var authorizedRequest = signinResponse.GetRequestWithCookies("/");
@@ -94,7 +102,8 @@ public class CasAuthenticationMiddlewareTests
         Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
         var bodyText = await authorizedResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
         Assert.Equal(principal.GetPrincipalName(), bodyText);
-        ticketValidator.Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        ticketValidator.Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -111,7 +120,8 @@ public class CasAuthenticationMiddlewareTests
         ticketValidator
             .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Throws(new NotSupportedException("test"));
-        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
@@ -157,7 +167,8 @@ public class CasAuthenticationMiddlewareTests
         ticketValidator
             .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Throws(new NotSupportedException("test"));
-        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
@@ -191,7 +202,8 @@ public class CasAuthenticationMiddlewareTests
             .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
 
-        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
@@ -233,7 +245,8 @@ public class CasAuthenticationMiddlewareTests
         });
         var ticket = Guid.NewGuid().ToString();
 
-        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value).ConfigureAwait(false);
+        using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value)
+            .ConfigureAwait(false);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
@@ -249,7 +262,7 @@ public class CasAuthenticationMiddlewareTests
     private static TestServer CreateServer(Action<CasAuthenticationOptions> configureOptions)
     {
         var options = new CasAuthenticationOptions();
-        configureOptions?.Invoke(options);
+        configureOptions.Invoke(options);
         return TestServer.Create(app =>
         {
             app.SetDataProtectionProvider(new FakeDataProtectionProvider(new AesDataProtector("test")));
@@ -266,7 +279,8 @@ public class CasAuthenticationMiddlewareTests
 
                 if (request.Path == CookieAuthenticationDefaults.LoginPath)
                 {
-                    context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" }, CasDefaults.AuthenticationType);
+                    context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" },
+                        CasDefaults.AuthenticationType);
                     return;
                 }
 
@@ -278,17 +292,17 @@ public class CasAuthenticationMiddlewareTests
 
                 var user = context.Authentication.User;
 
-                    // Deny anonymous request beyond this point.
-                    if (user?.Identities.Any(identity => identity.IsAuthenticated) != true)
+                // Deny anonymous request beyond this point.
+                if (user?.Identities.Any(identity => identity.IsAuthenticated) != true)
                 {
-                        // This is what [Authorize] calls
-                        // The cookie middleware will intercept this 401 and redirect to LoginPath
-                        context.Authentication.Challenge();
+                    // This is what [Authorize] calls
+                    // The cookie middleware will intercept this 401 and redirect to LoginPath
+                    context.Authentication.Challenge();
                     return;
                 }
 
-                    // Display authenticated principal name
-                    await context.Response.WriteAsync(user.GetPrincipalName()).ConfigureAwait(false);
+                // Display authenticated principal name
+                await context.Response.WriteAsync(user.GetPrincipalName()).ConfigureAwait(false);
             });
         });
     }

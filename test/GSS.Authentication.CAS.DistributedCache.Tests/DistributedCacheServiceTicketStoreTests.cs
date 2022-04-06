@@ -10,7 +10,9 @@ namespace GSS.Authentication.CAS.DistributedCache.Tests;
 
 public class DistributedCacheServiceTicketStoreTests
 {
-    private static readonly IDistributedCache _cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+    private static readonly IDistributedCache _cache =
+        new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+
     private readonly IServiceTicketStore _serviceTickets;
 
     public DistributedCacheServiceTicketStoreTests()
@@ -80,7 +82,8 @@ public class DistributedCacheServiceTicketStoreTests
         Assert.NotNull(actual);
         Assert.Equal(expected.TicketId, actual!.TicketId);
         Assert.Equal(expected.AuthenticationType, actual.AuthenticationType);
-        Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value, actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);
+        Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value,
+            actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);
         Assert.Equal(expected.Assertion.PrincipalName, actual.Assertion.PrincipalName);
         Assert.Equal(expected.Assertion.Attributes, actual.Assertion.Attributes);
         Assert.Equal(expected.Assertion.ValidFrom, actual.Assertion.ValidFrom);
@@ -106,10 +109,7 @@ public class DistributedCacheServiceTicketStoreTests
     {
         var ticket = new ServiceTicket(Guid.NewGuid().ToString(),
             new Assertion("test",
-                new Dictionary<string, StringValues>()
-                {
-                    ["foo"] = "bar"
-                },
+                new Dictionary<string, StringValues> { ["foo"] = "bar" },
                 DateTimeOffset.UtcNow,
                 DateTimeOffset.UtcNow.AddHours(1)),
             new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) }, "TEST");

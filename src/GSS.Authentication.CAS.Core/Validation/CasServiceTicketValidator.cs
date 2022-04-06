@@ -33,7 +33,10 @@ namespace GSS.Authentication.CAS.Validation
             var escapedTicket = Uri.EscapeDataString(ticket);
             var requestUri = new Uri($"{validateUri.AbsoluteUri}?service={escapedService}&ticket={escapedTicket}");
             var response = await _httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Failed to validate ticket [{ticket}] for service [{service}] with error status [{(int)response.StatusCode}], please make sure your CAS server support the validate URI [{validateUri}]");
+            }
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return BuildPrincipal(responseBody);
         }

@@ -1,5 +1,6 @@
 using Microsoft.Owin.Security.DataProtection;
 
+// ReSharper disable once CheckNamespace
 namespace GSS.Authentication.CAS.Owin.Tests;
 
 internal class FakeDataProtectionProvider : IDataProtectionProvider

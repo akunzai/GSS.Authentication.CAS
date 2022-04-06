@@ -9,7 +9,9 @@ public static class HttpResponseExtensions
     /// <param name="path"></param>
     /// <param name="method"></param>
     /// <returns>HttpRequestMessage with Cookie header</returns>
-    public static HttpRequestMessage GetRequestWithCookies(this HttpResponseMessage response, string path, HttpMethod? method = null)
+    public static HttpRequestMessage GetRequestWithCookies(this HttpResponseMessage response,
+        string path,
+        HttpMethod? method = null)
     {
         var request = new HttpRequestMessage(method ?? HttpMethod.Get, path);
         if (!response.Headers.TryGetValues("Set-Cookie", out var values))
@@ -23,6 +25,7 @@ public static class HttpResponseExtensions
                 continue;
             cookies.Add(nameValue);
         }
+
         request.Headers.Add("Cookie", string.Join("; ", cookies.ToArray()));
         return request;
     }

@@ -47,7 +47,7 @@ namespace GSS.Authentication.CAS.Validation
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(
-                    $"Failed to validate ticket [{ticket}] for service [{service}] with error status [{(int)response.StatusCode}], please make sure your CAS server support the validate URI [{validateUri}]");
+                    $"Failed to validate ticket [{ticket}] for service [{service}] with error status [{(int)response.StatusCode}], please make sure your CAS server supports the validation URI [{validateUri}]");
             }
 
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

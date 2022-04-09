@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.1.0 (2022-04-09)
+
+- Fixes the service parameter encoding mistake [#127](https://github.com/akunzai/GSS.Authentication.CAS/pull/127)
+- Default parameter for CancellationToken
+- User attributes may released in CAS v2 protocol with forward-compatible mode [#126](https://github.com/akunzai/GSS.Authentication.CAS/pull/126)
+- Obsolete the ValidateUrlSuffix property
+
 ## 5.0.1 (2021-11-14)
 
 - Fixed System.InvalidOperationException: A suitable constructor for type 'GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware' could not be located

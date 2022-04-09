@@ -94,7 +94,7 @@
       <Version>4.2.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Owin.Security.Cookies">
-      <Version>4.2.0</Version>
+      <Version>4.2.1</Version>
     </PackageReference>
     <PackageReference Include="MSBuild.Microsoft.VisualStudio.Web.targets">
       <Version>14.0.0.3</Version>

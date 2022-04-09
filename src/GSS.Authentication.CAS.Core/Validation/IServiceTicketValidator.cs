@@ -16,6 +16,8 @@ namespace GSS.Authentication.CAS.Validation
         /// <exception cref="System.Security.Authentication.AuthenticationException"></exception>
         /// <exception cref="System.Net.Http.HttpRequestException"></exception>
         /// <exception cref="System.UriFormatException"></exception>
-        Task<ICasPrincipal?> ValidateAsync(string ticket, string service, CancellationToken cancellationToken);
+        Task<ICasPrincipal?> ValidateAsync(string ticket,
+            string service,
+            CancellationToken cancellationToken = default);
     }
 }

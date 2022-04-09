@@ -28,7 +28,7 @@ namespace GSS.Authentication.CAS.Validation
         public virtual async Task<ICasPrincipal?> ValidateAsync(
             string ticket,
             string service,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(ticket)) throw new ArgumentNullException(nameof(ticket));
             if (string.IsNullOrEmpty(service)) throw new ArgumentNullException(nameof(service));

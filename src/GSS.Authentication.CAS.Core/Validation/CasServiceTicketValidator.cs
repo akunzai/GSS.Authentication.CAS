@@ -39,10 +39,9 @@ namespace GSS.Authentication.CAS.Validation
 #pragma warning disable CS0618
             var validateUri = new Uri(baseUri, ValidateUrlSuffix);
 #pragma warning restore CS0618
-            // unescape first to prevent double escape
-            var escapedService = Uri.EscapeDataString(Uri.UnescapeDataString(service));
-            var escapedTicket = Uri.EscapeDataString(ticket);
-            var requestUri = new Uri($"{validateUri.AbsoluteUri}?service={escapedService}&ticket={escapedTicket}");
+            var requestUri =
+                new Uri(
+                    $"{validateUri.AbsoluteUri}?ticket={Uri.EscapeDataString(ticket)}&service={Uri.EscapeDataString(service)}");
             var response = await _httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {

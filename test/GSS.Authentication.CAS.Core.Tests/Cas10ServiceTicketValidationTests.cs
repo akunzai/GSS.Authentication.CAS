@@ -36,6 +36,28 @@ public class Cas10ServiceTicketValidationTests
     }
 
     [Fact]
+    public async Task ValidateServiceTicketWithServiceParameter_ShouldSupportEncodedParameters()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var serviceUrl = $"https://dev.example.test?returnUrl={Uri.EscapeDataString("http://localhost/")}";
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/validate?ticket={ticket}&service={Uri.EscapeDataString(serviceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond("plain/text", "yes\nusername");
+        var validator = new Cas10ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act
+        var principal = await validator.ValidateAsync(ticket, serviceUrl).ConfigureAwait(false);
+
+        // Assert
+        Assert.NotNull(principal);
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
     public async Task ValidateServiceTicketWithFailPlainResponse_ShouldReturnNull()
     {
         // Arrange

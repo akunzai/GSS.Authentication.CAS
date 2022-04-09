@@ -28,7 +28,7 @@ namespace GSS.Authentication.CAS.Validation
         public virtual async Task<ICasPrincipal?> ValidateAsync(
             string ticket,
             string service,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(ticket)) throw new ArgumentNullException(nameof(ticket));
             if (string.IsNullOrEmpty(service)) throw new ArgumentNullException(nameof(service));
@@ -39,15 +39,14 @@ namespace GSS.Authentication.CAS.Validation
 #pragma warning disable CS0618
             var validateUri = new Uri(baseUri, ValidateUrlSuffix);
 #pragma warning restore CS0618
-            // unescape first to prevent double escape
-            var escapedService = Uri.EscapeDataString(Uri.UnescapeDataString(service));
-            var escapedTicket = Uri.EscapeDataString(ticket);
-            var requestUri = new Uri($"{validateUri.AbsoluteUri}?service={escapedService}&ticket={escapedTicket}");
+            var requestUri =
+                new Uri(
+                    $"{validateUri.AbsoluteUri}?ticket={Uri.EscapeDataString(ticket)}&service={Uri.EscapeDataString(service)}");
             var response = await _httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(
-                    $"Failed to validate ticket [{ticket}] for service [{service}] with error status [{(int)response.StatusCode}], please make sure your CAS server support the validate URI [{validateUri}]");
+                    $"Failed to validate ticket [{ticket}] for service [{service}] with error status [{(int)response.StatusCode}], please make sure your CAS server supports the validation URI [{validateUri}]");
             }
 
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

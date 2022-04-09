@@ -62,7 +62,7 @@ public class Cas20ServiceTicketValidationTests
         // Act & Assert
         await Assert
             .ThrowsAsync<AuthenticationException>(() =>
-                validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None)).ConfigureAwait(false);
+                validator.ValidateAsync(ticket, ServiceUrl)).ConfigureAwait(false);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }
@@ -82,7 +82,7 @@ public class Cas20ServiceTicketValidationTests
         // Act & Assert
         await Assert
             .ThrowsAsync<HttpRequestException>(
-                () => validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None)).ConfigureAwait(false);
+                () => validator.ValidateAsync(ticket, ServiceUrl)).ConfigureAwait(false);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

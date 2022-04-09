@@ -91,7 +91,7 @@
       <Version>1.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb">
-      <Version>4.2.0</Version>
+      <Version>4.2.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Owin.Security.Cookies">
       <Version>4.2.0</Version>

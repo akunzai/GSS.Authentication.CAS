@@ -42,7 +42,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var ticketId = ticket.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
+            var ticketId = ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString();
             var principal = ticket.Principal;
             var properties = ticket.Properties;
             var assertion = (principal as CasPrincipal)?.Assertion

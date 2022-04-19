@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog.Web;
 
@@ -22,7 +23,10 @@ if (!string.IsNullOrWhiteSpace(redisConfiguration))
 {
     builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
 }
-
+builder.Services.AddOptions<DistributedCacheServiceTicketStoreOptions>().Configure(options =>
+{
+    options.CacheEntryOptions = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(8) };
+});
 builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
 builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
 

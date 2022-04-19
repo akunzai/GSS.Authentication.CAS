@@ -92,6 +92,7 @@ namespace OwinSample
             {
                 options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
                 options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                options.SaveTokens = _configuration.GetValue("Authentication:CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
@@ -104,7 +105,6 @@ namespace OwinSample
                         _ => options.ServiceTicketValidator
                     };
                 }
-
                 options.Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = context =>
@@ -144,6 +144,7 @@ namespace OwinSample
                 options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
@@ -212,6 +213,7 @@ namespace OwinSample
                 RedeemCode = true,
                 Scope = _configuration.GetValue("Authentication:OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
+                SaveTokens = _configuration.GetValue("Authentication:OIDC:SaveTokens", false),
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
                     RedirectToIdentityProvider = notification =>

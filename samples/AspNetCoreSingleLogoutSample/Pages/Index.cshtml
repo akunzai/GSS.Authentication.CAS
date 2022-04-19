@@ -3,7 +3,6 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home";
-    var accessToken = await HttpContext.GetTokenAsync("access_token");
 }
 <h1>Hello @(User.Identity?.IsAuthenticated == true ? User.Identity.Name : "anonymous")</h1>
 
@@ -17,20 +16,6 @@
             <dd>@claim.Value</dd>
         }
     </dl>
-    @if (!string.IsNullOrWhiteSpace(accessToken))
-    {
-        <h2>Tokens</h2>
-        <dl>
-            <dt>Access Token</dt>
-            <dd>@accessToken</dd>
-            <dt>Refresh Token</dt>
-            <dd>@await HttpContext.GetTokenAsync("refresh_token")</dd>
-            <dt>Token Type</dt>
-            <dd>@await HttpContext.GetTokenAsync("token_type")</dd>
-            <dt>Expires At</dt>
-            <dd>@await HttpContext.GetTokenAsync("expires_at")</dd>
-        </dl>
-    }
     <a class="btn btn-danger" asp-page="/Account/Logout">Logout</a>
 }
 else

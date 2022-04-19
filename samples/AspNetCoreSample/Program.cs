@@ -55,6 +55,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCAS(options =>
     {
         options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens",false);
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
         if (protocolVersion != 3)
         {
@@ -113,6 +114,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens",false);
         options.Events = new OAuthEvents
         {
             OnCreatingTicket = async context =>
@@ -163,6 +165,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
         builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens",false);
         options.Events = new OpenIdConnectEvents
         {
             OnRemoteFailure = context =>

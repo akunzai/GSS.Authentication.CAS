@@ -13,6 +13,7 @@ using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -105,7 +106,7 @@ namespace OwinSingleLogoutSample
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 // required for CasSingleLogoutMiddleware
-                options.UseAuthenticationSessionStore = true;
+                options.SaveTokens = true;
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
@@ -266,6 +267,10 @@ namespace OwinSingleLogoutSample
             {
                 services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
             }
+
+            services.AddOptions<DistributedCacheServiceTicketStoreOptions>().Configure(options =>
+                options.CacheEntryOptions =
+                    new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(8) });
 
             services
                 .AddSingleton(_configuration)

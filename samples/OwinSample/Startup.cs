@@ -13,10 +13,12 @@ using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
 using NLog;
 using NLog.Owin.Logging;
 using Owin;
@@ -90,6 +92,7 @@ namespace OwinSample
             {
                 options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
                 options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                options.SaveTokens = _configuration.GetValue("Authentication:CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
@@ -102,7 +105,6 @@ namespace OwinSample
                         _ => options.ServiceTicketValidator
                     };
                 }
-
                 options.Provider = new CasAuthenticationProvider
                 {
                     OnCreatingTicket = context =>
@@ -142,6 +144,7 @@ namespace OwinSample
                 options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
@@ -194,6 +197,54 @@ namespace OwinSample
                         return Task.CompletedTask;
                     }
                 };
+            });
+
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                AuthenticationMode = AuthenticationMode.Passive,
+                CallbackPath = new PathString("/signin-oidc"),
+                ClientId = _configuration["Authentication:OIDC:ClientId"],
+                ClientSecret = _configuration["Authentication:OIDC:ClientSecret"],
+                Authority = _configuration["Authentication:OIDC:Authority"],
+                MetadataAddress = _configuration["Authentication:OIDC:MetadataAddress"],
+                ResponseType = _configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code),
+                ResponseMode = _configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
+                // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
+                RedeemCode = true,
+                Scope = _configuration.GetValue("Authentication:OIDC:Scope", "openid profile email"),
+                RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
+                SaveTokens = _configuration.GetValue("Authentication:OIDC:SaveTokens", false),
+                Notifications = new OpenIdConnectAuthenticationNotifications
+                {
+                    RedirectToIdentityProvider = notification =>
+                    {
+                        // generate the redirect_uri parameter automatically
+                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        {
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            notification.ProtocolMessage.RedirectUri = redirectUri;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    AuthorizationCodeReceived = notification =>
+                    {
+                        // generate the redirect_uri parameter automatically
+                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        {
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            notification.TokenEndpointRequest.RedirectUri = redirectUri;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    AuthenticationFailed = notification =>
+                    {
+                        var exception = notification.Exception;
+                        _logger.Error(exception, exception.Message);
+                        notification.Response.Redirect("/Account/ExternalLoginFailure");
+                        notification.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                }
             });
         }
     }

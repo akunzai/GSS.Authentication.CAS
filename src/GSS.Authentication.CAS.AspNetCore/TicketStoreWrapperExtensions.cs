@@ -1,19 +1,20 @@
-using Microsoft.Owin.Security;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication;
 
-namespace GSS.Authentication.CAS.Owin
+namespace GSS.Authentication.CAS.AspNetCore
 {
-    public static class AuthenticationSessionStoreExtensions
+    public static class TicketStoreWrapperExtensions
     {
         private const string ServiceTicketKey = "service_ticket";
 
         public static void SetServiceTicket(this AuthenticationProperties properties, string ticket)
         {
-            properties.Dictionary.Add(ServiceTicketKey, ticket);
+            properties.StoreTokens(new List<AuthenticationToken> { new() { Name = ServiceTicketKey, Value = ticket } });
         }
 
         public static string? GetServiceTicket(this AuthenticationProperties properties)
         {
-            properties.Dictionary.TryGetValue(ServiceTicketKey, out var ticket);
+            var ticket = properties.GetTokenValue(ServiceTicketKey);
             return string.IsNullOrWhiteSpace(ticket) ? null : ticket;
         }
     }

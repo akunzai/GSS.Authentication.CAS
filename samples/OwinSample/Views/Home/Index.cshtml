@@ -1,3 +1,4 @@
+@model Microsoft.Owin.Security.AuthenticationProperties
 @using System.Security.Claims;
 @{
     ViewData["Title"] = "Home";
@@ -15,6 +16,15 @@
             <dd>@claim.Value</dd>
         }
     </dl>
+    if (Model?.Dictionary?.Count > 0)
+    {
+        <h2>Properties</h2>
+        foreach (var prop in Model?.Dictionary)
+        {
+            <dt>@prop.Key</dt>
+            <dd>@prop.Value</dd>
+        }
+    }
     @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "btn btn-danger" })
 }
 else

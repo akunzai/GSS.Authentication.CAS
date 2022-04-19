@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.2.0 (2022-04-19)
+
+- Bump Microsoft.Owin.Security.Cookies from 4.1.1 to 4.2.0 [#130](https://github.com/akunzai/GSS.Authentication.CAS/pull/130)
+- Improved the IServiceTicketStore implementation [#128](https://github.com/akunzai/GSS.Authentication.CAS/pull/128)
+- Renamed the UseAuthenticationSessionStore to SaveTokens
+
 ## 5.1.0 (2022-04-09)
 
 - Fixes the service parameter encoding mistake [#127](https://github.com/akunzai/GSS.Authentication.CAS/pull/127)

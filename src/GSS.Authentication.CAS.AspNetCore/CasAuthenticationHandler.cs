@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -96,10 +95,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
             if (Options.SaveTokens)
             {
-                properties.StoreTokens(new List<AuthenticationToken>
-                {
-                    new AuthenticationToken {Name = "access_token", Value = serviceTicket}
-                });
+                properties.SetServiceTicket(serviceTicket);
             }
 
             var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),

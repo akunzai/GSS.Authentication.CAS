@@ -56,10 +56,25 @@ namespace GSS.Authentication.CAS.Owin
         /// </summary>
         public string? SignInAsAuthenticationType { get; set; }
 
+        [Obsolete("Use SaveTokens instead.")]
+        public bool UseAuthenticationSessionStore
+        {
+            get
+            {
+                return SaveTokens;
+            }
+            set
+            {
+                SaveTokens = value;
+            }
+        }
+
         /// <summary>
-        /// store serviceTicket in AuthenticationProperties for single sign out ?
+        /// Defines whether <c>service_ticket</c> tokens should be stored in the
+        /// <see cref="AuthenticationProperties"/> after a successful authorization.
+        /// This property needs set to <c>true</c> for single-logout to work.
         /// </summary>
-        public bool UseAuthenticationSessionStore { get; set; }
+        public bool SaveTokens { get; set; }
 
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.

@@ -163,9 +163,9 @@ namespace GSS.Authentication.CAS.Owin
                 return new AuthenticationTicket(null, properties);
             }
 
-            if (Options.UseAuthenticationSessionStore)
+            if (Options.SaveTokens)
             {
-                // store serviceTicket for single sign out
+                // store the service_ticket for single logout
                 properties.SetServiceTicket(ticket);
             }
 

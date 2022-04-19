@@ -3,34 +3,44 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using GSS.Authentication.CAS.Internal;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS
 {
     public class DistributedCacheServiceTicketStore : IServiceTicketStore
     {
-        private const string Prefix = "cas-st";
         private readonly IDistributedCache _cache;
+        private readonly DistributedCacheServiceTicketStoreOptions _options;
 
-        public DistributedCacheServiceTicketStore(IDistributedCache cache)
+        public DistributedCacheServiceTicketStore(IDistributedCache cache,
+            IOptions<DistributedCacheServiceTicketStoreOptions> options)
         {
             _cache = cache;
+            _options = options.Value;
         }
 
-        public static Func<string, string> CacheKeyFactory { get; set; } = (key) => $"{Prefix}:{key}";
+        [Obsolete("Use the constructor that takes an IOptions<DistributedCacheServiceTicketStoreOptions> instead.")]
+        public DistributedCacheServiceTicketStore(IDistributedCache cache) : this(cache,
+            Options.Create(DistributedCacheServiceTicketStoreOptions.Default))
+        {
+        }
 
-        public static JsonSerializerOptions SerializerOptions { get; set; } = new JsonSerializerOptions();
+        [Obsolete("Use DistributedCacheServiceTicketStoreOptions instead.")]
+        public static Func<string, string> CacheKeyFactory { get; set; } =
+            key => $"{DistributedCacheServiceTicketStoreOptions.Prefix}:{key}";
+
+        [Obsolete("Use DistributedCacheServiceTicketStoreOptions instead.")]
+        public static JsonSerializerOptions? SerializerOptions { get; set; }
 
         public async Task<string> StoreAsync(ServiceTicket ticket)
         {
             var holder = new ServiceTicketHolder(ticket);
+            var key = GetCacheKey(ticket.TicketId);
             var value = Serialize(holder);
             await _cache.SetAsync(
-                CacheKeyFactory(ticket.TicketId),
+                key,
                 value,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpiration = ticket.Assertion.ValidUntil
-                }).ConfigureAwait(false);
+                _options.CacheEntryOptions).ConfigureAwait(false);
             return ticket.TicketId;
         }
 
@@ -38,10 +48,11 @@ namespace GSS.Authentication.CAS
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
-            var value = await _cache.GetAsync(CacheKeyFactory(key)).ConfigureAwait(false);
+            var cacheKey = GetCacheKey(key);
+            var value = await _cache.GetAsync(cacheKey).ConfigureAwait(false);
             if (value == null || value.Length == 0)
                 return null;
-            return (ServiceTicket) Deserialize<ServiceTicketHolder>(value);
+            return (ServiceTicket)Deserialize<ServiceTicketHolder>(value);
         }
 
         public async Task RenewAsync(string key, ServiceTicket ticket)
@@ -50,30 +61,42 @@ namespace GSS.Authentication.CAS
                 throw new ArgumentNullException(nameof(key));
             var holder = new ServiceTicketHolder(ticket);
             var value = Serialize(holder);
-            await _cache.RemoveAsync(CacheKeyFactory(key)).ConfigureAwait(false);
-
-            await _cache.SetAsync(CacheKeyFactory(key), value, new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = ticket.Assertion.ValidUntil
-            }).ConfigureAwait(false);
+            var cacheKey = GetCacheKey(key);
+            await _cache.RemoveAsync(cacheKey).ConfigureAwait(false);
+            await _cache.SetAsync(cacheKey, value, _options.CacheEntryOptions).ConfigureAwait(false);
         }
 
         public Task RemoveAsync(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
-            return _cache.RemoveAsync(CacheKeyFactory(key));
+            return _cache.RemoveAsync(GetCacheKey(key));
         }
 
-        private static byte[] Serialize(object value)
+        private string GetCacheKey(string key)
         {
-            return JsonSerializer.SerializeToUtf8Bytes(value, SerializerOptions);
+            var cacheKeyFromOptions = _options.CacheKeyFactory(key);
+#pragma warning disable CS0618
+            var cacheKeyFromProperty = CacheKeyFactory(key);
+#pragma warning restore CS0618
+            return string.Equals(cacheKeyFromOptions, cacheKeyFromProperty, StringComparison.Ordinal)
+                ? cacheKeyFromOptions
+                : cacheKeyFromProperty;
         }
 
-        private static T Deserialize<T>(byte[] value)
+        private byte[] Serialize(object value)
+        {
+#pragma warning disable CS0618
+            return JsonSerializer.SerializeToUtf8Bytes(value, _options.SerializerOptions ?? SerializerOptions);
+#pragma warning restore CS0618
+        }
+
+        private T Deserialize<T>(byte[] value)
         {
             var readOnlySpan = new ReadOnlySpan<byte>(value);
-            return JsonSerializer.Deserialize<T>(readOnlySpan, SerializerOptions);
+#pragma warning disable CS0618
+            return JsonSerializer.Deserialize<T>(readOnlySpan, _options.SerializerOptions ?? SerializerOptions);
+#pragma warning restore CS0618
         }
     }
 }

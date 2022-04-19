@@ -13,12 +13,15 @@ using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
 using NLog;
 using NLog.Owin.Logging;
 using Owin;
@@ -103,7 +106,7 @@ namespace OwinSingleLogoutSample
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 // required for CasSingleLogoutMiddleware
-                options.UseAuthenticationSessionStore = true;
+                options.SaveTokens = true;
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
@@ -207,6 +210,53 @@ namespace OwinSingleLogoutSample
                     }
                 };
             });
+
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                AuthenticationMode = AuthenticationMode.Passive,
+                CallbackPath = new PathString("/signin-oidc"),
+                ClientId = _configuration["Authentication:OIDC:ClientId"],
+                ClientSecret = _configuration["Authentication:OIDC:ClientSecret"],
+                Authority = _configuration["Authentication:OIDC:Authority"],
+                MetadataAddress = _configuration["Authentication:OIDC:MetadataAddress"],
+                ResponseType = _configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code),
+                ResponseMode = _configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
+                // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
+                RedeemCode = true,
+                Scope = _configuration.GetValue("Authentication:OIDC:Scope", "openid profile email"),
+                RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
+                Notifications = new OpenIdConnectAuthenticationNotifications
+                {
+                    RedirectToIdentityProvider = notification =>
+                    {
+                        // generate the redirect_uri parameter automatically
+                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        {
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            notification.ProtocolMessage.RedirectUri = redirectUri;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    AuthorizationCodeReceived = notification =>
+                    {
+                        // generate the redirect_uri parameter automatically
+                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        {
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            notification.TokenEndpointRequest.RedirectUri = redirectUri;
+                        }
+                        return Task.CompletedTask;
+                    },
+                    AuthenticationFailed = notification =>
+                    {
+                        var exception = notification.Exception;
+                        _logger.Error(exception, exception.Message);
+                        notification.Response.Redirect("/Account/ExternalLoginFailure");
+                        notification.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                }
+            });
         }
 
         private static void ConfigureServices(IServiceCollection services)
@@ -217,6 +267,10 @@ namespace OwinSingleLogoutSample
             {
                 services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
             }
+
+            services.AddOptions<DistributedCacheServiceTicketStoreOptions>().Configure(options =>
+                options.CacheEntryOptions =
+                    new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(8) });
 
             services
                 .AddSingleton(_configuration)

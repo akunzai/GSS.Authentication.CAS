@@ -1,7 +1,6 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GSS.Authentication.CAS.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -17,10 +16,10 @@ namespace GSS.Authentication.CAS.AspNetCore
             _store = store;
         }
 
-        public Task<string> StoreAsync(AuthenticationTicket ticket)
+        public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return _store.StoreAsync(serviceTicket);
+            return await _store.StoreAsync(serviceTicket).ConfigureAwait(false);
         }
 
         public async Task<AuthenticationTicket?> RetrieveAsync(string key)
@@ -29,56 +28,34 @@ namespace GSS.Authentication.CAS.AspNetCore
             return ticket == null ? null : BuildAuthenticationTicket(ticket);
         }
 
-        public Task RenewAsync(string key, AuthenticationTicket ticket)
+        public async Task RenewAsync(string key, AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return _store.RenewAsync(key, serviceTicket);
+            await _store.RenewAsync(key, serviceTicket).ConfigureAwait(false);
         }
 
-        public Task RemoveAsync(string key)
+        public async Task RemoveAsync(string key)
         {
-            return _store.RemoveAsync(key);
+            await _store.RemoveAsync(key).ConfigureAwait(false);
         }
 
         private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var ticketId = ticket.Properties.GetTokenValue("access_token") ?? Guid.NewGuid().ToString();
-            var principal = ticket.Principal;
-            var properties = ticket.Properties;
-            var assertion = (principal as CasPrincipal)?.Assertion
-                ?? (principal.Identity as CasIdentity)?.Assertion
-                ?? new Assertion(
-                    principal.GetPrincipalName(),
-                    null, properties.IssuedUtc,
-                    properties.ExpiresUtc);
-            return new ServiceTicket(ticketId, assertion, principal.Claims, principal.Identity.AuthenticationType);
+            return new ServiceTicket(
+                ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString(),
+                ticket.Principal.Claims,
+                string.IsNullOrWhiteSpace(ticket.Principal.Identity.AuthenticationType)
+                    ? ticket.AuthenticationScheme
+                    : ticket.Principal.Identity.AuthenticationType,
+                ticket.Properties.IssuedUtc,
+                ticket.Properties.ExpiresUtc);
         }
 
         private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
-            var assertion = ticket.Assertion;
-            var principal = new CasPrincipal(assertion, ticket.AuthenticationType);
-            if (principal.Identity is not ClaimsIdentity identity)
-            {
-                return new AuthenticationTicket(
-                   principal,
-                   new AuthenticationProperties
-                   {
-                       IssuedUtc = assertion.ValidFrom,
-                       ExpiresUtc = assertion.ValidUntil
-                   },
-                   ticket.AuthenticationType);
-            }
-
-            identity.AddClaims(ticket.Claims);
-
             return new AuthenticationTicket(
-                principal,
-                new AuthenticationProperties
-                {
-                    IssuedUtc = assertion.ValidFrom,
-                    ExpiresUtc = assertion.ValidUntil
-                },
+                new ClaimsPrincipal(new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType)),
+                new AuthenticationProperties { IssuedUtc = ticket.ValidFrom, ExpiresUtc = ticket.ValidUntil },
                 ticket.AuthenticationType);
         }
     }

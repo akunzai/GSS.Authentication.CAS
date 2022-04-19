@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS.Internal
 {
@@ -14,7 +13,6 @@ namespace GSS.Authentication.CAS.Internal
         {
             TicketId = ticket.TicketId;
             AuthenticationType = ticket.AuthenticationType;
-            Assertion = new AssertionHolder(ticket.Assertion);
             Claims = ticket.Claims.Select(x=> new ClaimHolder(x));
         }
 
@@ -22,10 +20,9 @@ namespace GSS.Authentication.CAS.Internal
 
         public string AuthenticationType { get; set; }
 
-        public AssertionHolder Assertion { get; set; }
-
         public IEnumerable<ClaimHolder> Claims { get; set; }
 
-        public static explicit operator ServiceTicket(ServiceTicketHolder h) => new ServiceTicket(h.TicketId, (Assertion)h.Assertion, h.Claims.Select(x => (Claim)x), h.AuthenticationType);
+        public static explicit operator ServiceTicket(ServiceTicketHolder h) =>
+            new ServiceTicket(h.TicketId, h.Claims.Select(x => (Claim)x), h.AuthenticationType);
     }
 }

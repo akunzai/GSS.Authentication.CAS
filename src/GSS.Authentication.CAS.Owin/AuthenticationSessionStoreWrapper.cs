@@ -1,6 +1,6 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using GSS.Authentication.CAS.Security;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 
@@ -16,10 +16,10 @@ namespace GSS.Authentication.CAS.Owin
             _store = store;
         }
 
-        public Task<string> StoreAsync(AuthenticationTicket ticket)
+        public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return _store.StoreAsync(serviceTicket);
+            return await _store.StoreAsync(serviceTicket).ConfigureAwait(false);
         }
 
         public async Task<AuthenticationTicket?> RetrieveAsync(string key)
@@ -28,43 +28,31 @@ namespace GSS.Authentication.CAS.Owin
             return ticket == null ? null : BuildAuthenticationTicket(ticket);
         }
 
-        public Task RenewAsync(string key, AuthenticationTicket ticket)
+        public async Task RenewAsync(string key, AuthenticationTicket ticket)
         {
             var serviceTicket = BuildServiceTicket(ticket);
-            return _store.RenewAsync(key, serviceTicket);
+            await _store.RenewAsync(key, serviceTicket).ConfigureAwait(false);
         }
 
-        public Task RemoveAsync(string key)
+        public async Task RemoveAsync(string key)
         {
-            return _store.RemoveAsync(key);
+            await _store.RemoveAsync(key).ConfigureAwait(false);
         }
 
         private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
-            var identity = ticket.Identity;
-            var properties = ticket.Properties;
-            var ticketId = properties?.GetServiceTicket() ?? Guid.NewGuid().ToString();
-            var assertion = (identity as CasIdentity)?.Assertion
-                ?? new Assertion(
-                    identity.GetPrincipalName(),
-                    null,
-                    properties?.IssuedUtc,
-                    properties?.ExpiresUtc);
-            return new ServiceTicket(ticketId, assertion, identity.Claims, identity.AuthenticationType);
+            return new ServiceTicket(ticket.Properties?.GetServiceTicket() ?? Guid.NewGuid().ToString(),
+                ticket.Identity.Claims,
+                ticket.Identity.AuthenticationType,
+                ticket.Properties?.IssuedUtc,
+                ticket.Properties?.ExpiresUtc);
         }
 
         private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
-            var assertion = ticket.Assertion;
-            var identity = new CasIdentity(assertion, ticket.AuthenticationType);
-            identity.AddClaims(ticket.Claims);
             return new AuthenticationTicket(
-                identity,
-                new AuthenticationProperties
-                {
-                    IssuedUtc = assertion.ValidFrom,
-                    ExpiresUtc = assertion.ValidUntil
-                });
+                new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType),
+                new AuthenticationProperties { IssuedUtc = ticket.ValidFrom, ExpiresUtc = ticket.ValidUntil });
         }
     }
 }

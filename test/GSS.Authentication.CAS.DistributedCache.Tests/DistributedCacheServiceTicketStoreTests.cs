@@ -1,9 +1,7 @@
 using System.Security.Claims;
-using GSS.Authentication.CAS.Security;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using Xunit;
 
 namespace GSS.Authentication.CAS.DistributedCache.Tests;
@@ -17,7 +15,8 @@ public class DistributedCacheServiceTicketStoreTests
 
     public DistributedCacheServiceTicketStoreTests()
     {
-        _serviceTickets = new DistributedCacheServiceTicketStore(_cache);
+        _serviceTickets = new DistributedCacheServiceTicketStore(_cache,
+            Options.Create(DistributedCacheServiceTicketStoreOptions.Default));
     }
 
     [Fact]
@@ -84,10 +83,8 @@ public class DistributedCacheServiceTicketStoreTests
         Assert.Equal(expected.AuthenticationType, actual.AuthenticationType);
         Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value,
             actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);
-        Assert.Equal(expected.Assertion.PrincipalName, actual.Assertion.PrincipalName);
-        Assert.Equal(expected.Assertion.Attributes, actual.Assertion.Attributes);
-        Assert.Equal(expected.Assertion.ValidFrom, actual.Assertion.ValidFrom);
-        Assert.Equal(expected.Assertion.ValidUntil, actual.Assertion.ValidUntil);
+        Assert.Equal(expected.ValidFrom, actual.ValidFrom);
+        Assert.Equal(expected.ValidUntil, actual.ValidUntil);
     }
 
     [Fact]
@@ -108,11 +105,7 @@ public class DistributedCacheServiceTicketStoreTests
     private static ServiceTicket GenerateNewServiceTicket(Action<ServiceTicket>? setupAction = null)
     {
         var ticket = new ServiceTicket(Guid.NewGuid().ToString(),
-            new Assertion("test",
-                new Dictionary<string, StringValues> { ["foo"] = "bar" },
-                DateTimeOffset.UtcNow,
-                DateTimeOffset.UtcNow.AddHours(1)),
-            new List<Claim> { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) }, "TEST");
+            new List<Claim> { new(ClaimTypes.Name, Guid.NewGuid().ToString()) }, "TEST");
         setupAction?.Invoke(ticket);
         return ticket;
     }

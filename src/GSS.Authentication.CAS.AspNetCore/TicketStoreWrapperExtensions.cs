@@ -5,7 +5,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 {
     public static class TicketStoreWrapperExtensions
     {
-        private const string ServiceTicketKey = "access_token";
+        private const string ServiceTicketKey = "service_ticket";
 
         public static void SetServiceTicket(this AuthenticationProperties properties, string ticket)
         {

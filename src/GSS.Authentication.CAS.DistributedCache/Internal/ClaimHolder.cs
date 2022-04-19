@@ -22,6 +22,7 @@ namespace GSS.Authentication.CAS.Internal
         public string Issuer { get; set; }
         public string OriginalIssuer { get; set; }
 
-        public static explicit operator Claim(ClaimHolder w) => new Claim(w.Type, w.Value, w.ValueType, w.Issuer, w.OriginalIssuer);
+        public static explicit operator Claim(ClaimHolder w) =>
+            new Claim(w.Type, w.Value, w.ValueType, w.Issuer, w.OriginalIssuer);
     }
 }

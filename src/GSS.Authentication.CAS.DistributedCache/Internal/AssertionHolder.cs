@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Primitives;
@@ -15,23 +14,13 @@ namespace GSS.Authentication.CAS.Internal
         {
             PrincipalName = assertion.PrincipalName;
             Attributes = assertion.Attributes.ToDictionary(x => x.Key, x => x.Value.ToArray());
-            ValidFrom = assertion.ValidFrom;
-            ValidUntil = assertion.ValidUntil;
         }
 
         public string PrincipalName { get; set; }
 
         public IDictionary<string, string[]> Attributes { get; set; }
 
-        public DateTimeOffset? ValidFrom { get; set; }
-
-        public DateTimeOffset? ValidUntil { get; set; }
-
         public static explicit operator Assertion(AssertionHolder h) =>
-            new Assertion(
-                h.PrincipalName,
-                h.Attributes.ToDictionary(x => x.Key, x => new StringValues(x.Value)),
-                h.ValidFrom,
-                h.ValidUntil);
+            new Assertion(h.PrincipalName, h.Attributes.ToDictionary(x => x.Key, x => new StringValues(x.Value)));
     }
 }

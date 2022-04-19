@@ -4,7 +4,7 @@ namespace GSS.Authentication.CAS.Owin
 {
     public static class AuthenticationSessionStoreExtensions
     {
-        private const string ServiceTicketKey = "ServiceTicket";
+        private const string ServiceTicketKey = "service_ticket";
 
         public static void SetServiceTicket(this AuthenticationProperties properties, string ticket)
         {

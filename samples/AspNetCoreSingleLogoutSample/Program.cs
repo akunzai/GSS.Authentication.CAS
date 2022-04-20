@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog.Web;
 
@@ -23,10 +22,7 @@ if (!string.IsNullOrWhiteSpace(redisConfiguration))
 {
     builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
 }
-builder.Services.AddOptions<DistributedCacheServiceTicketStoreOptions>().Configure(options =>
-{
-    options.CacheEntryOptions = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(8) };
-});
+
 builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
 builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
 
@@ -177,11 +173,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClientSecret = builder.Configuration["Authentication:OIDC:ClientSecret"];
         options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
         options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
-        options.ResponseType = builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
-        options.ResponseMode = builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
+        options.ResponseType =
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
+        options.ResponseMode =
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
-        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.Events = new OpenIdConnectEvents
         {
             OnRemoteFailure = context =>

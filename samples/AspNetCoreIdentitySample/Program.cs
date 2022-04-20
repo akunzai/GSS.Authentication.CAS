@@ -112,11 +112,14 @@ builder.Services.AddAuthentication()
         options.ClientSecret = builder.Configuration["Authentication:OIDC:ClientSecret"];
         options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
         options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
-        options.ResponseType = builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
-        options.ResponseMode = builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
+        options.ResponseType =
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
+        options.ResponseMode =
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
-        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.Events = new OpenIdConnectEvents
         {
             OnRemoteFailure = context =>

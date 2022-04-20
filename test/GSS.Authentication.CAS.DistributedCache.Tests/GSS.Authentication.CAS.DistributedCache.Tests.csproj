@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;netcoreapp3.1;net48</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
   </ItemGroup>
 

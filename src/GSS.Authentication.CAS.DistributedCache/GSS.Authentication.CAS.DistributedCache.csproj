@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <Description>Distributed cache implementation of the IServiceTicketStore for Single Logout</Description>
     <RootNamespace>GSS.Authentication.CAS</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.0.0"/>
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0"/>
   </ItemGroup>

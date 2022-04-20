@@ -32,7 +32,9 @@ namespace GSS.Authentication.CAS
             IEnumerable<Claim> claims,
             string authenticationType,
             DateTimeOffset? issuedUtc = null,
-            DateTimeOffset? expiresUtc = null)
+            DateTimeOffset? expiresUtc = null,
+            string? nameClaimType = null,
+            string? roleClaimType = null)
         {
             if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType))
@@ -42,6 +44,8 @@ namespace GSS.Authentication.CAS
             AuthenticationType = authenticationType;
             IssuedUtc = issuedUtc;
             ExpiresUtc = expiresUtc;
+            NameClaimType = nameClaimType;
+            RoleClaimType = roleClaimType;
         }
 
         public string TicketId { get; }
@@ -49,6 +53,10 @@ namespace GSS.Authentication.CAS
         public string AuthenticationType { get; }
 
         public IEnumerable<Claim> Claims { get; }
+
+        public string? NameClaimType { get; }
+
+        public string? RoleClaimType { get; }
 
         public DateTimeOffset? IssuedUtc { get; }
 

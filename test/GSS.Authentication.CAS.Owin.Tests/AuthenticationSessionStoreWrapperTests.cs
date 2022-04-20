@@ -101,7 +101,12 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 .Verifiable();
             var tickets = new AuthenticationSessionStoreWrapper(serviceTickets.Object);
             var expected = new AuthenticationTicket(
-                new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Guid.NewGuid().ToString()) }, "TEST"), null);
+                new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                        new Claim(ClaimTypes.Role, "TEST")
+                    }, "TEST", ClaimTypes.NameIdentifier, ClaimTypes.Role), null);
             var key = await tickets.StoreAsync(expected);
 
             // Act
@@ -111,6 +116,9 @@ namespace GSS.Authentication.CAS.Owin.Tests
             Assert.NotNull(actual);
             Assert.Equal(expected.Identity.AuthenticationType, actual?.Identity.AuthenticationType);
             Assert.Equal(expected.Identity.GetPrincipalName(), actual?.Identity.GetPrincipalName());
+            Assert.Equal(expected.Identity.Claims.First(c=>c.Type.Equals(expected.Identity.RoleClaimType)).Value, actual?.Identity.Claims.First(c=>c.Type.Equals(actual.Identity.RoleClaimType)).Value);
+            Assert.Equal(expected.Identity.NameClaimType, actual?.Identity.NameClaimType);
+            Assert.Equal(expected.Identity.RoleClaimType, actual?.Identity.RoleClaimType);
             serviceTickets.Verify();
         }
 

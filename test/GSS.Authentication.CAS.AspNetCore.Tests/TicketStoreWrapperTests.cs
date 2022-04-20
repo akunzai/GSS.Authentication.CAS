@@ -109,8 +109,9 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var expected = new AuthenticationTicket(
                 new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, Guid.NewGuid().ToString())
-                })), "TEST");
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.Role, "TEST")
+                }, "TEST", ClaimTypes.NameIdentifier, ClaimTypes.Role)), "TEST");
             var key = await tickets.StoreAsync(expected);
 
             // Act
@@ -120,6 +121,11 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             Assert.NotNull(actual);
             Assert.Equal(expected.AuthenticationScheme, actual?.AuthenticationScheme);
             Assert.Equal(expected.Principal.GetPrincipalName(), actual?.Principal.GetPrincipalName());
+            Assert.True(actual?.Principal.IsInRole("TEST"));
+            var expectedIdentity = expected.Principal.Identity as ClaimsIdentity;
+            var actualIdentity = actual?.Principal.Identity as ClaimsIdentity;
+            Assert.Equal(expectedIdentity?.NameClaimType, actualIdentity?.NameClaimType);
+            Assert.Equal(expectedIdentity?.RoleClaimType, actualIdentity?.RoleClaimType);
             serviceTickets.Verify();
         }
 

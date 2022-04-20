@@ -13,7 +13,6 @@ using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -219,8 +218,10 @@ namespace OwinSingleLogoutSample
                 ClientSecret = _configuration["Authentication:OIDC:ClientSecret"],
                 Authority = _configuration["Authentication:OIDC:Authority"],
                 MetadataAddress = _configuration["Authentication:OIDC:MetadataAddress"],
-                ResponseType = _configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code),
-                ResponseMode = _configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
+                ResponseType =
+                    _configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code),
+                ResponseMode =
+                    _configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
                 // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
                 RedeemCode = true,
                 Scope = _configuration.GetValue("Authentication:OIDC:Scope", "openid profile email"),
@@ -232,9 +233,12 @@ namespace OwinSingleLogoutSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
+                                              notification.Request.Host + notification.Request.PathBase +
+                                              notification.Options.CallbackPath;
                             notification.ProtocolMessage.RedirectUri = redirectUri;
                         }
+
                         return Task.CompletedTask;
                     },
                     AuthorizationCodeReceived = notification =>
@@ -242,9 +246,12 @@ namespace OwinSingleLogoutSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter + notification.Request.Host + notification.Request.PathBase + notification.Options.CallbackPath;
+                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
+                                              notification.Request.Host + notification.Request.PathBase +
+                                              notification.Options.CallbackPath;
                             notification.TokenEndpointRequest.RedirectUri = redirectUri;
                         }
+
                         return Task.CompletedTask;
                     },
                     AuthenticationFailed = notification =>
@@ -267,10 +274,6 @@ namespace OwinSingleLogoutSample
             {
                 services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
             }
-
-            services.AddOptions<DistributedCacheServiceTicketStoreOptions>().Configure(options =>
-                options.CacheEntryOptions =
-                    new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(8) });
 
             services
                 .AddSingleton(_configuration)

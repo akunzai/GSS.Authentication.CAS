@@ -45,14 +45,16 @@ namespace GSS.Authentication.CAS.Owin
                 ticket.Identity.Claims,
                 ticket.Identity.AuthenticationType,
                 ticket.Properties?.IssuedUtc,
-                ticket.Properties?.ExpiresUtc);
+                ticket.Properties?.ExpiresUtc,
+                ticket.Identity.NameClaimType,
+                ticket.Identity.RoleClaimType);
         }
 
         private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
             return new AuthenticationTicket(
-                new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType),
-                new AuthenticationProperties { IssuedUtc = ticket.ValidFrom, ExpiresUtc = ticket.ValidUntil });
+                new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType, ticket.NameClaimType, ticket.RoleClaimType),
+                new AuthenticationProperties { IssuedUtc = ticket.IssuedUtc, ExpiresUtc = ticket.ExpiresUtc });
         }
     }
 }

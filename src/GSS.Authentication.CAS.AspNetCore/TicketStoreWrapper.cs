@@ -41,6 +41,7 @@ namespace GSS.Authentication.CAS.AspNetCore
 
         private static ServiceTicket BuildServiceTicket(AuthenticationTicket ticket)
         {
+            var identity = ticket.Principal.Identity as ClaimsIdentity;
             return new ServiceTicket(
                 ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString(),
                 ticket.Principal.Claims,
@@ -48,14 +49,16 @@ namespace GSS.Authentication.CAS.AspNetCore
                     ? ticket.AuthenticationScheme
                     : ticket.Principal.Identity.AuthenticationType,
                 ticket.Properties.IssuedUtc,
-                ticket.Properties.ExpiresUtc);
+                ticket.Properties.ExpiresUtc,
+                identity?.NameClaimType,
+                identity?.RoleClaimType);
         }
 
         private static AuthenticationTicket BuildAuthenticationTicket(ServiceTicket ticket)
         {
             return new AuthenticationTicket(
-                new ClaimsPrincipal(new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType)),
-                new AuthenticationProperties { IssuedUtc = ticket.ValidFrom, ExpiresUtc = ticket.ValidUntil },
+                new ClaimsPrincipal(new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType, ticket.NameClaimType, ticket.RoleClaimType)),
+                new AuthenticationProperties { IssuedUtc = ticket.IssuedUtc, ExpiresUtc = ticket.ExpiresUtc },
                 ticket.AuthenticationType);
         }
     }

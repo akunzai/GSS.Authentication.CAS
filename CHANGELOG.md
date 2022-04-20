@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.3.0 (2022-04-21)
+
+- [Use the ASP.NET Core shared framework](https://docs.microsoft.com/aspnet/core/fundamentals/target-aspnetcore#use-the-aspnet-core-shared-framework) [#131](https://github.com/akunzai/GSS.Authentication.CAS/pull/131)
+- Restore the Name and Role ClaimType of ClaimsIdentity [#132](https://github.com/akunzai/GSS.Authentication.CAS/pull/132)
+- Renamed the ServiceTicket properties to match naming in AuthenticationProperties
+- Prefer to use the ServiceTicket.ExpiresUtc for cache expiration
+
 ## 5.2.0 (2022-04-19)
 
 - Bump Microsoft.Owin.Security.Cookies from 4.1.1 to 4.2.0 [#130](https://github.com/akunzai/GSS.Authentication.CAS/pull/130)

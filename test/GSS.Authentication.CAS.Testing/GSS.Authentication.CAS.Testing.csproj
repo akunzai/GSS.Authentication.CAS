@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net48;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
 </Project>

@@ -83,8 +83,8 @@ public class DistributedCacheServiceTicketStoreTests
         Assert.Equal(expected.AuthenticationType, actual.AuthenticationType);
         Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value,
             actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);
-        Assert.Equal(expected.ValidFrom, actual.ValidFrom);
-        Assert.Equal(expected.ValidUntil, actual.ValidUntil);
+        Assert.Equal(expected.IssuedUtc, actual.IssuedUtc);
+        Assert.Equal(expected.ExpiresUtc, actual.ExpiresUtc);
     }
 
     [Fact]

@@ -52,7 +52,7 @@ namespace GSS.Authentication.CAS.Owin
         {
             return new AuthenticationTicket(
                 new ClaimsIdentity(ticket.Claims, ticket.AuthenticationType),
-                new AuthenticationProperties { IssuedUtc = ticket.ValidFrom, ExpiresUtc = ticket.ValidUntil });
+                new AuthenticationProperties { IssuedUtc = ticket.IssuedUtc, ExpiresUtc = ticket.ExpiresUtc });
         }
     }
 }

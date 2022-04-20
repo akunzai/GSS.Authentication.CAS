@@ -37,10 +37,11 @@ namespace GSS.Authentication.CAS
             var holder = new ServiceTicketHolder(ticket);
             var key = GetCacheKey(ticket.TicketId);
             var value = Serialize(holder);
+            var cacheOptions = CloneCacheOptions(ticket.ExpiresUtc);
             await _cache.SetAsync(
                 key,
                 value,
-                _options.CacheEntryOptions).ConfigureAwait(false);
+                cacheOptions).ConfigureAwait(false);
             return ticket.TicketId;
         }
 
@@ -63,7 +64,8 @@ namespace GSS.Authentication.CAS
             var value = Serialize(holder);
             var cacheKey = GetCacheKey(key);
             await _cache.RemoveAsync(cacheKey).ConfigureAwait(false);
-            await _cache.SetAsync(cacheKey, value, _options.CacheEntryOptions).ConfigureAwait(false);
+            var cacheOptions = CloneCacheOptions(ticket.ExpiresUtc);
+            await _cache.SetAsync(cacheKey, value, cacheOptions).ConfigureAwait(false);
         }
 
         public Task RemoveAsync(string key)
@@ -71,6 +73,16 @@ namespace GSS.Authentication.CAS
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
             return _cache.RemoveAsync(GetCacheKey(key));
+        }
+
+        private DistributedCacheEntryOptions CloneCacheOptions(DateTimeOffset? expiresUtc)
+        {
+            return new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = expiresUtc ?? _options.CacheEntryOptions.AbsoluteExpiration,
+                AbsoluteExpirationRelativeToNow = _options.CacheEntryOptions.AbsoluteExpirationRelativeToNow,
+                SlidingExpiration = _options.CacheEntryOptions.SlidingExpiration,
+            };
         }
 
         private string GetCacheKey(string key)

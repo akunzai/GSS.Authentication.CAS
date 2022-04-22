@@ -21,20 +21,12 @@ CAS Authentication Middleware for OWIN & ASP.NET Core
 OWIN
 
 ```shell
-# Package Manager
-Install-Package GSS.Authentication.CAS.Owin
-
-# .NET CLI
 dotnet add package GSS.Authentication.CAS.Owin
 ```
 
 ASP.NET Core
 
 ```shell
-# Package Manager
-Install-Package GSS.Authentication.CAS.AspNetCore
-
-# .NET CLI
 dotnet add package GSS.Authentication.CAS.AspNetCore
 ```
 

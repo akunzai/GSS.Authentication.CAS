@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -22,6 +21,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using NLog;
+using NLog.Extensions.Logging;
 using NLog.Owin.Logging;
 using Owin;
 using Owin.OAuthGeneric;
@@ -32,7 +32,7 @@ namespace OwinSingleLogoutSample
 {
     public class Startup
     {
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static ILogger _logger;
         private static IConfiguration _configuration;
         private static IServiceProvider _resolver;
 
@@ -59,9 +59,8 @@ namespace OwinSingleLogoutSample
             );
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
 
-            // configure nlog.config per environment
-            var envLogConfig = new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{env}.config"));
-            LogManager.LoadConfiguration(envLogConfig.Exists ? envLogConfig.Name : "nlog.config");
+            // https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json
+            _logger = LogManager.Setup().LoadConfigurationFromSection(_configuration).GetCurrentClassLogger();
             app.UseNLog();
 
             app.UseCasSingleLogout(_resolver.GetRequiredService<IAuthenticationSessionStore>());

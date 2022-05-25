@@ -53,9 +53,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="favicon.ico" />
-    <Content Include="nlog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
@@ -68,10 +65,6 @@
   <ItemGroup>
     <None Include="appsettings.*.json">
       <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="nlog.*.config">
-      <DependentUpon>nlog.config</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -117,6 +110,9 @@
     </PackageReference>
     <PackageReference Include="MSBuild.Microsoft.VisualStudio.Web.targets">
       <Version>14.0.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="NLog.Extensions.Logging">
+      <Version>5.0.0</Version>
     </PackageReference>
     <PackageReference Include="NLog.Owin.Logging">
       <Version>1.1.0</Version>

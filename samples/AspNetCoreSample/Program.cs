@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using NLog;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 builder.Services.AddRazorPages();
 builder.Services.AddAuthorization(options =>
@@ -91,10 +93,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             OnRemoteFailure = context =>
             {
                 var failure = context.Failure;
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<CasEvents>>();
                 if (!string.IsNullOrWhiteSpace(failure?.Message))
                 {
-                    logger.LogError(failure, "{Exception}", failure.Message);
+                    logger.Error(failure, "{Exception}", failure.Message);
                 }
 
                 context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -142,10 +143,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             OnRemoteFailure = context =>
             {
                 var failure = context.Failure;
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
                 if (!string.IsNullOrWhiteSpace(failure?.Message))
                 {
-                    logger.LogError(failure, "{Exception}", failure.Message);
+                    logger.Error(failure, "{Exception}", failure.Message);
                 }
 
                 context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -174,10 +174,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             OnRemoteFailure = context =>
             {
                 var failure = context.Failure;
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OAuthEvents>>();
                 if (!string.IsNullOrWhiteSpace(failure?.Message))
                 {
-                    logger.LogError(failure, "{Exception}", failure.Message);
+                    logger.Error(failure, "{Exception}", failure.Message);
                 }
 
                 context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -186,10 +185,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             }
         };
     });
-builder.Logging
-    .ClearProviders()
-    .SetMinimumLevel(LogLevel.Trace)
-    .AddNLogWeb();
+
+// Setup NLog for Dependency injection
+builder.Logging.ClearProviders().SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+builder.Host.UseNLog();
 
 var app = builder.Build();
 
@@ -209,10 +208,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-// configure nlog.config per environment
-var envLogConfig =
-    new FileInfo(Path.Combine(AppContext.BaseDirectory, $"nlog.{app.Environment.EnvironmentName}.config"));
-var logger = NLogBuilder.ConfigureNLog(envLogConfig.Exists ? envLogConfig.Name : "nlog.config").GetCurrentClassLogger();
 try
 {
     app.Run();
@@ -226,5 +221,5 @@ catch (Exception exception)
 finally
 {
     // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
+    LogManager.Shutdown();
 }

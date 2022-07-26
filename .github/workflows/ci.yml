@@ -42,6 +42,13 @@ jobs:
           dotnet build samples/AspNetCoreSingleLogoutSample/AspNetCoreSingleLogoutSample.csproj -c Release
           msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
           msbuild samples/OwinSingleLogoutSample/OwinSingleLogoutSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
+      - name: Scan vulnerable packages
+        if: matrix.os == 'ubuntu-latest'
+        # https://github.com/dotnet/sdk/issues/16852
+        run: |
+          dotnet restore
+          dotnet list package --vulnerable --include-transitive | tee vulnerable.out
+          test `grep -cm 1 'has the following vulnerable packages' vulnerable.out` = 0
       - name: Test
         run: |
           dotnet test --collect:"XPlat Code Coverage"

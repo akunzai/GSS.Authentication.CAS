@@ -4,6 +4,7 @@ appsettings.*.json
 launchSettings.json
 *.db
 log.txt
+vulnerable.out
 # JetBrians Rider
 .idea/
 .run/*.run.xml

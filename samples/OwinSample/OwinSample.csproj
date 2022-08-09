@@ -106,7 +106,7 @@
       <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
-      <Version>5.0.0</Version>
+      <Version>5.0.1</Version>
     </PackageReference>
     <PackageReference Include="NLog.Owin.Logging">
       <Version>1.1.0</Version>

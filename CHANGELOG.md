@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.3.1 (2022-08-18)
+
+- Remove the `netstandard2.0` target framework from `GSS.Authentication.CAS.AspNetCore` to fix [CVE-2022-34716](https://github.com/advisories/GHSA-2m65-m22p-9wjw)
+
 ## 5.3.0 (2022-04-21)
 
 - [Use the ASP.NET Core shared framework](https://docs.microsoft.com/aspnet/core/fundamentals/target-aspnetcore#use-the-aspnet-core-shared-framework) [#131](https://github.com/akunzai/GSS.Authentication.CAS/pull/131)

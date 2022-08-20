@@ -27,6 +27,10 @@ indent_size = 2
 [*.{json,json5}]
 indent_size = 2
 
+# JS/TS Files
+[*.{js,jsx,ts,tsx}]
+quote_type = single
+
 # YAML Files
 [*.{yml,yaml}]
 indent_size = 2

@@ -172,9 +172,9 @@ All notable changes to this project will be documented in this file.
 
 ### GSS.Authentication.CAS.Core 2.0.0
 
-- Migrate to .NET Standard 2.0 
-- Add CasDefaults.AuthenticationType constant 
-- CasOptions.AuthenticationType default to CasDefaults.AuthenticationType 
+- Migrate to .NET Standard 2.0
+- Add CasDefaults.AuthenticationType constant
+- CasOptions.AuthenticationType default to CasDefaults.AuthenticationType
 
 ### GSS.Authentication.CAS.(AspNetCore|Owin|DistributedCache) 2.0.0
 

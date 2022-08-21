@@ -38,6 +38,7 @@ jobs:
       - name: Build Samples
         run: |
           dotnet build samples/AspNetCoreIdentitySample/AspNetCoreIdentitySample.csproj -c Release
+          dotnet build samples/AspNetCoreReactSample/AspNetCoreReactSample.csproj -c Release
           dotnet build samples/AspNetCoreSample/AspNetCoreSample.csproj -c Release
           dotnet build samples/AspNetCoreSingleLogoutSample/AspNetCoreSingleLogoutSample.csproj -c Release
           msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release

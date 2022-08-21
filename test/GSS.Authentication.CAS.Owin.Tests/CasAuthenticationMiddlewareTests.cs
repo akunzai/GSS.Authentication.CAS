@@ -83,20 +83,20 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await server.HttpClient.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        var cookies = signinResponse.Headers.GetValues("Set-Cookie").ToList();
+        var cookies = signInResponse.Headers.GetValues("Set-Cookie").ToList();
         Assert.Contains(cookies,
             x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix +
                               CookieAuthenticationDefaults.AuthenticationType));
         Assert.Contains(cookies,
             x => x.StartsWith(
                 $"{CookieAuthenticationDefaults.CookiePrefix}Correlation.{CasDefaults.AuthenticationType}"));
-        Assert.Equal("/", signinResponse.Headers.Location.OriginalString);
+        Assert.Equal("/", signInResponse.Headers.Location.OriginalString);
 
-        using var authorizedRequest = signinResponse.GetRequestWithCookies("/");
+        using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
         using var authorizedResponse = await server.HttpClient.SendAsync(authorizedRequest).ConfigureAwait(false);
 
         Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
@@ -130,8 +130,8 @@ public class CasAuthenticationMiddlewareTests
         try
         {
             // Act
-            using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await server.HttpClient.SendAsync(signInRequest).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -174,12 +174,12 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await server.HttpClient.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-        Assert.Equal("/Account/ExternalLoginFailure", signinResponse.Headers.Location.OriginalString);
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal("/Account/ExternalLoginFailure", signInResponse.Headers.Location.OriginalString);
     }
 
     [Fact]
@@ -211,8 +211,8 @@ public class CasAuthenticationMiddlewareTests
         try
         {
             // Act
-            using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await server.HttpClient.SendAsync(signInRequest).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -251,12 +251,12 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await server.HttpClient.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await server.HttpClient.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-        Assert.Equal("/Account/ExternalLoginFailure", signinResponse.Headers.Location.OriginalString);
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal("/Account/ExternalLoginFailure", signInResponse.Headers.Location.OriginalString);
     }
 
     private static TestServer CreateServer(Action<CasAuthenticationOptions> configureOptions)

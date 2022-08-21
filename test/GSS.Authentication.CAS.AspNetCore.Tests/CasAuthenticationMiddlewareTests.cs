@@ -94,20 +94,20 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await client.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-        var cookies = signinResponse.Headers.GetValues("Set-Cookie").ToList();
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        var cookies = signInResponse.Headers.GetValues("Set-Cookie").ToList();
         Assert.Equal(2, cookies.Count);
         Assert.Contains(cookies,
             x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix +
                               CookieAuthenticationDefaults.AuthenticationScheme));
         Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation"));
-        Assert.Equal("/", signinResponse.Headers.Location?.OriginalString);
+        Assert.Equal("/", signInResponse.Headers.Location?.OriginalString);
 
-        using var authorizedRequest = signinResponse.GetRequestWithCookies("/");
+        using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
         using var authorizedResponse = await client.SendAsync(authorizedRequest).ConfigureAwait(false);
 
         Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
@@ -145,8 +145,8 @@ public class CasAuthenticationMiddlewareTests
         try
         {
             // Act
-            using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signinRequest).ConfigureAwait(false);
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -192,12 +192,12 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await client.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signinResponse.Headers.Location?.OriginalString);
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -229,8 +229,8 @@ public class CasAuthenticationMiddlewareTests
         try
         {
             // Act
-            using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signinRequest).ConfigureAwait(false);
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -272,12 +272,12 @@ public class CasAuthenticationMiddlewareTests
         var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
 
         // Act
-        using var signinRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signinResponse = await client.SendAsync(signinRequest).ConfigureAwait(false);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Found, signinResponse.StatusCode);
-        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signinResponse.Headers.Location?.OriginalString);
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
     }
 
     private static IHost CreateHost(Action<CasAuthenticationOptions> configureOptions)
@@ -296,17 +296,17 @@ public class CasAuthenticationMiddlewareTests
                     .Configure(app =>
                     {
                         app.UseAuthentication();
-                        app.Map(CookieAuthenticationDefaults.LoginPath, signinApp =>
+                        app.Map(CookieAuthenticationDefaults.LoginPath, signInApp =>
                         {
-                            signinApp.Run(async context =>
+                            signInApp.Run(async context =>
                             {
                                 await context.ChallengeAsync(CasDefaults.AuthenticationType,
                                     new AuthenticationProperties { RedirectUri = "/" }).ConfigureAwait(false);
                             });
                         });
-                        app.Map(CookieAuthenticationDefaults.LogoutPath, signoutApp =>
+                        app.Map(CookieAuthenticationDefaults.LogoutPath, signOutApp =>
                         {
-                            signoutApp.Run(async context =>
+                            signOutApp.Run(async context =>
                             {
                                 await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
                                     .ConfigureAwait(false);
@@ -315,7 +315,7 @@ public class CasAuthenticationMiddlewareTests
                         app.Run(async context =>
                         {
                             // Deny anonymous request beyond this point.
-                            if (context.User.Identities.Any(identity => identity.IsAuthenticated) != true)
+                            if (!context.User.Identities.Any(identity => identity.IsAuthenticated))
                             {
                                 // This is what [Authorize] calls
                                 // The cookie middleware will intercept this 401 and redirect to LoginPath

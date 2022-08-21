@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useService } from 'react-service-container';
-import { UserManager } from '../../api';
+import { UserManager } from '../api';
 
 export function Login(): JSX.Element {
   const userManager = useService(UserManager);
@@ -17,18 +17,16 @@ export function Login(): JSX.Element {
   return (
     <>
       <h1>Choose an authentication scheme</h1>
-      <div>
-        {schemes.map((scheme) => (
-          <button
-            key={scheme}
-            type="button"
-            className="btn btn-outline-primary btn-lg mx-1"
-            onClick={() => userManager.signIn(scheme)}
-          >
-            {scheme}
-          </button>
-        ))}
-      </div>
+      {schemes.map((scheme) => (
+        <button
+          key={scheme}
+          type="button"
+          className="btn btn-outline-primary btn-lg mx-1"
+          onClick={() => userManager.signIn(scheme)}
+        >
+          {scheme}
+        </button>
+      ))}
     </>
   );
 }

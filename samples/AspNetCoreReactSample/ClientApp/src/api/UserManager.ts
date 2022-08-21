@@ -44,13 +44,13 @@ export class UserManager {
   }
 
   public async signIn(scheme: string): Promise<void> {
-    const loginUrl = `/api/account/login?scheme=${scheme}`;
+    const loginUrl = `/account/login?scheme=${scheme}`;
     window.location.assign(loginUrl);
   }
 
   public async signOut(): Promise<void> {
     await this.removeUser();
-    const logoutUrl = '/api/account/logout';
+    const logoutUrl = '/account/logout';
     window.location.assign(logoutUrl);
   }
 }

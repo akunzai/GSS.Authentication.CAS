@@ -16,7 +16,6 @@ using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
-IServiceProvider? services = null;
 
 builder.Services.AddDistributedMemoryCache();
 var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
@@ -36,32 +35,30 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 });
+builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+    .Configure<ITicketStore>((o, t) => o.SessionStore = t);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.SessionStore = services?.GetRequiredService<ITicketStore>();
-        options.Events = new CookieAuthenticationEvents
+        options.Events.OnSigningOut = context =>
         {
-            OnSigningOut = context =>
-            {
-                // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-                var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-                var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
-                var redirectUri = UriHelper.BuildAbsolute(
-                    casUrl.Scheme,
-                    new HostString(casUrl.Host, casUrl.Port),
-                    casUrl.LocalPath, "/logout",
-                    QueryString.Create("service", serviceUrl!));
-                context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
-                    context.HttpContext,
-                    context.Scheme,
-                    context.Options,
-                    context.Properties,
-                    redirectUri
-                ));
-                return Task.CompletedTask;
-            }
+            // Single Sign-Out
+            var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+            var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+            var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
+            var redirectUri = UriHelper.BuildAbsolute(
+                casUrl.Scheme,
+                new HostString(casUrl.Host, casUrl.Port),
+                casUrl.LocalPath, "/logout",
+                QueryString.Create("service", serviceUrl!));
+            context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+                context.HttpContext,
+                context.Scheme,
+                context.Options,
+                context.Properties,
+                redirectUri
+            ));
+            return Task.CompletedTask;
         };
     })
     .AddCAS(options =>
@@ -199,7 +196,6 @@ builder.Logging.ClearProviders().SetMinimumLevel(Microsoft.Extensions.Logging.Lo
 builder.Host.UseNLog();
 
 var app = builder.Build();
-services = app.Services;
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

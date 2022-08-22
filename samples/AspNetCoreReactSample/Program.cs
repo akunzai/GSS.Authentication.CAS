@@ -27,28 +27,25 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Events = new CookieAuthenticationEvents
+        options.Events.OnSigningOut = context =>
         {
-            OnSigningOut = context =>
-            {
-                // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-                var request = context.Request;
-                var serviceUrl = context.Properties.RedirectUri ?? $"{request.Scheme}://{request.Host}/{request.PathBase}";
-                var redirectUri = UriHelper.BuildAbsolute(
-                    casUrl.Scheme,
-                    new HostString(casUrl.Host, casUrl.Port),
-                    casUrl.LocalPath, "/logout",
-                    QueryString.Create("service", serviceUrl));
-                context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
-                    context.HttpContext,
-                    context.Scheme,
-                    context.Options,
-                    context.Properties,
-                    redirectUri
-                ));
-                return Task.CompletedTask;
-            }
+            // Single Sign-Out
+            var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+            var request = context.Request;
+            var serviceUrl = context.Properties.RedirectUri ?? $"{request.Scheme}://{request.Host}/{request.PathBase}";
+            var redirectUri = UriHelper.BuildAbsolute(
+                casUrl.Scheme,
+                new HostString(casUrl.Host, casUrl.Port),
+                casUrl.LocalPath, "/logout",
+                QueryString.Create("service", serviceUrl));
+            context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+                context.HttpContext,
+                context.Scheme,
+                context.Options,
+                context.Properties,
+                redirectUri
+            ));
+            return Task.CompletedTask;
         };
     })
     .AddCAS(options =>
@@ -66,27 +63,24 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             };
         }
 
-        options.Events = new CasEvents
+        options.Events.OnCreatingTicket = context =>
         {
-            OnCreatingTicket = context =>
-            {
-                if (context.Identity == null)
-                    return Task.CompletedTask;
-                // Map claims from assertion
-                var assertion = context.Assertion;
-                context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-                if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
-                }
-
-                if (assertion.Attributes.TryGetValue("email", out var email))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                }
-
+            if (context.Identity == null)
                 return Task.CompletedTask;
+            // Map claims from assertion
+            var assertion = context.Assertion;
+            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+            {
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
             }
+
+            if (assertion.Attributes.TryGetValue("email", out var email))
+            {
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+            }
+
+            return Task.CompletedTask;
         };
     })
     .AddOAuth(OAuthDefaults.DisplayName, options =>
@@ -101,30 +95,27 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens", false);
-        options.Events = new OAuthEvents
+        options.Events.OnCreatingTicket = async context =>
         {
-            OnCreatingTicket = async context =>
+            // Get the OAuth user
+            using var request =
+                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            using var response =
+                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
+                    .ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode ||
+                response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
             {
-                // Get the OAuth user
-                using var request =
-                    new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                using var response =
-                    await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
-                        .ConfigureAwait(false);
-
-                if (!response.IsSuccessStatusCode ||
-                    response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
-                {
-                    throw new HttpRequestException(
-                        $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                }
-
-                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                context.RunClaimActions(json.RootElement);
+                throw new HttpRequestException(
+                    $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
             }
+
+            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+            context.RunClaimActions(json.RootElement);
         };
     })
     .AddOpenIdConnect(options =>

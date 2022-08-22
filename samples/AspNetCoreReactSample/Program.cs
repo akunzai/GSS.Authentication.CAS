@@ -6,7 +6,6 @@ using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -28,40 +27,32 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        // prepend the path with /api for the SPA proxy
-        options.LoginPath = "/api/account/login";
-        options.LogoutPath = "/api/account/logout";
         options.Events = new CookieAuthenticationEvents
         {
             OnSigningOut = context =>
             {
                 // Single Sign-Out
                 var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-                var req = context.Request;
-                var serviceUrl = context.Properties.RedirectUri ?? $"{req.Scheme}://{req.Host}/{req.PathBase}";
+                var request = context.Request;
+                var serviceUrl = context.Properties.RedirectUri ?? $"{request.Scheme}://{request.Host}/{request.PathBase}";
                 var redirectUri = UriHelper.BuildAbsolute(
                     casUrl.Scheme,
                     new HostString(casUrl.Host, casUrl.Port),
                     casUrl.LocalPath, "/logout",
                     QueryString.Create("service", serviceUrl));
-
-                var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
+                context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
                     context.HttpContext,
                     context.Scheme,
                     context.Options,
                     context.Properties,
                     redirectUri
-                );
-                context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
-                context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                ));
                 return Task.CompletedTask;
             }
         };
     })
     .AddCAS(options =>
     {
-        // prepend the path with /api for the SPA proxy
-        options.CallbackPath = "/api/signin-cas";
         options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
         options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
@@ -95,25 +86,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 }
 
                 return Task.CompletedTask;
-            },
-            OnRemoteFailure = context =>
-            {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
             }
         };
     })
     .AddOAuth(OAuthDefaults.DisplayName, options =>
     {
-        // prepend the path with /api for the SPA proxy
-        options.CallbackPath = "/api/signin-oauth";
+        options.CallbackPath = "/signin-oauth";
         options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"];
         options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
@@ -146,25 +124,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
                 context.RunClaimActions(json.RootElement);
-            },
-            OnRemoteFailure = context =>
-            {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
             }
         };
     })
     .AddOpenIdConnect(options =>
     {
-        // prepend the path with /api for the SPA proxy
-        options.CallbackPath = "/api/sign-oidc";
         options.ClientId = builder.Configuration["Authentication:OIDC:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:OIDC:ClientSecret"];
         options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
@@ -178,21 +142,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens", false);
-        options.Events = new OpenIdConnectEvents
-        {
-            OnRemoteFailure = context =>
-            {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
-            }
-        };
     });
 
 // Setup NLog for Dependency injection

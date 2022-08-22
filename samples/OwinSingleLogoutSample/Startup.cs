@@ -86,13 +86,12 @@ namespace OwinSingleLogoutSample
                         var redirectUri = new UriBuilder(casUrl);
                         redirectUri.Path += "/logout";
                         redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                        var logoutRedirectContext = new CookieApplyRedirectContext
+                        context.Options.Provider.ApplyRedirect(new CookieApplyRedirectContext
                         (
                             context.OwinContext,
                             context.Options,
                             redirectUri.Uri.AbsoluteUri
-                        );
-                        context.Options.Provider.ApplyRedirect(logoutRedirectContext);
+                        ));
                     }
                 }
             });

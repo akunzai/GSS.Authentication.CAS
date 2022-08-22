@@ -47,22 +47,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 // Single Sign-Out
                 var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
                 var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-                var serviceUrl = links.GetUriByPage(context.HttpContext, "/Index");
+                var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
                 var redirectUri = UriHelper.BuildAbsolute(
                     casUrl.Scheme,
                     new HostString(casUrl.Host, casUrl.Port),
                     casUrl.LocalPath, "/logout",
                     QueryString.Create("service", serviceUrl!));
-
-                var logoutRedirectContext = new RedirectContext<CookieAuthenticationOptions>(
+                context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
                     context.HttpContext,
                     context.Scheme,
                     context.Options,
                     context.Properties,
                     redirectUri
-                );
-                context.Response.StatusCode = 204; //Prevent RedirectToReturnUrl
-                context.Options.Events.RedirectToLogout(logoutRedirectContext);
+                ));
                 return Task.CompletedTask;
             }
         };

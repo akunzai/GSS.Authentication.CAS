@@ -22,7 +22,7 @@ export function Home(): JSX.Element {
     return (
       <div>
         <h1>Hello anonymous</h1>
-        <NavLink className="btn btn-primary" to="/Account/Login">
+        <NavLink className="btn btn-primary" to="/login">
           Login
         </NavLink>
       </div>

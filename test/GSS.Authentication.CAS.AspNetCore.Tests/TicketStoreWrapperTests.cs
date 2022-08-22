@@ -97,10 +97,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var serviceTickets = new Mock<IServiceTicketStore>();
             var store = new Dictionary<string, ServiceTicket>();
             serviceTickets.Setup(x => x.StoreAsync(It.IsAny<ServiceTicket>()))
-                .Callback<ServiceTicket>(x =>
-                {
-                    store[x.TicketId] = x;
-                })
+                .Callback<ServiceTicket>(x => store[x.TicketId] = x)
                 .Returns<ServiceTicket>(ticket => Task.FromResult(ticket.TicketId)).Verifiable();
             serviceTickets.Setup(x => x.RetrieveAsync(It.IsAny<string>()))
                 .Returns<string>(key => Task.FromResult(store.TryGetValue(key, out var ticket) ? ticket : null))
@@ -136,16 +133,10 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             var serviceTickets = new Mock<IServiceTicketStore>();
             var store = new Dictionary<string, ServiceTicket>();
             serviceTickets.Setup(x => x.StoreAsync(It.IsAny<ServiceTicket>()))
-                .Callback<ServiceTicket>(x =>
-                {
-                    store[x.TicketId] = x;
-                })
+                .Callback<ServiceTicket>(x => store[x.TicketId] = x)
                 .Returns<ServiceTicket>(ticket => Task.FromResult(ticket.TicketId)).Verifiable();
             serviceTickets.Setup(x => x.RenewAsync(It.IsAny<string>(), It.IsAny<ServiceTicket>()))
-                .Callback<string, ServiceTicket>((key, x) =>
-                {
-                    store[key] = x;
-                }).Returns(Task.CompletedTask).Verifiable();
+                .Callback<string, ServiceTicket>((key, x) => store[key] = x).Returns(Task.CompletedTask).Verifiable();
             serviceTickets.Setup(x => x.RetrieveAsync(It.IsAny<string>()))
                 .Returns<string>(key => Task.FromResult(store.TryGetValue(key, out var ticket) ? ticket : null))
                 .Verifiable();
@@ -177,10 +168,7 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             // ReSharper disable once CollectionNeverQueried.Local
             var store = new Dictionary<string, ServiceTicket>();
             serviceTickets.Setup(x => x.StoreAsync(It.IsAny<ServiceTicket>()))
-                .Callback<ServiceTicket>(x =>
-                {
-                    store[x.TicketId] = x;
-                })
+                .Callback<ServiceTicket>(x => store[x.TicketId] = x)
                 .Returns<ServiceTicket>(ticket => Task.FromResult(ticket.TicketId)).Verifiable();
             serviceTickets.Setup(x => x.RemoveAsync(It.IsAny<string>()))
                 .Callback<string>(key => store.Remove(key))

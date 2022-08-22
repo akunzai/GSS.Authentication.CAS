@@ -26,30 +26,29 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("profile")]
-    public UserProfile? GetUserProfile()
+    public UserProfile GetUserProfile()
     {
-        if (User.Identity?.IsAuthenticated != true) return null;
         return new UserProfile
         {
-            Id = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? User.Identity.Name!,
-            Name = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ?? User.Identity.Name,
+            Id =
+                User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? User.Identity!.Name!,
+            Name = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ??
+                   User.Claims.FirstOrDefault(x => x.Type == "display_name")?.Value,
             Email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
         };
     }
 
     [AllowAnonymous]
-    [HttpGet("login")]
+    [HttpGet("/account/login")]
     public IActionResult Login(string? scheme)
     {
-        if (string.IsNullOrWhiteSpace(scheme))
-        {
-            return BadRequest();
-        }
-
-        return Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
+        return string.IsNullOrWhiteSpace(scheme)
+            ? Challenge(new AuthenticationProperties { RedirectUri = "/" })
+            : Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
     }
 
-    [HttpGet("logout")]
+    [AllowAnonymous]
+    [HttpGet("/account/logout")]
     public IActionResult Logout()
     {
         return SignOut();

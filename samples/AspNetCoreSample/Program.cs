@@ -6,7 +6,6 @@ using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -27,28 +26,25 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Events = new CookieAuthenticationEvents
+        options.Events.OnSigningOut = context =>
         {
-            OnSigningOut = context =>
-            {
-                // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-                var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-                var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
-                var redirectUri = UriHelper.BuildAbsolute(
-                    casUrl.Scheme,
-                    new HostString(casUrl.Host, casUrl.Port),
-                    casUrl.LocalPath, "/logout",
-                    QueryString.Create("service", serviceUrl!));
-                context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
-                    context.HttpContext,
-                    context.Scheme,
-                    context.Options,
-                    context.Properties,
-                    redirectUri
-                ));
-                return Task.CompletedTask;
-            }
+            // Single Sign-Out
+            var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+            var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
+            var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
+            var redirectUri = UriHelper.BuildAbsolute(
+                casUrl.Scheme,
+                new HostString(casUrl.Host, casUrl.Port),
+                casUrl.LocalPath, "/logout",
+                QueryString.Create("service", serviceUrl!));
+            context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+                context.HttpContext,
+                context.Scheme,
+                context.Options,
+                context.Properties,
+                redirectUri
+            ));
+            return Task.CompletedTask;
         };
     })
     .AddCAS(options =>
@@ -66,39 +62,36 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             };
         }
 
-        options.Events = new CasEvents
+        options.Events.OnCreatingTicket = context =>
         {
-            OnCreatingTicket = context =>
-            {
-                if (context.Identity == null)
-                    return Task.CompletedTask;
-                // Map claims from assertion
-                var assertion = context.Assertion;
-                context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-                if (assertion.Attributes.TryGetValue("display_name", out var displayName))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
-                }
-
-                if (assertion.Attributes.TryGetValue("email", out var email))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
-                }
-
+            if (context.Identity == null)
                 return Task.CompletedTask;
-            },
-            OnRemoteFailure = context =>
+            // Map claims from assertion
+            var assertion = context.Assertion;
+            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
             {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
             }
+
+            if (assertion.Attributes.TryGetValue("email", out var email))
+            {
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+            }
+
+            return Task.CompletedTask;
+        };
+        options.Events.OnRemoteFailure = context =>
+        {
+            var failure = context.Failure;
+            if (!string.IsNullOrWhiteSpace(failure?.Message))
+            {
+                logger.Error(failure, "{Exception}", failure.Message);
+            }
+
+            context.Response.Redirect("/Account/ExternalLoginFailure");
+            context.HandleResponse();
+            return Task.CompletedTask;
         };
     })
     .AddOAuth(OAuthDefaults.DisplayName, options =>
@@ -113,42 +106,39 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens", false);
-        options.Events = new OAuthEvents
+        options.Events.OnCreatingTicket = async context =>
         {
-            OnCreatingTicket = async context =>
+            // Get the OAuth user
+            using var request =
+                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            using var response =
+                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
+                    .ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode ||
+                response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
             {
-                // Get the OAuth user
-                using var request =
-                    new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                using var response =
-                    await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
-                        .ConfigureAwait(false);
-
-                if (!response.IsSuccessStatusCode ||
-                    response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
-                {
-                    throw new HttpRequestException(
-                        $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-                }
-
-                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                context.RunClaimActions(json.RootElement);
-            },
-            OnRemoteFailure = context =>
-            {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
+                throw new HttpRequestException(
+                    $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
             }
+
+            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
+            context.RunClaimActions(json.RootElement);
+        };
+        options.Events.OnRemoteFailure = context =>
+        {
+            var failure = context.Failure;
+            if (!string.IsNullOrWhiteSpace(failure?.Message))
+            {
+                logger.Error(failure, "{Exception}", failure.Message);
+            }
+
+            context.Response.Redirect("/Account/ExternalLoginFailure");
+            context.HandleResponse();
+            return Task.CompletedTask;
         };
     })
     .AddOpenIdConnect(options =>
@@ -166,20 +156,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens", false);
-        options.Events = new OpenIdConnectEvents
+        options.Events.OnRemoteFailure = context =>
         {
-            OnRemoteFailure = context =>
+            var failure = context.Failure;
+            if (!string.IsNullOrWhiteSpace(failure?.Message))
             {
-                var failure = context.Failure;
-                if (!string.IsNullOrWhiteSpace(failure?.Message))
-                {
-                    logger.Error(failure, "{Exception}", failure.Message);
-                }
-
-                context.Response.Redirect("/Account/ExternalLoginFailure");
-                context.HandleResponse();
-                return Task.CompletedTask;
+                logger.Error(failure, "{Exception}", failure.Message);
             }
+
+            context.Response.Redirect("/Account/ExternalLoginFailure");
+            context.HandleResponse();
+            return Task.CompletedTask;
         };
     });
 

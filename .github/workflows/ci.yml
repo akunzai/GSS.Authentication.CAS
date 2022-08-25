@@ -17,9 +17,10 @@ jobs:
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-            fetch-depth: 10
+          fetch-depth: 10
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v2
         with:

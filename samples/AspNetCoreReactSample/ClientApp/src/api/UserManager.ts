@@ -1,8 +1,11 @@
-import { FETCH_COMMON_OPTIONS } from '../constants';
 import { User } from '../types';
+import { axiosFactory } from '.';
 
 export class UserManager {
-  constructor(private userStoreKey = 'user:me') {}
+  constructor(
+    private userStoreKey = 'user:me',
+    private axiosInstance = axiosFactory()
+  ) {}
 
   public async isAuthenticated() {
     const user = await this.getUser();
@@ -15,12 +18,11 @@ export class UserManager {
       return JSON.parse(json);
     }
     if (force) {
-      const response = await fetch('/api/account/profile', FETCH_COMMON_OPTIONS);
-      if (response.status === 200) {
-        const user = await response.json();
-        await this.storeUser(user);
-        return user;
-      }
+      const response = await this.axiosInstance.get<User>(
+        '/api/account/profile'
+      );
+      await this.storeUser(response.data);
+      return response.data;
     }
     return null;
   }
@@ -39,8 +41,10 @@ export class UserManager {
   }
 
   public async getAuthenticationSchemes(): Promise<string[]> {
-    const response = await fetch('/api/account/auth-schemes', FETCH_COMMON_OPTIONS);
-    return await response.json();
+    const response = await this.axiosInstance.get<string[]>(
+      '/api/account/auth-schemes'
+    );
+    return response.data;
   }
 
   public async signIn(scheme: string): Promise<void> {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // This script configures a proxy of the SPA Dev server and forward API request to the ASP.NET Core Host
 // https://create-react-app.dev/docs/proxying-api-requests-in-development/
 

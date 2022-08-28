@@ -61,6 +61,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                     casUrl.LocalPath, "/logout",
                     QueryString.Create("service", serviceUrl!));
             }
+
             context.Options.Events.RedirectToLogout(redirectContext);
             return Task.CompletedTask;
         };

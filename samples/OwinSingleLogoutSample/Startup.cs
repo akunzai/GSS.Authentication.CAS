@@ -95,6 +95,7 @@ namespace OwinSingleLogoutSample
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
                         }
+
                         context.Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }
@@ -183,6 +184,7 @@ namespace OwinSingleLogoutSample
                             };
                             request.RequestUri = uriBuilder.Uri;
                         }
+
                         using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled)
                             .ConfigureAwait(false);
 
@@ -204,14 +206,17 @@ namespace OwinSingleLogoutSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
                         }
+
                         if (user.TryGetProperty("name", out var name))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()));
                         }
+
                         if (user.TryGetProperty("email", out var email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
                         }
+
                         if (user.TryGetProperty("attributes", out var attributes))
                         {
                             if (attributes.TryGetProperty("display_name", out var displayName))
@@ -259,10 +264,10 @@ namespace OwinSingleLogoutSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
-                                              notification.Request.Host + notification.Request.PathBase +
-                                              notification.Options.CallbackPath;
-                            notification.ProtocolMessage.RedirectUri = redirectUri;
+                            notification.ProtocolMessage.RedirectUri =
+                                notification.Request.Scheme + Uri.SchemeDelimiter +
+                                notification.Request.Host + notification.Request.PathBase +
+                                notification.Options.CallbackPath;
                         }
 
                         return Task.CompletedTask;
@@ -272,10 +277,10 @@ namespace OwinSingleLogoutSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
-                                              notification.Request.Host + notification.Request.PathBase +
-                                              notification.Options.CallbackPath;
-                            notification.TokenEndpointRequest.RedirectUri = redirectUri;
+                            notification.TokenEndpointRequest.RedirectUri =
+                                notification.Request.Scheme + Uri.SchemeDelimiter +
+                                notification.Request.Host + notification.Request.PathBase +
+                                notification.Options.CallbackPath;
                         }
 
                         return Task.CompletedTask;

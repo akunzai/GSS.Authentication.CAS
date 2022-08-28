@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -68,20 +69,24 @@ namespace OwinSample
                 {
                     OnResponseSignOut = context =>
                     {
-                        // Single Sign-Out
-                        var casUrl = new Uri(_configuration["Authentication:CAS:ServerUrlBase"]);
-                        var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                        var serviceUrl =
-                            urlHelper.Action("Index", "Home", null, HttpContext.Current.Request.Url.Scheme);
-                        var redirectUri = new UriBuilder(casUrl);
-                        redirectUri.Path += "/logout";
-                        redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                        context.Options.Provider.ApplyRedirect(new CookieApplyRedirectContext
+                        var redirectContext = new CookieApplyRedirectContext
                         (
                             context.OwinContext,
                             context.Options,
-                            redirectUri.Uri.AbsoluteUri
-                        ));
+                            "/"
+                        );
+                        if (_configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+                        {
+                            // Single Sign-Out
+                            var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+                            var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
+                            var redirectUri = new UriBuilder(_configuration["Authentication:CAS:ServerUrlBase"]);
+                            redirectUri.Path += "/logout";
+                            redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
+                            redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
+                        }
+
+                        context.Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }
             });
@@ -143,6 +148,10 @@ namespace OwinSample
                 options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.Scopes.Clear();
+                _configuration.GetValue("Authentication:OAuth:Scope", "email")
+                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList()
+                    .ForEach(s => options.Scopes.Add(s));
                 options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
                 options.Events = new OAuthEvents
                 {
@@ -151,7 +160,21 @@ namespace OwinSample
                         // Get the OAuth user
                         using var request =
                             new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        request.Headers.Accept.ParseAdd("application/json");
+                        if (_configuration.GetValue("Authentication:OAuth:UseAuthenticationHeader", true))
+                        {
+                            request.Headers.Authorization =
+                                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        }
+                        else
+                        {
+                            var uriBuilder = new UriBuilder(request.RequestUri)
+                            {
+                                Query = $"access_token={Uri.EscapeDataString(context.AccessToken)}"
+                            };
+                            request.RequestUri = uriBuilder.Uri;
+                        }
+
                         using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled)
                             .ConfigureAwait(false);
 
@@ -174,6 +197,16 @@ namespace OwinSample
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
                         }
 
+                        if (user.TryGetProperty("name", out var name))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()));
+                        }
+
+                        if (user.TryGetProperty("email", out var email))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                        }
+
                         if (user.TryGetProperty("attributes", out var attributes))
                         {
                             if (attributes.TryGetProperty("display_name", out var displayName))
@@ -181,9 +214,9 @@ namespace OwinSample
                                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
                             }
 
-                            if (attributes.TryGetProperty("email", out var email))
+                            if (attributes.TryGetProperty("email", out var email2))
                             {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email2.GetString()));
                             }
                         }
                     },
@@ -222,10 +255,10 @@ namespace OwinSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
-                                              notification.Request.Host + notification.Request.PathBase +
-                                              notification.Options.CallbackPath;
-                            notification.ProtocolMessage.RedirectUri = redirectUri;
+                            notification.ProtocolMessage.RedirectUri =
+                                notification.Request.Scheme + Uri.SchemeDelimiter +
+                                notification.Request.Host + notification.Request.PathBase +
+                                notification.Options.CallbackPath;
                         }
 
                         return Task.CompletedTask;
@@ -235,10 +268,10 @@ namespace OwinSample
                         // generate the redirect_uri parameter automatically
                         if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
-                            var redirectUri = notification.Request.Scheme + Uri.SchemeDelimiter +
-                                              notification.Request.Host + notification.Request.PathBase +
-                                              notification.Options.CallbackPath;
-                            notification.TokenEndpointRequest.RedirectUri = redirectUri;
+                            notification.TokenEndpointRequest.RedirectUri =
+                                notification.Request.Scheme + Uri.SchemeDelimiter +
+                                notification.Request.Host + notification.Request.PathBase +
+                                notification.Options.CallbackPath;
                         }
 
                         return Task.CompletedTask;

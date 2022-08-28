@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
 using NLog.Web;
@@ -29,22 +30,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Events.OnSigningOut = context =>
         {
-            // Single Sign-Out
-            var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-            var request = context.Request;
-            var serviceUrl = context.Properties.RedirectUri ?? $"{request.Scheme}://{request.Host}/{request.PathBase}";
-            var redirectUri = UriHelper.BuildAbsolute(
-                casUrl.Scheme,
-                new HostString(casUrl.Host, casUrl.Port),
-                casUrl.LocalPath, "/logout",
-                QueryString.Create("service", serviceUrl));
-            context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+            var redirectContext = new RedirectContext<CookieAuthenticationOptions>(
                 context.HttpContext,
                 context.Scheme,
                 context.Options,
                 context.Properties,
-                redirectUri
-            ));
+                "/"
+            );
+            if (builder.Configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+            {
+                // Single Sign-Out
+                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+                var request = context.Request;
+                var serviceUrl = context.Properties.RedirectUri ??
+                                 $"{request.Scheme}://{request.Host}/{request.PathBase}";
+                redirectContext.RedirectUri = UriHelper.BuildAbsolute(
+                    casUrl.Scheme,
+                    new HostString(casUrl.Host, casUrl.Port),
+                    casUrl.LocalPath, "/logout",
+                    QueryString.Create("service", serviceUrl));
+            }
+
+            context.Options.Events.RedirectToLogout(redirectContext);
             return Task.CompletedTask;
         };
     })
@@ -91,7 +98,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
         options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
         options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
+        builder.Configuration.GetValue("Authentication:OAuth:Scope", "email")
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens", false);
@@ -100,8 +111,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             // Get the OAuth user
             using var request =
                 new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            request.Headers.Accept.ParseAdd("application/json");
+            if (builder.Configuration.GetValue("Authentication:OAuth:UseAuthenticationHeader", true))
+            {
+                request.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            }
+            else
+            {
+                request.RequestUri =
+                    new Uri(QueryHelpers.AddQueryString(request.RequestUri!.OriginalString, "access_token",
+                        context.AccessToken!));
+            }
+
             using var response =
                 await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
                     .ConfigureAwait(false);

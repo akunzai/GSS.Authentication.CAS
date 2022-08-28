@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -143,6 +144,10 @@ namespace OwinSample
                 options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.Scopes.Clear();
+                _configuration.GetValue("Authentication:OAuth:Scope", "email")
+                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList()
+                    .ForEach(s => options.Scopes.Add(s));
                 options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
                 options.Events = new OAuthEvents
                 {

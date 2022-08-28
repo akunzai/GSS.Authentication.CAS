@@ -91,6 +91,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
         options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
         options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
+        builder.Configuration.GetValue("Authentication:OAuth:Scope", "email")
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");

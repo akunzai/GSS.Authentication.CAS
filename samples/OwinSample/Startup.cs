@@ -69,20 +69,23 @@ namespace OwinSample
                 {
                     OnResponseSignOut = context =>
                     {
-                        // Single Sign-Out
-                        var casUrl = new Uri(_configuration["Authentication:CAS:ServerUrlBase"]);
-                        var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                        var serviceUrl =
-                            urlHelper.Action("Index", "Home", null, HttpContext.Current.Request.Url.Scheme);
-                        var redirectUri = new UriBuilder(casUrl);
-                        redirectUri.Path += "/logout";
-                        redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                        context.Options.Provider.ApplyRedirect(new CookieApplyRedirectContext
+                        var redirectContext = new CookieApplyRedirectContext
                         (
                             context.OwinContext,
                             context.Options,
-                            redirectUri.Uri.AbsoluteUri
-                        ));
+                            "/"
+                        );
+                        if (_configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+                        {
+                            // Single Sign-Out
+                            var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+                            var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
+                            var redirectUri = new UriBuilder(_configuration["Authentication:CAS:ServerUrlBase"]);
+                            redirectUri.Path += "/logout";
+                            redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
+                            redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
+                        }
+                        context.Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }
             });

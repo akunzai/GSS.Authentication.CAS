@@ -30,22 +30,27 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Events.OnSigningOut = context =>
         {
-            // Single Sign-Out
-            var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
-            var request = context.Request;
-            var serviceUrl = context.Properties.RedirectUri ?? $"{request.Scheme}://{request.Host}/{request.PathBase}";
-            var redirectUri = UriHelper.BuildAbsolute(
-                casUrl.Scheme,
-                new HostString(casUrl.Host, casUrl.Port),
-                casUrl.LocalPath, "/logout",
-                QueryString.Create("service", serviceUrl));
-            context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+            var redirectContext = new RedirectContext<CookieAuthenticationOptions>(
                 context.HttpContext,
                 context.Scheme,
                 context.Options,
                 context.Properties,
-                redirectUri
-            ));
+                "/"
+            );
+            if (builder.Configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+            {
+                // Single Sign-Out
+                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+                var request = context.Request;
+                var serviceUrl = context.Properties.RedirectUri ??
+                                 $"{request.Scheme}://{request.Host}/{request.PathBase}";
+                redirectContext.RedirectUri = UriHelper.BuildAbsolute(
+                    casUrl.Scheme,
+                    new HostString(casUrl.Host, casUrl.Port),
+                    casUrl.LocalPath, "/logout",
+                    QueryString.Create("service", serviceUrl));
+            }
+            context.Options.Events.RedirectToLogout(redirectContext);
             return Task.CompletedTask;
         };
     })

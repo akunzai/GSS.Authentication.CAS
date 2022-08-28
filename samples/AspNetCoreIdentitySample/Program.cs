@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
@@ -87,8 +88,19 @@ builder.Services.AddAuthentication()
             // Get the OAuth user
             using var request =
                 new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            request.Headers.Accept.ParseAdd("application/json");
+            if (builder.Configuration.GetValue("Authentication:OAuth:UseAuthenticationHeader", true))
+            {
+                request.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
+            }
+            else
+            {
+                request.RequestUri =
+                    new Uri(QueryHelpers.AddQueryString(request.RequestUri!.OriginalString, "access_token",
+                        context.AccessToken!));
+            }
+
             using var response =
                 await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
                     .ConfigureAwait(false);

@@ -156,7 +156,20 @@ namespace OwinSample
                         // Get the OAuth user
                         using var request =
                             new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        request.Headers.Accept.ParseAdd("application/json");
+                        if (_configuration.GetValue("Authentication:OAuth:UseAuthenticationHeader", true))
+                        {
+                            request.Headers.Authorization =
+                                new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        }
+                        else
+                        {
+                            var uriBuilder = new UriBuilder(request.RequestUri)
+                            {
+                                Query = $"access_token={Uri.EscapeDataString(context.AccessToken)}"
+                            };
+                            request.RequestUri = uriBuilder.Uri;
+                        }
                         using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled)
                             .ConfigureAwait(false);
 

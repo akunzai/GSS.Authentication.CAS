@@ -188,7 +188,14 @@ namespace OwinSingleLogoutSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
                         }
-
+                        if (user.TryGetProperty("name", out var name))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()));
+                        }
+                        if (user.TryGetProperty("email", out var email))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                        }
                         if (user.TryGetProperty("attributes", out var attributes))
                         {
                             if (attributes.TryGetProperty("display_name", out var displayName))
@@ -196,9 +203,9 @@ namespace OwinSingleLogoutSample
                                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
                             }
 
-                            if (attributes.TryGetProperty("email", out var email))
+                            if (attributes.TryGetProperty("email", out var email2))
                             {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
+                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email2.GetString()));
                             }
                         }
                     },

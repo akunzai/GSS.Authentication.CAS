@@ -119,6 +119,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         builder.Configuration.GetValue("Authentication:OAuth:Scope", "email")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
         options.Events.OnCreatingTicket = async context =>

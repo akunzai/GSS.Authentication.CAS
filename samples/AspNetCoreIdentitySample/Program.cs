@@ -89,16 +89,16 @@ builder.Services.AddAuthentication()
             using var request =
                 new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
             request.Headers.Accept.ParseAdd("application/json");
-            if (builder.Configuration.GetValue("Authentication:OAuth:UseAuthenticationHeader", true))
-            {
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
-            }
-            else
+            if (builder.Configuration.GetValue("Authentication:OAuth:SendAccessTokenInQuery", false))
             {
                 request.RequestUri =
                     new Uri(QueryHelpers.AddQueryString(request.RequestUri!.OriginalString, "access_token",
                         context.AccessToken!));
+            }
+            else
+            {
+                request.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
             }
 
             using var response =

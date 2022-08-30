@@ -3,6 +3,7 @@
   "extends": [
     "config:base"
   ],
+  "rangeStrategy": "update-lockfile",
   "postUpdateOptions": [
     "yarnDedupeHighest"
   ],

@@ -36,6 +36,13 @@ jobs:
         run: |
           dotnet --info
           dotnet build -c Release
+      - name: Build Sample assets
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          corepack enable
+          cd ./samples/AspNetCoreReactSample/ClientApp
+          yarn install --immutable
+          yarn build
       - name: Build Samples
         run: |
           dotnet build samples/AspNetCoreIdentitySample/AspNetCoreIdentitySample.csproj -c Release

@@ -1,9 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /
+    directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:
-      interval: daily
+      interval: weekly
   - package-ecosystem: nuget
     directory: /
     schedule:

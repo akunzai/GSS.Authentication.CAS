@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.3.2 (2022-08-31)
+
+- Add net462 target framework to fix assembly reference errors
+- Bump Microsoft.Extensions.Primitives from 2.0.0 to 2.2.0
+- Bump Microsoft.Extensions.Caching.Abstractions from 2.0.0 to 2.2.0
+- Bump Microsoft.Owin.Security.Cookies from 2.0.0 to 2.2.0
+
 ## 5.3.1 (2022-08-18)
 
 - Remove the `netstandard2.0` target framework from `GSS.Authentication.CAS.AspNetCore` to fix [CVE-2022-34716](https://github.com/advisories/GHSA-2m65-m22p-9wjw)

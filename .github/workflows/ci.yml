@@ -36,21 +36,17 @@ jobs:
         run: |
           dotnet --info
           dotnet build -c Release
-      - name: Build Sample assets
+          msbuild -version
+          msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore
+          msbuild samples/OwinSingleLogoutSample/OwinSingleLogoutSample.csproj -noLogo -verbosity:minimal -restore
+      - name: Build static assets
         if: matrix.os == 'ubuntu-latest'
         run: |
           corepack enable
-          cd ./samples/AspNetCoreReactSample/ClientApp
+          cd samples/AspNetCoreReactSample/ClientApp
+          yarn --version
           yarn install --immutable
           yarn build
-      - name: Build Samples
-        run: |
-          dotnet build samples/AspNetCoreIdentitySample/AspNetCoreIdentitySample.csproj -c Release
-          dotnet build samples/AspNetCoreReactSample/AspNetCoreReactSample.csproj -c Release
-          dotnet build samples/AspNetCoreSample/AspNetCoreSample.csproj -c Release
-          dotnet build samples/AspNetCoreSingleLogoutSample/AspNetCoreSingleLogoutSample.csproj -c Release
-          msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
-          msbuild samples/OwinSingleLogoutSample/OwinSingleLogoutSample.csproj -noLogo -verbosity:minimal -restore -p:Configuration=Release
       - name: Scan vulnerable packages
         if: matrix.os == 'ubuntu-latest'
         continue-on-error: true

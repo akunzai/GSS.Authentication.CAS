@@ -1,0 +1,1 @@
+msbuild -noLogo -verbosity:minimal -restore -p:Configuration=Release

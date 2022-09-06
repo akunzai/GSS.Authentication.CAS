@@ -1,18 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:base",
+    ":preserveSemverRanges",
+    ":widenPeerDependencies",
+    ":semanticCommits",
+    ":automergeMinor",
+    ":automergeTesters",
+    ":automergeRequireAllStatusChecks"
   ],
-  "rangeStrategy": "update-lockfile",
   "postUpdateOptions": [
     "yarnDedupeHighest"
-  ],
-  "packageRules": [
-    {
-      "description": "Require typescript minor approval for typescript-eslint",
-      "matchPackageNames": ["typescript"],
-      "matchUpdateTypes": ["minor"],
-      "dependencyDashboardApproval": true
-    }
   ]
 }

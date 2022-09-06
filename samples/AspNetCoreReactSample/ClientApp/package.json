@@ -11,8 +11,8 @@
     "lint": "./node_modules/.bin/eslint ./src/"
   },
   "dependencies": {
-    "@types/node": "^18.7.14",
-    "@types/react": "^18.0.17",
+    "@types/node": "^18.7.15",
+    "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
@@ -24,14 +24,13 @@
     "react-scripts": "^5.0.1",
     "react-service-container": "^0.2.6",
     "rimraf": "^3.0.2",
-    "typescript": "~4.7.4",
-    "web-vitals": "^3.0.0"
+    "typescript": "~4.8.2",
+    "web-vitals": "^3.0.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
   },
   "resolutions": {
-    "css-what": "^6.1.0",
     "nth-check": "^2.1.1"
   },
   "eslintConfig": {

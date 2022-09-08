@@ -49,7 +49,6 @@ jobs:
           yarn build
       - name: Scan vulnerable packages
         if: matrix.os == 'ubuntu-latest'
-        continue-on-error: true
         # https://github.com/dotnet/sdk/issues/16852
         run: |
           dotnet restore

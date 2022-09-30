@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 10
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             3.1.x

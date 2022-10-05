@@ -173,7 +173,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapFallbackToFile("index.html").AllowAnonymous();
+app.MapFallbackToFile("index.html").AllowAnonymous()
+    // only match 'GET' and 'HEAD' requests, fixed since .NET 7
+    // https://github.com/aspnet/Announcements/issues/495
+    .WithMetadata(new HttpMethodMetadata(new[] { HttpMethod.Get.Method, HttpMethod.Head.Method }));
 
 try
 {

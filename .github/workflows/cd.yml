@@ -8,6 +8,8 @@ on:
     tags:
       - "*"
 
+permissions: read-all
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

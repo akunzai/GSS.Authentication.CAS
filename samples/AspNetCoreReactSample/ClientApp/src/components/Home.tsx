@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useService } from 'react-service-container';
 import { UserManager } from '../api';
 import { User } from '../types';
 
 export function Home(): JSX.Element {
-  const userManager = useService(UserManager);
+  const userManager = useMemo(() => new UserManager(), []);
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 

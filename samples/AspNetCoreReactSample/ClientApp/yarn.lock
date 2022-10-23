@@ -2638,10 +2638,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^18.8.5":
-  version: 18.8.5
-  resolution: "@types/node@npm:18.8.5"
-  checksum: f7d896f54743178e64c534c6da16f582505acf18904ecd0ee8541cb4bc1d429ba514e7ecfd5145221b71adbd6ae1ff72df082f667e56d056fcd1a719df948e08
+"@types/node@npm:*, @types/node@npm:^18.11.3":
+  version: 18.11.3
+  resolution: "@types/node@npm:18.11.3"
+  checksum: 3a2a9142d891a90a195c296149bf64a69cc0abcc42f543be911ab22b2e0ead85ff077f90af92f0f13f6e3e5e72501469200fd753dfd1101825d4646a89d3ee47
   languageName: node
   linkType: hard
 
@@ -3492,10 +3492,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "aspnetcorereactsample@workspace:."
   dependencies:
-    "@types/node": ^18.8.5
+    "@types/node": ^18.11.3
     "@types/react": ^18.0.21
     "@types/react-dom": ^18.0.6
-    axios: ^1.1.2
+    axios: ^1.1.3
     bootstrap: ^5.2.2
     cross-env: ^7.0.3
     http-proxy-middleware: ^2.0.6
@@ -3504,10 +3504,9 @@ __metadata:
     react-router-bootstrap: ^0.26.2
     react-router-dom: ^6.4.2
     react-scripts: ^5.0.1
-    react-service-container: ^0.2.6
     rimraf: ^3.0.2
     typescript: ~4.8.4
-    web-vitals: ^3.0.3
+    web-vitals: ^3.0.4
   languageName: unknown
   linkType: soft
 
@@ -3564,14 +3563,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "axios@npm:1.1.2"
+"axios@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "axios@npm:1.1.3"
   dependencies:
     follow-redirects: ^1.15.0
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 136c25a5031aa2845fdbda3006c36888bbe351b11d1195f1f898a23c5df1430febbdb1ad034a61f27967e83762d5b5a3e851fff8a363cb4badeb883f8ff21461
+  checksum: cab3b17bf6092c9387f7023d699db093cfa23650b56c4422cd474d124b78b2e3b5a520f932c330664a58ab85b867b1c25a95cace475ef72d236888c852b84e6d
   languageName: node
   linkType: hard
 
@@ -10226,15 +10225,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-service-container@npm:^0.2.6":
-  version: 0.2.6
-  resolution: "react-service-container@npm:0.2.6"
-  peerDependencies:
-    react: ^16.13.1
-  checksum: b64e1e2cf1ba825cf1265c0955f3d36053184e5bd584233200d06990af429e203dcd9810315995a089b78ed015a8a5139c7db1cf5ce1b5e8f04db755647176a5
-  languageName: node
-  linkType: hard
-
 "react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
@@ -11972,10 +11962,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "web-vitals@npm:3.0.3"
-  checksum: 77df36f83590afbab6872f94f01e9df536ec4b0a4421833b500306f5ee5f9cdebdcd9139cfd94801edfb555a56ad61d8a5d28529ade8c645f6c82b76aebca19e
+"web-vitals@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "web-vitals@npm:3.0.4"
+  checksum: b618a8e049e0c64948eea09c372db490802bcc8bcb30230a2bc69d9e243b1a2fa54d0f0ae19d5e63f19381df86db2a9260ca15ef620e10024888eab487a77d56
   languageName: node
   linkType: hard
 

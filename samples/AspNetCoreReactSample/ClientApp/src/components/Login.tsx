@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useService } from 'react-service-container';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserManager } from '../api';
 
 export function Login(): JSX.Element {
-  const userManager = useService(UserManager);
+  const userManager = useMemo(() => new UserManager(), []);
   const [schemes, setSchemes] = useState<string[]>([]);
 
   const fetchSchemes = useCallback(async () => {

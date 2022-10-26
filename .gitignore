@@ -3,7 +3,6 @@ appsettings.*.json
 [Nn][Ll]og.*.config
 *.db
 log.txt
-vulnerable.out
 # JetBrians Rider
 .idea/
 .run/*.run.xml

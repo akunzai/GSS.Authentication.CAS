@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
-    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+    <PackageReference Include="coverlet.collector" Version="3.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.3.2" Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

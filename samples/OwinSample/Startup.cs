@@ -57,6 +57,17 @@ namespace OwinSample
             _logger = LogManager.Setup().LoadConfigurationFromSection(_configuration).GetCurrentClassLogger();
             app.UseNLog();
 
+            // https://github.com/aspnet/AspNetKatana/issues/332
+            app.Use(async (context, next) =>
+            {
+                var proxyProtocol = context.Request.Headers["X-Forwarded-Proto"];
+                if (string.Equals(proxyProtocol, "https", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Request.Scheme = "https";
+                }
+                await next.Invoke();
+            });
+
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions

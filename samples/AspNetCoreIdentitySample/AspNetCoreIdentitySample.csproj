@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.11" PrivateAssets="All" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.5" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>

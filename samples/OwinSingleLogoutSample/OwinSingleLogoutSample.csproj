@@ -100,7 +100,7 @@
       <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect">
-      <Version>6.25.0</Version>
+      <Version>6.25.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Condition=" '$(OS)' != 'Windows_NT' ">
       <Version>1.0.3</Version>

@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj"/>
+    <ProjectReference Include="..\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,38 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="3.6.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.25.1" />
+    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
+    <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
+    <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
+    <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
+    <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.0" />
+    <PackageVersion Include="NLog.Owin.Logging" Version="1.1.0" />
+    <PackageVersion Include="NLog.Web" Version="5.2.0" />
+    <PackageVersion Include="NLog.Web.AspNetCore" Version="5.2.0" />
+    <PackageVersion Include="Owin.OAuthGeneric" Version="1.0.3" />
+    <PackageVersion Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Text.Encodings.Web" Version="7.0.0" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+</Project>

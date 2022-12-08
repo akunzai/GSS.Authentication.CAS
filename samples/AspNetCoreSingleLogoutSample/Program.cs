@@ -91,12 +91,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
             if (assertion.Attributes.TryGetValue("display_name", out var displayName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
 
             if (assertion.Attributes.TryGetValue("email", out var email))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email!));
             }
 
             return Task.CompletedTask;

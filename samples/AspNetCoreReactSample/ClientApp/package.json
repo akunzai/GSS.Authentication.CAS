@@ -30,7 +30,7 @@
     "cross-env": "^7.0.3"
   },
   "resolutions": {
-    "loader-utils": "^2.0.4",
+    "loader-utils": "^3.0.0",
     "nth-check": "^2.1.1"
   },
   "eslintConfig": {

@@ -31,6 +31,7 @@
   },
   "resolutions": {
     "loader-utils": "^2.0.4",
+    "minimatch": "^3.0.8",
     "nth-check": "^2.1.1"
   },
   "eslintConfig": {

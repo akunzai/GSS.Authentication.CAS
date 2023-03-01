@@ -7,7 +7,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.14" />
-    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.14" />
     <PackageVersion Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="3.6.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.14" />

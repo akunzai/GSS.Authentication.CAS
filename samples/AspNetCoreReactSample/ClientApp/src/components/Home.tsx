@@ -9,9 +9,9 @@ export function Home(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
 
   const fetchUser = useCallback(async () => {
-    setUser(await userManager.getUser(!authenticated));
+    setUser(await userManager.getUser());
     setAuthenticated(await userManager.isAuthenticated());
-  }, [authenticated, userManager]);
+  }, [userManager]);
 
   useEffect(() => {
     fetchUser();

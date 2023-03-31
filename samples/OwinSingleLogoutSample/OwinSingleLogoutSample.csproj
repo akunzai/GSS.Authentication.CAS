@@ -93,6 +93,7 @@
     <PackageReference Include="NLog.Owin.Logging" />
     <PackageReference Include="NLog.Web" />
     <PackageReference Include="Owin.OAuthGeneric" />
+    <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
   <ItemGroup>

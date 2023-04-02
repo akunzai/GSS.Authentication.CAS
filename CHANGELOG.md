@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 5.3.3 (2023-04-02)
+
+- [Build symbol package and publish it to NuGet.org](https://learn.microsoft.com/nuget/create-packages/symbol-packages-snupkg)
+- [Enabling Central Package Management](https://learn.microsoft.com/nuget/consume-packages/central-package-management)
+
 ## 5.3.2 (2022-08-31)
 
 - Add net462 target framework to fix assembly reference errors

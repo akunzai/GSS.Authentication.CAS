@@ -10,7 +10,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.16" />
     <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.16" />
     <PackageVersion Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.16" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.16" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.5" />

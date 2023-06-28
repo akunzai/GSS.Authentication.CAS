@@ -33,6 +33,7 @@
     "loader-utils": "^2.0.4",
     "minimatch": "^9.0.0",
     "nth-check": "^2.1.1",
+    "optionator": "^0.9.3",
     "semver": "^7.5.3"
   },
   "eslintConfig": {

@@ -1,0 +1,13 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <h2 class="text-danger">Sorry, there's nothing at this address.</h2>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

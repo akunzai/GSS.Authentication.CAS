@@ -29,7 +29,7 @@ export function Home(): JSX.Element {
   }
   return (
     <div>
-      <h1>Hello {user?.name}</h1>
+      <h1>Hello, {user?.name}</h1>
       <dl>
         <dt>ID</dt>
         <dd>{user?.id}</dd>

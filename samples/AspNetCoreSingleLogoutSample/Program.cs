@@ -31,9 +31,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthorization(options =>
 {
     // Globally Require Authenticated Users
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
+    options.FallbackPolicy = options.DefaultPolicy;
 });
 builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
     .Configure<ITicketStore>((o, t) => o.SessionStore = t);

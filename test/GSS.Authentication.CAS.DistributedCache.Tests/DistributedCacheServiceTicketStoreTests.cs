@@ -79,7 +79,7 @@ public class DistributedCacheServiceTicketStoreTests
 
         // Assert
         Assert.NotNull(actual);
-        Assert.Equal(expected.TicketId, actual!.TicketId);
+        Assert.Equal(expected.TicketId, actual.TicketId);
         Assert.Equal(expected.AuthenticationType, actual.AuthenticationType);
         Assert.Equal(expected.Claims.First(x => x.Type == ClaimTypes.Name).Value,
             actual.Claims.First(x => x.Type == ClaimTypes.Name).Value);

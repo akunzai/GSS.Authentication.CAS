@@ -36,7 +36,7 @@ public class Cas20ServiceTicketValidationTests
 
         //Assert
         Assert.NotNull(principal);
-        Assert.NotNull(principal!.Assertion);
+        Assert.NotNull(principal.Assertion);
         Assert.Equal(principal.GetPrincipalName(), principal.Assertion.PrincipalName);
         Assert.Empty(principal.Assertion.Attributes);
         mockHttp.VerifyNoOutstandingRequest();

@@ -111,11 +111,11 @@ namespace GSS.Authentication.CAS.Owin.Tests
 
             // Assert
             Assert.NotNull(actual);
-            Assert.Equal(expected.Identity.AuthenticationType, actual?.Identity.AuthenticationType);
-            Assert.Equal(expected.Identity.GetPrincipalName(), actual?.Identity.GetPrincipalName());
-            Assert.Equal(expected.Identity.Claims.First(c=>c.Type.Equals(expected.Identity.RoleClaimType)).Value, actual?.Identity.Claims.First(c=>c.Type.Equals(actual.Identity.RoleClaimType)).Value);
-            Assert.Equal(expected.Identity.NameClaimType, actual?.Identity.NameClaimType);
-            Assert.Equal(expected.Identity.RoleClaimType, actual?.Identity.RoleClaimType);
+            Assert.Equal(expected.Identity.AuthenticationType, actual.Identity.AuthenticationType);
+            Assert.Equal(expected.Identity.GetPrincipalName(), actual.Identity.GetPrincipalName());
+            Assert.Equal(expected.Identity.Claims.First(c=>c.Type.Equals(expected.Identity.RoleClaimType)).Value, actual.Identity.Claims.First(c=>c.Type.Equals(actual.Identity.RoleClaimType)).Value);
+            Assert.Equal(expected.Identity.NameClaimType, actual.Identity.NameClaimType);
+            Assert.Equal(expected.Identity.RoleClaimType, actual.Identity.RoleClaimType);
             serviceTickets.Verify();
         }
 
@@ -145,8 +145,8 @@ namespace GSS.Authentication.CAS.Owin.Tests
             // Assert
             var actual = await tickets.RetrieveAsync(key);
             Assert.NotNull(actual);
-            Assert.Equal(expected.Identity.AuthenticationType, actual?.Identity.AuthenticationType);
-            Assert.Equal(expected.Identity.GetPrincipalName(), actual?.Identity.GetPrincipalName());
+            Assert.Equal(expected.Identity.AuthenticationType, actual.Identity.AuthenticationType);
+            Assert.Equal(expected.Identity.GetPrincipalName(), actual.Identity.GetPrincipalName());
             serviceTickets.Verify();
         }
 

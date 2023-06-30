@@ -140,8 +140,8 @@ public class CasAuthenticationMiddlewareTests
 
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("An error was encountered while handling the remote login.", exception?.Message);
-        Assert.IsType<NotSupportedException>(exception?.InnerException);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.IsType<NotSupportedException>(exception.InnerException);
     }
 
     [Fact]
@@ -221,8 +221,8 @@ public class CasAuthenticationMiddlewareTests
 
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("An error was encountered while handling the remote login.", exception?.Message);
-        Assert.IsType<NotSupportedException>(exception?.InnerException);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.IsType<NotSupportedException>(exception.InnerException);
     }
 
     [Fact]

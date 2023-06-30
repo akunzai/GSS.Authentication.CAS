@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSample", "samples\OwinS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSingleLogoutSample", "samples\OwinSingleLogoutSample\OwinSingleLogoutSample.csproj", "{01390DEE-2AB7-478B-8F51-32DE70BF3125}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorServerSample", "samples\BlazorServerSample\BlazorServerSample.csproj", "{35775C99-782F-4502-B31D-B13E966D0A90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01390DEE-2AB7-478B-8F51-32DE70BF3125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35775C99-782F-4502-B31D-B13E966D0A90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35775C99-782F-4502-B31D-B13E966D0A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35775C99-782F-4502-B31D-B13E966D0A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35775C99-782F-4502-B31D-B13E966D0A90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +153,7 @@ Global
 		{D400F7CA-C73B-4480-A3D8-E5E8D6ABBB77} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}
 		{BB89E35B-F73F-426F-8E66-456D6A49FDF3} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}
 		{01390DEE-2AB7-478B-8F51-32DE70BF3125} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}
+		{35775C99-782F-4502-B31D-B13E966D0A90} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C211A196-2432-4E8E-88F4-EBF50079001C}

@@ -1,13 +1,11 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
-using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -17,24 +15,14 @@ using NLog.Web;
 var builder = WebApplication.CreateBuilder(args);
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
-builder.Services.AddDistributedMemoryCache();
-var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
-if (!string.IsNullOrWhiteSpace(redisConfiguration))
-{
-    builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
-}
-
-builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
-
+// Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 builder.Services.AddAuthorization(options =>
 {
     // Globally Require Authenticated Users
     options.FallbackPolicy = options.DefaultPolicy;
 });
-builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
-    .Configure<ITicketStore>((o, t) => o.SessionStore = t);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -67,8 +55,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCAS(options =>
     {
         options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
-        // required for CasSingleLogoutMiddleware
-        options.SaveTokens = true;
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
         if (protocolVersion != 3)
         {
@@ -89,12 +76,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
             if (assertion.Attributes.TryGetValue("display_name", out var displayName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
             }
 
             if (assertion.Attributes.TryGetValue("email", out var email))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email!));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
             }
 
             return Task.CompletedTask;
@@ -127,6 +114,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens", false);
         options.Events.OnCreatingTicket = async context =>
         {
             // Get the OAuth user
@@ -187,6 +175,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Scope.Clear();
         builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens", false);
         options.Events.OnRemoteFailure = context =>
         {
             var failure = context.Failure;
@@ -217,12 +206,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCasSingleLogout();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 try
 {

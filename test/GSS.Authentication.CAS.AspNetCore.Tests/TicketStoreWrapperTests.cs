@@ -116,11 +116,11 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
 
             // Assert
             Assert.NotNull(actual);
-            Assert.Equal(expected.AuthenticationScheme, actual?.AuthenticationScheme);
-            Assert.Equal(expected.Principal.GetPrincipalName(), actual?.Principal.GetPrincipalName());
-            Assert.True(actual?.Principal.IsInRole("TEST"));
+            Assert.Equal(expected.AuthenticationScheme, actual.AuthenticationScheme);
+            Assert.Equal(expected.Principal.GetPrincipalName(), actual.Principal.GetPrincipalName());
+            Assert.True(actual.Principal.IsInRole("TEST"));
             var expectedIdentity = expected.Principal.Identity as ClaimsIdentity;
-            var actualIdentity = actual?.Principal.Identity as ClaimsIdentity;
+            var actualIdentity = actual.Principal.Identity as ClaimsIdentity;
             Assert.Equal(expectedIdentity?.NameClaimType, actualIdentity?.NameClaimType);
             Assert.Equal(expectedIdentity?.RoleClaimType, actualIdentity?.RoleClaimType);
             serviceTickets.Verify();
@@ -155,8 +155,8 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests
             // Assert
             var actual = await tickets.RetrieveAsync(key);
             Assert.NotNull(actual);
-            Assert.Equal(expected.AuthenticationScheme, actual?.AuthenticationScheme);
-            Assert.Equal(expected.Principal.GetPrincipalName(), actual?.Principal.GetPrincipalName());
+            Assert.Equal(expected.AuthenticationScheme, actual.AuthenticationScheme);
+            Assert.Equal(expected.Principal.GetPrincipalName(), actual.Principal.GetPrincipalName());
             serviceTickets.Verify();
         }
 

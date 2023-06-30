@@ -39,6 +39,7 @@ Check out these [samples](./samples/) to learn the basics and key features.
 - [ASP.NET Core app with Single-Logout](./samples/AspNetCoreSingleLogoutSample/)
 - [ASP.NET Core app with React.js](./samples/AspNetCoreReactSample/)
 - [ASP.NET Core Identity app](./samples/AspNetCoreIdentitySample/)
+- [ASP.NET Core Blazor Server](./samples/BlazorServerSample/)
 - [OWIN app](./samples/OwinSample/)
 - [OWIN app with Single-Logout](./samples/OwinSingleLogoutSample/)
 

@@ -182,7 +182,7 @@ try
 }
 catch (Exception exception)
 {
-    //NLog: catch setup errors
+    // NLog: catch setup errors
     logger.Error(exception, "Stopped program because of exception");
     throw;
 }

@@ -6,7 +6,6 @@ using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -182,7 +181,7 @@ try
 }
 catch (Exception exception)
 {
-    //NLog: catch setup errors
+    // NLog: catch setup errors
     logger.Error(exception, "Stopped program because of exception");
     throw;
 }

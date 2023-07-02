@@ -41,7 +41,6 @@ jobs:
           dotnet build -c Release
           msbuild -version
           msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore
-          msbuild samples/OwinSingleLogoutSample/OwinSingleLogoutSample.csproj -noLogo -verbosity:minimal -restore
       - name: Build static assets
         if: matrix.os == 'ubuntu-latest'
         run: |

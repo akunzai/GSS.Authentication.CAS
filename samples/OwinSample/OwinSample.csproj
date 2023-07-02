@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="DependencyInjection\ServiceCollectionExtensions.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -84,9 +85,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Mvc" />
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" />
@@ -97,12 +101,17 @@
     <PackageReference Include="NLog.Owin.Logging" />
     <PackageReference Include="NLog.Web" />
     <PackageReference Include="Owin.OAuthGeneric" />
+    <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">
       <Project>{7d78728a-b592-41e6-83bf-7a83d6e868ad}</Project>
       <Name>GSS.Authentication.CAS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj">
+      <Project>{5e8f18a4-2648-4a87-b55d-092369b2f305}</Project>
+      <Name>GSS.Authentication.CAS.DistributedCache</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
       <Project>{9cd61773-631d-4ba7-a723-2bc1fff31c66}</Project>

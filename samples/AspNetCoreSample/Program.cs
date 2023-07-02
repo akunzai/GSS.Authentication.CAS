@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -14,6 +15,21 @@ using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+var singleLogout = builder.Configuration.GetValue("Authentication:CAS:SingleLogout", false);
+if (singleLogout)
+{
+    builder.Services.AddDistributedMemoryCache();
+    var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
+    if (!string.IsNullOrWhiteSpace(redisConfiguration))
+    {
+        builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
+    }
+
+    builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
+    builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
+    builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+        .Configure<ITicketStore>((o, t) => o.SessionStore = t);
+}
 
 builder.Services.AddRazorPages();
 builder.Services.AddAuthorization(options =>
@@ -53,7 +69,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCAS(options =>
     {
         options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
-        options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
+        // required for CasSingleLogoutMiddleware
+        options.SaveTokens = singleLogout || builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
         if (protocolVersion != 3)
         {
@@ -74,12 +91,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
             if (assertion.Attributes.TryGetValue("display_name", out var displayName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
 
             if (assertion.Attributes.TryGetValue("email", out var email))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email!));
             }
 
             return Task.CompletedTask;
@@ -204,6 +221,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+if (singleLogout)
+{
+    app.UseCasSingleLogout();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

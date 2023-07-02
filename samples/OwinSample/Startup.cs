@@ -13,6 +13,7 @@ using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
@@ -24,6 +25,7 @@ using NLog.Extensions.Logging;
 using NLog.Owin.Logging;
 using Owin;
 using Owin.OAuthGeneric;
+using OwinSample.DependencyInjection;
 
 [assembly: OwinStartup(typeof(OwinSample.Startup))]
 
@@ -42,6 +44,14 @@ namespace OwinSample
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
+
+            var singleLogout = _configuration.GetValue("Authentication:CAS:SingleLogout", false);
+            var services = new ServiceCollection();
+            if (singleLogout)
+            {
+                services.AddSingleLogout(_configuration);
+            }
+            var resolver = services.BuildServiceProvider();
 
             // MVC
             GlobalFilters.Filters.Add(new AuthorizeAttribute());
@@ -68,6 +78,11 @@ namespace OwinSample
                 await next.Invoke();
             });
 
+            if (singleLogout)
+            {
+                app.UseCasSingleLogout(resolver.GetRequiredService<IAuthenticationSessionStore>());
+            }
+
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -76,6 +91,7 @@ namespace OwinSample
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
+                SessionStore = singleLogout ? resolver.GetRequiredService<IAuthenticationSessionStore>() : null,
                 Provider = new CookieAuthenticationProvider
                 {
                     OnResponseSignOut = context =>
@@ -91,7 +107,7 @@ namespace OwinSample
                             // Single Sign-Out
                             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                             var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
-                            var redirectUri = new UriBuilder(_configuration["Authentication:CAS:ServerUrlBase"]);
+                            var redirectUri = new UriBuilder(_configuration["Authentication:CAS:ServerUrlBase"]!);
                             redirectUri.Path += "/logout";
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
@@ -104,9 +120,10 @@ namespace OwinSample
 
             app.UseCasAuthentication(options =>
             {
-                options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"];
+                options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"]!;
                 options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
-                options.SaveTokens = _configuration.GetValue("Authentication:CAS:SaveTokens", false);
+                // required for CasSingleLogoutMiddleware
+                options.SaveTokens = singleLogout || _configuration.GetValue("Authentication:CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);

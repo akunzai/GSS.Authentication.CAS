@@ -1,7 +1,7 @@
 // This script sets up HTTPS for the application using the ASP.NET Core HTTPS certificate
-const fs = require('fs');
-const spawn = require('child_process').spawn;
-const path = require('path');
+import { existsSync } from 'fs';
+import { spawn } from 'child_process';
+import { join } from 'path';
 
 const baseFolder =
   process.env.APPDATA !== undefined && process.env.APPDATA !== ''
@@ -22,10 +22,10 @@ if (!certificateName) {
   process.exit(-1);
 }
 
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+const certFilePath = join(baseFolder, `${certificateName}.pem`);
+const keyFilePath = join(baseFolder, `${certificateName}.key`);
 
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+if (!existsSync(certFilePath) || !existsSync(keyFilePath)) {
   spawn(
     'dotnet',
     [

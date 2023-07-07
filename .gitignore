@@ -371,7 +371,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # React.js
-build/
+dist/
 .env.local
 .env.development.local
 .env.test.local

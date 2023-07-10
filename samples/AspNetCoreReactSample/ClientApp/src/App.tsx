@@ -1,17 +1,26 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Redirect, Route, Router, Switch } from 'wouter';
 import { Home, Layout, Login } from './components';
 
 export default function App(): JSX.Element {
-  const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
+  const baseUrl = document
+    .getElementsByTagName('base')[0]
+    .getAttribute('href')
+    ?.replace(/[/]$/, '');
   return (
-    <BrowserRouter basename={baseUrl || ''}>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Layout>
-    </BrowserRouter>
+    <Router base={baseUrl || ''}>
+      <Layout>
+        <Switch>
+          <Route path="/">
+            <Home />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route>
+            <Redirect to="/" />
+          </Route>
+        </Switch>
+      </Layout>
+    </Router>
   );
 }

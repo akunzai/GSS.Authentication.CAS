@@ -24,8 +24,8 @@
     "wouter": "^2.11.0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.2",
     "eslint": "^8.44.0",
     "eslint-config-react-app": "^7.0.1",

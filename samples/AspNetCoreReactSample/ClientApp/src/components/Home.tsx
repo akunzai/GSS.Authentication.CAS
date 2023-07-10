@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'wouter';
 import { UserManager } from '../api';
 import { User } from '../types';
 
@@ -20,10 +20,10 @@ export function Home(): JSX.Element {
   if (!authenticated) {
     return (
       <div>
-        <h1>Hello anonymous</h1>
-        <NavLink className="btn btn-primary" to="/login">
+        <h1>Hello, anonymous</h1>
+        <Link href="/login" className="btn btn-primary">
           Login
-        </NavLink>
+        </Link>
       </div>
     );
   }

@@ -1,21 +1,20 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 
-namespace GSS.Authentication.CAS.AspNetCore
+namespace GSS.Authentication.CAS.AspNetCore;
+
+public static class TicketStoreWrapperExtensions
 {
-    public static class TicketStoreWrapperExtensions
+    private const string ServiceTicketKey = "service_ticket";
+
+    public static void SetServiceTicket(this AuthenticationProperties properties, string ticket)
     {
-        private const string ServiceTicketKey = "service_ticket";
+        properties.StoreTokens(new List<AuthenticationToken> { new() { Name = ServiceTicketKey, Value = ticket } });
+    }
 
-        public static void SetServiceTicket(this AuthenticationProperties properties, string ticket)
-        {
-            properties.StoreTokens(new List<AuthenticationToken> { new() { Name = ServiceTicketKey, Value = ticket } });
-        }
-
-        public static string? GetServiceTicket(this AuthenticationProperties properties)
-        {
-            var ticket = properties.GetTokenValue(ServiceTicketKey);
-            return string.IsNullOrWhiteSpace(ticket) ? null : ticket;
-        }
+    public static string? GetServiceTicket(this AuthenticationProperties properties)
+    {
+        var ticket = properties.GetTokenValue(ServiceTicketKey);
+        return string.IsNullOrWhiteSpace(ticket) ? null : ticket;
     }
 }

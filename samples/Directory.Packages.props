@@ -26,7 +26,7 @@
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.4" />
-    <PackageVersion Include="NLog.Owin.Logging" Version="1.1.0" />
+    <PackageVersion Include="NLog.Owin.Logging" Version="4.0.0" />
     <PackageVersion Include="NLog.Web" Version="5.3.4" />
     <PackageVersion Include="NLog.Web.AspNetCore" Version="5.3.4" />
     <PackageVersion Include="Owin.OAuthGeneric" Version="1.0.3" />

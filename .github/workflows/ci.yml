@@ -58,6 +58,6 @@ jobs:
           dotnet test --collect:"XPlat Code Coverage"
           dotnet tool restore
           dotnet tool run reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coverlet/reports" "-reporttypes:Cobertura"
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v3
         with:
           name: unittests-${{ matrix.os }}

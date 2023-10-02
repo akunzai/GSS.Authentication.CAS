@@ -1,5 +1,6 @@
 **/PublishProfiles/**
-appsettings.*.json
+appsettings.Production.json
+appsettings.Staging.json
 [Nn][Ll]og.*.config
 *.db
 log.txt

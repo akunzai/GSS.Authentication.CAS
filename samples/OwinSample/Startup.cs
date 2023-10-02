@@ -177,7 +177,7 @@ namespace OwinSample
                 options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
                 options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
                 options.Scopes.Clear();
-                _configuration.GetValue("Authentication:OAuth:Scope", "email")
+                _configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")
                     .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList()
                     .ForEach(s => options.Scopes.Add(s));
                 options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
@@ -223,6 +223,10 @@ namespace OwinSample
                         if (user.TryGetProperty("id", out var id))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
+                        }
+                        if (user.TryGetProperty("sub", out var sub))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, sub.GetString()));
                         }
 
                         if (user.TryGetProperty("name", out var name))

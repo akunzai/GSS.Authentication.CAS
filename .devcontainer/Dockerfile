@@ -1,10 +1,10 @@
 # https://hub.docker.com/_/microsoft-dotnet-sdk/
-FROM mcr.microsoft.com/dotnet/sdk:7.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim
 
 ARG APT_URL=""
 
 # install ASP.NET Core 6.0 Runtime
-COPY --from=mcr.microsoft.com/dotnet/aspnet:6.0-bookworm-slim /usr/share/dotnet /usr/share/dotnet
+COPY --from=mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim /usr/share/dotnet /usr/share/dotnet
 
 RUN set -eux; \
     # preferred mirror site

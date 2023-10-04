@@ -73,9 +73,10 @@ builder.Services.AddAuthentication()
         options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
         options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
         options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
-        builder.Configuration.GetValue("Authentication:OAuth:Scope", "email")
+        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");

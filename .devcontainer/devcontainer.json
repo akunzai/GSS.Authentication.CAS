@@ -1,0 +1,14 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+  "name": ".NET and Keycloak",
+  // https://containers.dev/guide/dockerfile
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dotnet",
+  "workspaceFolder": "/workspaces",
+  "postStartCommand": "corepack enable",
+  // https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  }
+}

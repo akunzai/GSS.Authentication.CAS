@@ -30,9 +30,6 @@ jobs:
         with:
           dotnet-version: |
             6.0.x
-      # https://github.com/microsoft/vstest/issues/4549
-      - name: Workaround for .NET SDK 7.0.400 and vstest issue
-        run: dotnet new globaljson --sdk-version 6.0.413
       - name: Set up MSBuild
         if: matrix.os == 'windows-latest'
         uses: microsoft/setup-msbuild@v1

@@ -21,7 +21,7 @@ public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
 
     public IServiceTicketValidator? ServiceTicketValidator { get; set; }
 
-    public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
+    public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
     public new CasEvents Events
     {

@@ -50,7 +50,7 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
         // CSRF
         GenerateCorrelationId(properties);
 
-        var state = Options.StateDataFormat?.Protect(properties);
+        var state = Options.StateDataFormat.Protect(properties);
         var service = BuildRedirectUri(state == null || string.IsNullOrWhiteSpace(state)
             ? Options.CallbackPath
             : $"{Options.CallbackPath}?state={Uri.EscapeDataString(state)}");
@@ -67,7 +67,7 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
     {
         var query = Request.Query;
         var state = query["state"];
-        var properties = Options.StateDataFormat?.Unprotect(state);
+        var properties = Options.StateDataFormat.Unprotect(state);
 
         if (properties == null)
         {
@@ -102,7 +102,7 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
 
         if (Options.SaveTokens)
         {
-            properties.SetServiceTicket(serviceTicket);
+            properties.SetServiceTicket(serviceTicket!);
         }
 
         var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),
@@ -120,6 +120,15 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
             assertion);
 
         await Events.CreatingTicket(context).ConfigureAwait(false);
+        
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(context.Principal);
+#else
+        if (context.Principal == null)
+        {
+            throw new ArgumentNullException(nameof(context.Principal));
+        }
+#endif
 
         return new AuthenticationTicket(context.Principal, context.Properties, Scheme.Name);
     }

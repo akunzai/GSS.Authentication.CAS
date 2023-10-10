@@ -50,16 +50,9 @@ namespace GSS.Authentication.CAS.Owin
             if (exception != null)
             {
                 _logger.WriteWarning(exception.Message);
+                var errorContext = new CasRemoteFailureContext(Context, exception) { Properties = properties };
 
-                var errorContext = new CasRemoteFailureContext(Context, exception)
-                {
-                    Properties = properties
-                };
-
-                if (Options.Provider != null)
-                {
-                    await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
-                }
+                await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
 
                 if (errorContext.Handled)
                 {
@@ -90,10 +83,7 @@ namespace GSS.Authentication.CAS.Owin
                 ticket.Properties.RedirectUri = null;
             }
 
-            if (Options.Provider != null)
-            {
-                await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
-            }
+            await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
 
             if (context.SignInAsAuthenticationType != null && context.Identity != null)
             {
@@ -174,10 +164,7 @@ namespace GSS.Authentication.CAS.Owin
                 principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
                 properties);
 
-            if (Options.Provider != null)
-            {
-                await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
-            }
+            await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
 
             return new AuthenticationTicket(context.Identity, context.Properties);
         }

@@ -45,7 +45,7 @@ public class TicketStoreWrapper : ITicketStore
         return new ServiceTicket(
             ticket.Properties.GetServiceTicket() ?? Guid.NewGuid().ToString(),
             ticket.Principal.Claims,
-            string.IsNullOrWhiteSpace(ticket.Principal.Identity.AuthenticationType)
+            string.IsNullOrWhiteSpace(ticket.Principal.Identity?.AuthenticationType)
                 ? ticket.AuthenticationScheme
                 : ticket.Principal.Identity.AuthenticationType,
             ticket.Properties.IssuedUtc,

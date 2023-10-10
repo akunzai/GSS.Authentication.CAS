@@ -9,16 +9,21 @@ using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore;
 
-public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
-    where TOptions : CasAuthenticationOptions, new()
+public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthenticationOptions>
 {
 #if NET8_0_OR_GREATER
-    public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+    public CasAuthenticationHandler(
+        IOptionsMonitor<CasAuthenticationOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder)
         : base(options, logger, encoder)
     {
     }
 #else
-    public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder,
+    public CasAuthenticationHandler(
+        IOptionsMonitor<CasAuthenticationOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
         ISystemClock clock)
         : base(options, logger, encoder, clock)
     {
@@ -107,8 +112,8 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
 
         try
         {
-        var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),
-            properties, principal.Assertion).ConfigureAwait(false);
+            var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),
+                properties, principal.Assertion).ConfigureAwait(false);
             return HandleRequestResult.Success(ticket);
         }
         catch (Exception exception)
@@ -117,7 +122,7 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
         }
     }
 
-    protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal,
+    private async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal,
         AuthenticationProperties properties, Assertion assertion)
     {
         var context = new CasCreatingTicketContext(principal, properties, Context, Scheme, Options, Options.Backchannel,

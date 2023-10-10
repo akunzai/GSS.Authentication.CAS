@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 namespace GSS.Authentication.CAS.AspNetCore;
 
 /// <summary>
-/// Configuration options for <see cref="CasAuthenticationHandler{TOptions}"/>
+/// Configuration options for <see cref="CasAuthenticationHandler"/>
 /// </summary>
 public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
 {

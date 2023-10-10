@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -6,9 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore;
 
-internal class CasPostConfigureOptions<TOptions, THandler> : IPostConfigureOptions<TOptions>
-    where TOptions : CasAuthenticationOptions, new()
-    where THandler : CasAuthenticationHandler<TOptions>
+internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthenticationOptions>
 {
     private readonly IDataProtectionProvider _dataProtection;
 

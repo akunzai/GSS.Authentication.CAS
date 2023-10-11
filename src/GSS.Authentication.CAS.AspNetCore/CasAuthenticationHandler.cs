@@ -105,12 +105,16 @@ public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TO
             properties.SetServiceTicket(serviceTicket!);
         }
 
+        try
+        {
         var ticket = await CreateTicketAsync(principal as ClaimsPrincipal ?? new ClaimsPrincipal(principal),
             properties, principal.Assertion).ConfigureAwait(false);
-
-        return ticket != null
-            ? HandleRequestResult.Success(ticket)
-            : HandleRequestResult.Fail("Failed to retrieve user information from remote server.");
+            return HandleRequestResult.Success(ticket);
+        }
+        catch (Exception exception)
+        {
+            return HandleRequestResult.Fail(exception, properties);
+        }
     }
 
     protected virtual async Task<AuthenticationTicket> CreateTicketAsync(ClaimsPrincipal principal,

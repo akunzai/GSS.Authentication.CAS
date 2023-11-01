@@ -28,5 +28,8 @@
     "eslint": "^8.52.0",
     "eslint-config-react-app": "^7.0.1",
     "vite": "^4.5.0"
+  },
+  "resolutions": {
+    "semver": "^7.5.4"
   }
 }

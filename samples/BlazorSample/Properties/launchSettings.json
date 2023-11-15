@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "BlazorServerSample": {
+    "BlazorSample": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

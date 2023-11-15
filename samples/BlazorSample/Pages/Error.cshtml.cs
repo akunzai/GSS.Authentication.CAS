@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BlazorServerSample.Pages;
+namespace BlazorSample.Pages;
 
 [AllowAnonymous]
 [IgnoreAntiforgeryToken]

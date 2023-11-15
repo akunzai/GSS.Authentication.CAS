@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/microsoft-dotnet-sdk/
-FROM mcr.microsoft.com/dotnet/sdk:7.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/sdk:8.0
 
 ARG APT_URL=""
 

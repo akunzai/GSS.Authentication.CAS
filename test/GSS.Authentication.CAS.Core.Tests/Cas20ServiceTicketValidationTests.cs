@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http;
 using System.Security.Authentication;
 using System.Text;
 using GSS.Authentication.CAS.Validation;

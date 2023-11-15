@@ -33,7 +33,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication()
     .AddCAS(options =>
     {
-        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
+        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"]!;
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
         if (protocolVersion != 3)
         {
@@ -52,14 +52,14 @@ builder.Services.AddAuthentication()
             // Map claims from assertion
             var assertion = context.Assertion;
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrEmpty(displayName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
 
-            if (assertion.Attributes.TryGetValue("email", out var email))
+            if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrEmpty(email))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email!));
             }
 
             return Task.CompletedTask;
@@ -68,12 +68,12 @@ builder.Services.AddAuthentication()
     .AddOAuth(OAuthDefaults.DisplayName, options =>
     {
         options.CallbackPath = "/signin-oauth";
-        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"];
-        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
-        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
-        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
-        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")
+        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"]!;
+        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"]!;
+        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"]!;
+        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"]!;
+        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
@@ -122,12 +122,12 @@ builder.Services.AddAuthentication()
         options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
         options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
         options.ResponseType =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
         options.ResponseMode =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
-        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
+        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.Events.OnRemoteFailure = context =>
         {

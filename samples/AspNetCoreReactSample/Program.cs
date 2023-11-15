@@ -37,7 +37,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             if (builder.Configuration.GetValue("Authentication:CAS:SingleSignOut", false))
             {
                 // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]);
+                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]!);
                 var request = context.Request;
                 var serviceUrl = context.Properties.RedirectUri ??
                                  $"{request.Scheme}://{request.Host}/{request.PathBase}";
@@ -54,7 +54,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     })
     .AddCAS(options =>
     {
-        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"];
+        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"]!;
         options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
         var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
         if (protocolVersion != 3)
@@ -74,14 +74,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             // Map claims from assertion
             var assertion = context.Assertion;
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrWhiteSpace(displayName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
 
-            if (assertion.Attributes.TryGetValue("email", out var email))
+            if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrWhiteSpace(email))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email!));
             }
 
             return Task.CompletedTask;
@@ -90,12 +90,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddOAuth(OAuthDefaults.DisplayName, options =>
     {
         options.CallbackPath = "/signin-oauth";
-        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"];
-        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"];
-        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"];
-        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"];
-        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")
+        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"]!;
+        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"]!;
+        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"]!;
+        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"]!;
+        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
@@ -145,12 +145,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
         options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
         options.ResponseType =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code);
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
         options.ResponseMode =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query);
+            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
-        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")
+        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens", false);
     });

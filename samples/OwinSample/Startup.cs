@@ -146,12 +146,12 @@ namespace OwinSample
                             return Task.CompletedTask;
                         // Map claims from assertion
                         context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName))
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrWhiteSpace(displayName))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
 
-                        if (assertion.Attributes.TryGetValue("email", out var email))
+                        if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrWhiteSpace(email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }

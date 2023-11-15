@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using RichardSzalay.MockHttp;
 using Xunit;

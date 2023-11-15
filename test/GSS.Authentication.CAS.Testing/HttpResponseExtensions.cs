@@ -1,4 +1,6 @@
-﻿namespace GSS.Authentication.CAS.Testing;
+﻿using System.Net.Http;
+
+namespace GSS.Authentication.CAS.Testing;
 
 public static class HttpResponseExtensions
 {

@@ -6,7 +6,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "dotnet",
   "workspaceFolder": "/workspaces",
-  "postStartCommand": "corepack enable",
+  "postAttachCommand": "corepack enable",
   // https://containers.dev/features.
   "features": {
     "ghcr.io/devcontainers/features/node:1": {}

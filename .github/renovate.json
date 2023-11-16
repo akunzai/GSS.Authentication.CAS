@@ -12,5 +12,9 @@
   ],
   "postUpdateOptions": [
     "yarnDedupeHighest"
-  ]
+  ],
+  "recreateWhen": "never",
+  "major": {
+    "dependencyDashboardApproval": true
+  }
 }

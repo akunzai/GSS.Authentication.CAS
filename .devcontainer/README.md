@@ -23,6 +23,6 @@ docker compose up -d
 cd ../samples/AspNetSample
 dotnet run
 
-# browser sample app and sign-in as demo user (test:test)
+# browse sample app and sign-in as demo user (test:test)
 open https://localhost:5001
 ```

@@ -13,11 +13,8 @@
 > The following instrstuctions are for macOS environment
 
 ```sh
-# set up hostname
-./scripts/setup-host.sh
-
-# set up TLS certificates
-./scripts/setup-tls.sh
+# set up TLS certs and hosts in Host
+./init.sh auth.dev.local
 
 # run the Dev Containers
 docker compose up -d

@@ -25,11 +25,11 @@ services:
       KC_HOSTNAME: auth.dev.local
       KC_HTTP_ENABLED: 'true'
       KC_HTTPS_PORT: 443
-      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/tls/cert.pem
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/tls/key.pem
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/key.pem
     volumes:
       - keycloak-data:/opt/keycloak/data
-      - ./keycloak/tls:/opt/keycloak/tls
+      - ./certs:/opt/keycloak/certs
       - ./keycloak/export:/opt/keycloak/data/export
       - ./keycloak/import:/opt/keycloak/data/import
     command: start --optimized --import-realm

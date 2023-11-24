@@ -9,6 +9,10 @@
     <PackageReference Include="RichardSzalay.MockHttp" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj" />
   </ItemGroup>

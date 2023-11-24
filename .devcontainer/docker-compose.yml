@@ -15,7 +15,10 @@ services:
     command: sleep infinity
 
   keycloak:
-    build: ./keycloak
+    build: 
+      context: ./keycloak
+      args:
+        KEYCLOAK_VERSION: 23.0.0
     image: keycloak:cas
     environment:
       # https://www.keycloak.org/server/configuration

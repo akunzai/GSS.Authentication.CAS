@@ -1,8 +1,11 @@
 <Project>
 
   <PropertyGroup>
-    <Authors>Galaxy Software Services Corporation</Authors>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>

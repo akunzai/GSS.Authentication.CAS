@@ -26,7 +26,7 @@ public class DistributedCacheServiceTicketStoreTests
         var expected = GenerateNewServiceTicket();
 
         // Act
-        var key = await _serviceTickets.StoreAsync(expected).ConfigureAwait(false);
+        var key = await _serviceTickets.StoreAsync(expected);
 
         // Assert
         Assert.NotNull(key);
@@ -40,12 +40,12 @@ public class DistributedCacheServiceTicketStoreTests
         var expected = GenerateNewServiceTicket();
 
         // Act
-        await _serviceTickets.RenewAsync(key, expected).ConfigureAwait(false);
+        await _serviceTickets.RenewAsync(key, expected);
 
         // Assert
-        var ignored = await _serviceTickets.RetrieveAsync(expected.TicketId).ConfigureAwait(false);
+        var ignored = await _serviceTickets.RetrieveAsync(expected.TicketId);
         Assert.Null(ignored);
-        var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
+        var actual = await _serviceTickets.RetrieveAsync(key);
         Assert.NotNull(actual);
     }
 
@@ -54,16 +54,16 @@ public class DistributedCacheServiceTicketStoreTests
     {
         // Arrange
         var existEntry = GenerateNewServiceTicket();
-        var key = await _serviceTickets.StoreAsync(existEntry).ConfigureAwait(false);
+        var key = await _serviceTickets.StoreAsync(existEntry);
         var newEntry = GenerateNewServiceTicket();
 
         // Act
-        await _serviceTickets.RenewAsync(key, newEntry).ConfigureAwait(false);
+        await _serviceTickets.RenewAsync(key, newEntry);
 
         // Assert
-        var exist = await _serviceTickets.RetrieveAsync(existEntry.TicketId).ConfigureAwait(false);
+        var exist = await _serviceTickets.RetrieveAsync(existEntry.TicketId);
         Assert.NotNull(exist);
-        var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
+        var actual = await _serviceTickets.RetrieveAsync(key);
         Assert.NotNull(actual);
     }
 
@@ -72,10 +72,10 @@ public class DistributedCacheServiceTicketStoreTests
     {
         // Arrange
         var expected = GenerateNewServiceTicket();
-        var key = await _serviceTickets.StoreAsync(expected).ConfigureAwait(false);
+        var key = await _serviceTickets.StoreAsync(expected);
 
         // Act
-        var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
+        var actual = await _serviceTickets.RetrieveAsync(key);
 
         // Assert
         Assert.NotNull(actual);
@@ -92,13 +92,13 @@ public class DistributedCacheServiceTicketStoreTests
     {
         // Arrange
         var expected = GenerateNewServiceTicket();
-        var key = await _serviceTickets.StoreAsync(expected).ConfigureAwait(false);
+        var key = await _serviceTickets.StoreAsync(expected);
 
         // Act
-        await _serviceTickets.RemoveAsync(key).ConfigureAwait(false);
+        await _serviceTickets.RemoveAsync(key);
 
         // Assert
-        var actual = await _serviceTickets.RetrieveAsync(key).ConfigureAwait(false);
+        var actual = await _serviceTickets.RetrieveAsync(key);
         Assert.Null(actual);
     }
 

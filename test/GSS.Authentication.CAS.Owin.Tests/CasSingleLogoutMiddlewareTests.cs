@@ -19,7 +19,7 @@ public class CasSingleLogoutMiddlewareTests
         content.Headers.ContentType = null;
 
         // Act
-        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
         store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -38,7 +38,7 @@ public class CasSingleLogoutMiddlewareTests
         );
 
         // Act
-        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
         store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -64,7 +64,7 @@ public class CasSingleLogoutMiddlewareTests
         });
 
         // Act
-        using var response = await server.HttpClient.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
         Assert.Equal(ticket, removedTicket);

@@ -27,11 +27,11 @@ public class CasAuthenticationMiddlewareTests
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
 
         // Act
-        using var response = await client.GetAsync("/").ConfigureAwait(false);
+        using var response = await client.GetAsync("/");
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, response.StatusCode);
@@ -47,11 +47,11 @@ public class CasAuthenticationMiddlewareTests
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
 
         // Act
-        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -80,7 +80,7 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
@@ -89,13 +89,13 @@ public class CasAuthenticationMiddlewareTests
             .ReturnsAsync(principal);
 
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
+        using var signInResponse = await client.SendAsync(signInRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -108,10 +108,10 @@ public class CasAuthenticationMiddlewareTests
         Assert.Equal("/", signInResponse.Headers.Location?.OriginalString);
 
         using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
-        using var authorizedResponse = await client.SendAsync(authorizedRequest).ConfigureAwait(false);
+        using var authorizedResponse = await client.SendAsync(authorizedRequest);
 
         Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
-        var bodyText = await authorizedResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
         Assert.Equal(principal.GetPrincipalName(), bodyText);
         ticketValidator
             .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -129,7 +129,7 @@ public class CasAuthenticationMiddlewareTests
             options.CasServerUrlBase = CasServerUrlBase;
         });
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         ticketValidator
@@ -137,7 +137,7 @@ public class CasAuthenticationMiddlewareTests
             .Throws(new NotSupportedException("test"));
 
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
 
@@ -146,7 +146,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest).ConfigureAwait(false);
+            await client.SendAsync(signInRequest);
         }
         catch (Exception e)
         {
@@ -179,7 +179,7 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         ticketValidator
@@ -187,13 +187,13 @@ public class CasAuthenticationMiddlewareTests
             .Throws(new NotSupportedException("test"));
 
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
+        using var signInResponse = await client.SendAsync(signInRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -212,7 +212,7 @@ public class CasAuthenticationMiddlewareTests
             options.Events = new CasEvents { OnCreatingTicket = _ => throw new NotSupportedException("test") };
         });
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
@@ -221,7 +221,7 @@ public class CasAuthenticationMiddlewareTests
             .ReturnsAsync(principal);
 
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
 
@@ -230,7 +230,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest).ConfigureAwait(false);
+            await client.SendAsync(signInRequest);
         }
         catch (Exception e)
         {
@@ -262,18 +262,18 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
 
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath).ConfigureAwait(false);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest).ConfigureAwait(false);
+        using var signInResponse = await client.SendAsync(signInRequest);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -301,15 +301,14 @@ public class CasAuthenticationMiddlewareTests
                             signInApp.Run(async context =>
                             {
                                 await context.ChallengeAsync(CasDefaults.AuthenticationType,
-                                    new AuthenticationProperties { RedirectUri = "/" }).ConfigureAwait(false);
+                                    new AuthenticationProperties { RedirectUri = "/" });
                             });
                         });
                         app.Map(CookieAuthenticationDefaults.LogoutPath, signOutApp =>
                         {
                             signOutApp.Run(async context =>
                             {
-                                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
-                                    .ConfigureAwait(false);
+                                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                             });
                         });
                         app.Run(async context =>
@@ -319,7 +318,7 @@ public class CasAuthenticationMiddlewareTests
                             {
                                 // This is what [Authorize] calls
                                 // The cookie middleware will intercept this 401 and redirect to LoginPath
-                                await context.ChallengeAsync().ConfigureAwait(false);
+                                await context.ChallengeAsync();
                                 return;
                             }
 
@@ -328,7 +327,7 @@ public class CasAuthenticationMiddlewareTests
                             {
                                 await context.Response
                                     .WriteAsync(claimsIdentity.FindFirst(claimsIdentity.NameClaimType)?.Value ??
-                                                string.Empty).ConfigureAwait(false);
+                                                string.Empty);
                             }
                         });
                     });

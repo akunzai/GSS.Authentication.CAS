@@ -19,13 +19,13 @@ public class CasSingleLogoutMiddlewareTests
         var store = new Mock<ITicketStore>();
         using var host = CreateHost(store.Object);
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         using var content = new StringContent("TEST");
         content.Headers.ContentType = null;
 
         // Act
-        using var response = await client.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await client.PostAsync("/", content);
 
         // Assert
         store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -38,7 +38,7 @@ public class CasSingleLogoutMiddlewareTests
         var store = new Mock<ITicketStore>();
         using var host = CreateHost(store.Object);
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         using var content = new StringContent(
             JsonSerializer.Serialize(new { logoutRequest = new { ticket = Guid.NewGuid().ToString() } }),
@@ -47,7 +47,7 @@ public class CasSingleLogoutMiddlewareTests
         );
 
         // Act
-        using var response = await client.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await client.PostAsync("/", content);
 
         // Assert
         store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
@@ -64,7 +64,7 @@ public class CasSingleLogoutMiddlewareTests
             .Returns(Task.CompletedTask);
         using var host = CreateHost(store.Object);
         var server = host.GetTestServer();
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -76,7 +76,7 @@ public class CasSingleLogoutMiddlewareTests
         });
 
         // Act
-        using var response = await client.PostAsync("/", content).ConfigureAwait(false);
+        using var response = await client.PostAsync("/", content);
 
         // Assert
         Assert.Equal(ticket, removedTicket);
@@ -96,7 +96,7 @@ public class CasSingleLogoutMiddlewareTests
             .Build();
 
         // Act & Assert
-        await host.StartAsync().ConfigureAwait(false);
+        await host.StartAsync();
     }
 
     private static IHost CreateHost(ITicketStore store)

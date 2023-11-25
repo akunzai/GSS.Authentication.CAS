@@ -21,7 +21,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="NLog.Web.AspNetCore" />
     <PackageReference Include="StackExchange.Redis" />
-    <PackageReference Include="System.Drawing.Common" />
   </ItemGroup>
 
   <ItemGroup>

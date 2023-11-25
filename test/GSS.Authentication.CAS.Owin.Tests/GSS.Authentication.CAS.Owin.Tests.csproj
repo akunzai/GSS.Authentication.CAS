@@ -6,10 +6,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" VersionOverride="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" />
     <PackageReference Include="Microsoft.Owin.Testing" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>

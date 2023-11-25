@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <!-- https://aka.ms/vs-build-acceleration -->
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'">

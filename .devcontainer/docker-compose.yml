@@ -1,5 +1,5 @@
 version: '2'
-
+name: auth-cas_devcontainer
 services:
   dotnet:
     # https://github.com/devcontainers/images/blob/main/src/dotnet

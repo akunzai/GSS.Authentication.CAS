@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md。
+      "name": ".NET Core Launch (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      // Needs change path when updating target Framework
+      "program": "${workspaceFolder}/samples/AspNetCoreSample/bin/Debug/net8.0/AspNetCoreSample.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/samples/AspNetCoreSample",
+      "stopAtEntry": false,
+      // https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ services:
   dotnet:
     # https://github.com/devcontainers/images/blob/main/src/dotnet
     build: .
-    image: dotnet:mono
+    image: dotnet-sdk:mono
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       PATH: $PATH:/home/vscode/.dotnet:/home/vscode/.dotnet/tools

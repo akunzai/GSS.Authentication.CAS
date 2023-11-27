@@ -10,19 +10,30 @@
 
 ## Getting Start
 
-> The following instrstuctions are for macOS environment
-
 ```sh
 # set up TLS certs and hosts in Host
 ./init.sh auth.dev.local
 
-# run the Dev Containers
+# starting container
 docker compose up -d
 
 # run the sample app in Host
-cd ../samples/AspNetSample
+cd ../samples/AspNetCoreSample
 dotnet run
-
-# browse sample app and sign-in as demo user (test:test)
-open https://localhost:5001
 ```
+
+## Admin URLs
+
+- [Keycloak](https://auth.dev.local)
+
+## Credentials
+
+### Keycloak admin
+
+- Username: `admin`
+- Password: `admin`
+
+### Keycloak user
+
+- Username: `test`
+- Password: `test`

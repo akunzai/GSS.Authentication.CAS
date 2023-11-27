@@ -7,8 +7,17 @@
   "service": "dotnet",
   "workspaceFolder": "/workspaces",
   "postAttachCommand": "corepack enable",
-  // https://containers.dev/features.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "josefpihrt-vscode.roslynator"
+      ]
+    }
+  },
+  // https://containers.dev/features
   "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/node:1": {}
   }
 }

@@ -51,7 +51,7 @@
     <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.2" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.8.0" />
-    <PackageVersion Include="Moq" Version="4.20.69" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.5" />

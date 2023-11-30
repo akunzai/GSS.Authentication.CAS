@@ -4,6 +4,8 @@
     <LangVersion>latest</LangVersion>
     <!-- https://aka.ms/vs-build-acceleration -->
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <!-- https://learn.microsoft.com/nuget/consume-packages/package-references-in-project-files#enabling-the-lock-file -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'">

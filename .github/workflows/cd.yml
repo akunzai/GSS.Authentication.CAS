@@ -2,15 +2,11 @@ name: CD
 
 on:
   push:
-    branches:
-      - main
-      - "release/*"
     tags:
-      - "*"
-  # Allow manually triggering the workflow.
-  workflow_dispatch:
+      - "v*"
 
-permissions: read-all
+permissions: 
+    contents: write
 
 jobs:
   deploy:
@@ -28,3 +24,14 @@ jobs:
           dotnet pack -o packages
       - name: Publish to NuGet.org
         run: dotnet nuget push "packages/*.nupkg" -k ${{ secrets.NUGET_AUTH_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Pre-release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') && (contains(github.ref,'dev') || contains(github.ref,'beta') || contains(github.ref,'alpha') || contains(github.ref,'rc'))
+        with:
+          prerelease: true
+          generate_release_notes: true
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') && !(contains(github.ref,'dev') || contains(github.ref,'beta') || contains(github.ref,'alpha') || contains(github.ref,'rc'))
+        with:
+          generate_release_notes: true

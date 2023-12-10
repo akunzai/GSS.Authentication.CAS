@@ -21,7 +21,7 @@ public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
 
     public string AuthenticationType => CasDefaults.AuthenticationType;
 
-    public IServiceTicketValidator? ServiceTicketValidator { get; set; }
+    public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
 
     public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
     

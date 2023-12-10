@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using AspNetCoreIdentitySample.Data;
 using GSS.Authentication.CAS.AspNetCore;
-using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
@@ -34,17 +33,6 @@ builder.Services.AddAuthentication()
     .AddCAS(options =>
     {
         options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"]!;
-        var protocolVersion = builder.Configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
-        if (protocolVersion != 3)
-        {
-            options.ServiceTicketValidator = protocolVersion switch
-            {
-                1 => new Cas10ServiceTicketValidator(options),
-                2 => new Cas20ServiceTicketValidator(options),
-                _ => null
-            };
-        }
-
         options.Events.OnCreatingTicket = context =>
         {
             if (context.Identity == null)

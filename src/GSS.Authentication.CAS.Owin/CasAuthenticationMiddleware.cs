@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
@@ -49,20 +48,10 @@ namespace GSS.Authentication.CAS.Owin
                 Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (Options.ServiceTicketValidator == null)
             {
-#pragma warning disable CA2000 // Dispose objects before losing scope
-#pragma warning disable IDE0067 // Dispose objects before losing scope
-                var httpClient = new HttpClient(Options.BackchannelHttpHandler ?? new HttpClientHandler())
-#pragma warning restore IDE0067 // Dispose objects before losing scope
-#pragma warning restore CA2000 // Dispose objects before losing scope
-                {
-                    Timeout = Options.BackchannelTimeout,
-                    MaxResponseContentBufferSize = 1024 * 1024 * 10 // 10 MB
-                };
-                httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET CAS middleware");
-                httpClient.DefaultRequestHeaders.ExpectContinue = false;
+                var httpClient = Options.BackchannelFactory(Options);
                 Options.ServiceTicketValidator = new Cas30ServiceTicketValidator(Options, httpClient);
             }
         }

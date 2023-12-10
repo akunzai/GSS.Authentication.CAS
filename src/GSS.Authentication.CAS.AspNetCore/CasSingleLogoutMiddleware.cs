@@ -58,11 +58,11 @@ public class CasSingleLogoutMiddleware
             var doc = XDocument.Parse(text);
             var nav = doc.CreateNavigator();
             /*
-            <samlp:LogoutRequest 
-            xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" 
-            ID="[RANDOM ID]" 
-            Version="2.0" 
+            <samlp:LogoutRequest
+            xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+            ID="[RANDOM ID]"
+            Version="2.0"
             IssueInstant="[CURRENT DATE/TIME]">
               <saml:NameID>@NOT_USED@</saml:NameID>
               <samlp:SessionIndex>[SESSION IDENTIFIER]</samlp:SessionIndex>
@@ -76,7 +76,7 @@ public class CasSingleLogoutMiddleware
         }
         catch (XmlException e)
         {
-            _logger.LogWarning(e, e.Message);
+            _logger.LogWarning(e, "{Exception}", e.Message);
         }
 
         return string.Empty;

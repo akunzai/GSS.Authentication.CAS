@@ -30,6 +30,7 @@ namespace GSS.Authentication.CAS.Owin
 
             _logger = app.CreateLogger<CasAuthenticationMiddleware>();
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (Options.Provider == null)
             {
                 Options.Provider = new CasAuthenticationProvider();

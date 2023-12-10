@@ -59,10 +59,83 @@ public class CasAuthenticationMiddlewareTests
     }
 
     [Fact]
+    public async Task SingleSignOut_ShouldRedirectToCasServer()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Events = new CasEvents
+            {
+                OnCreatingTicket = context =>
+                {
+                    var assertion = context.Assertion;
+                    if (context.Principal?.Identity is not ClaimsIdentity identity)
+                        return Task.CompletedTask;
+                    identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
+                    return Task.CompletedTask;
+                }
+            };
+        }, options =>
+        {
+            options.Events.OnSigningOut = async context =>
+            {
+                var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
+                var result = await authService.AuthenticateAsync(context.HttpContext, null);
+                var authScheme = result.Properties?.Items[".AuthScheme"];
+                if (string.Equals(authScheme, CasDefaults.AuthenticationType))
+                {
+                    options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!,
+                        context.CookieOptions);
+                    await context.HttpContext.SignOutAsync(authScheme);
+                }
+            };
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest);
+        var signOutRequest = signInResponse.GetRequestWithCookies(CookieAuthenticationDefaults.LogoutPath);
+
+        // Act
+        using var signOutResponse = await client.SendAsync(signOutRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Found, signOutResponse.StatusCode);
+        var cookie = signOutResponse.Headers.GetValues("Set-Cookie").Single();
+        Assert.StartsWith(".AspNetCore.Cookies=;", cookie);
+        var callbackUrl = QueryHelpers.AddQueryString("http://localhost/signout-callback-cas", "state", string.Empty);
+        var expectedUrlPrefix =
+            QueryHelpers.AddQueryString(CasServerUrlBase + Constants.Paths.Logout, "service", callbackUrl);
+        Assert.StartsWith(expectedUrlPrefix, signOutResponse.Headers.Location?.AbsoluteUri ?? string.Empty);
+        ticketValidator
+            .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+    }
+
+    [Fact]
     public async Task ValidatingAndCreatingTicketSuccess_ShouldResponseWithAuthCookies()
     {
         // Arrange
         var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
         using var host = CreateHost(options =>
         {
             options.ServiceTicketValidator = ticketValidator.Object;
@@ -82,16 +155,11 @@ public class CasAuthenticationMiddlewareTests
         var server = host.GetTestServer();
         await host.StartAsync();
         using var client = server.CreateClient();
-        var ticket = Guid.NewGuid().ToString();
-        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
-        ticketValidator
-            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(principal);
-
         using var challengeResponse =
             await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
@@ -139,7 +207,8 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse =
             await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         Exception? exception = null;
         try
@@ -189,7 +258,8 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse =
             await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
@@ -223,7 +293,8 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse =
             await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         Exception? exception = null;
         try
@@ -269,7 +340,8 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse =
             await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"]!, "ticket", ticket);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
@@ -280,14 +352,22 @@ public class CasAuthenticationMiddlewareTests
         Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
     }
 
-    private static IHost CreateHost(Action<CasAuthenticationOptions> configureOptions)
+    private static IHost CreateHost(Action<CasAuthenticationOptions> configureOptions,
+        Action<CookieAuthenticationOptions>? configureCookie = null)
     {
         return new HostBuilder()
             .ConfigureServices(services =>
             {
-                services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie()
+                var authBuilder = services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCAS(configureOptions);
+                if (configureCookie != null)
+                {
+                    authBuilder.AddCookie(configureCookie);
+                }
+                else
+                {
+                    authBuilder.AddCookie();
+                }
             })
             .ConfigureWebHost(webHostBuilder =>
             {

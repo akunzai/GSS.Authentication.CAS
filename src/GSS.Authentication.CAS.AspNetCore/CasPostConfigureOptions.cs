@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
@@ -6,9 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore;
 
-internal class CasPostConfigureOptions<TOptions, THandler> : IPostConfigureOptions<TOptions>
-    where TOptions : CasAuthenticationOptions, new()
-    where THandler : CasAuthenticationHandler<TOptions>
+internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthenticationOptions>
 {
     private readonly IDataProtectionProvider _dataProtection;
 
@@ -17,10 +16,24 @@ internal class CasPostConfigureOptions<TOptions, THandler> : IPostConfigureOptio
         _dataProtection = dataProtection;
     }
 
-    public void PostConfigure(string name, TOptions options)
+    public void PostConfigure(string? name, CasAuthenticationOptions options)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(name);
+#else
+        if (name == null) throw new ArgumentNullException(nameof(name));
+#endif
         options.DataProtectionProvider ??= _dataProtection;
+        
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (options.StateDataFormat == null)
+        {
+            var dataProtector = options.DataProtectionProvider.CreateProtector(
+                typeof(CasAuthenticationHandler).FullName!, name, "v1");
+            options.StateDataFormat = new PropertiesDataFormat(dataProtector);
+        }
 
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (options.Backchannel == null)
         {
 #pragma warning disable CA2000 // Dispose objects before losing scope
@@ -32,12 +45,7 @@ internal class CasPostConfigureOptions<TOptions, THandler> : IPostConfigureOptio
             options.Backchannel.Timeout = options.BackchannelTimeout;
             options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
         }
-        if (options.StateDataFormat == null)
-        {
-            var dataProtector = options.DataProtectionProvider.CreateProtector(
-                typeof(THandler).FullName, name, "v1");
-            options.StateDataFormat = new PropertiesDataFormat(dataProtector);
-        }
+        
         options.ServiceTicketValidator ??= new Cas30ServiceTicketValidator(options, options.Backchannel);
     }
 }

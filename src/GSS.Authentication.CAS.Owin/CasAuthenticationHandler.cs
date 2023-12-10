@@ -12,6 +12,7 @@ namespace GSS.Authentication.CAS.Owin
 {
     public class CasAuthenticationHandler : AuthenticationHandler<CasAuthenticationOptions>
     {
+        private const string State = "state";
         private readonly ILogger _logger;
 
         public CasAuthenticationHandler(ILogger logger)
@@ -19,12 +20,17 @@ namespace GSS.Authentication.CAS.Owin
             _logger = logger;
         }
 
+        /// <summary>
+        /// Calls InvokeReturnPathAsync
+        /// </summary>
+        /// <returns>True if the request was handled, false if the next middleware should be invoked.</returns>
         public override async Task<bool> InvokeAsync()
         {
             if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 return await InvokeReturnPathAsync().ConfigureAwait(false);
             }
+
             return false;
         }
 
@@ -50,16 +56,9 @@ namespace GSS.Authentication.CAS.Owin
             if (exception != null)
             {
                 _logger.WriteWarning(exception.Message);
+                var errorContext = new CasRemoteFailureContext(Context, exception) { Properties = properties };
 
-                var errorContext = new CasRemoteFailureContext(Context, exception)
-                {
-                    Properties = properties
-                };
-
-                if (Options.Provider != null)
-                {
-                    await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
-                }
+                await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
 
                 if (errorContext.Handled)
                 {
@@ -75,7 +74,8 @@ namespace GSS.Authentication.CAS.Owin
 
                 if (errorContext.Failure != null)
                 {
-                    throw new Exception("An error was encountered while handling the remote login.", errorContext.Failure);
+                    throw new Exception("An error was encountered while handling the remote login.",
+                        errorContext.Failure);
                 }
             }
 
@@ -90,18 +90,18 @@ namespace GSS.Authentication.CAS.Owin
                 ticket.Properties.RedirectUri = null;
             }
 
-            if (Options.Provider != null)
-            {
-                await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
-            }
+            await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
 
             if (context.SignInAsAuthenticationType != null && context.Identity != null)
             {
                 var signInIdentity = context.Identity;
-                if (!string.Equals(signInIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))
+                if (!string.Equals(signInIdentity.AuthenticationType, context.SignInAsAuthenticationType,
+                        StringComparison.Ordinal))
                 {
-                    signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType, signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
+                    signInIdentity = new ClaimsIdentity(signInIdentity.Claims, context.SignInAsAuthenticationType,
+                        signInIdentity.NameClaimType, signInIdentity.RoleClaimType);
                 }
+
                 Context.Authentication.SignIn(context.Properties, signInIdentity);
             }
 
@@ -112,6 +112,7 @@ namespace GSS.Authentication.CAS.Owin
                     // add a redirect hint that sign-in failed in some way
                     context.RedirectUri = WebUtilities.AddQueryString(context.RedirectUri, "error", "access_denied");
                 }
+
                 Response.Redirect(context.RedirectUri);
                 context.RequestCompleted();
             }
@@ -119,11 +120,15 @@ namespace GSS.Authentication.CAS.Owin
             return context.IsRequestCompleted;
         }
 
+        /// <summary>
+        /// Invoked to process incoming authentication tickets
+        /// </summary>
+        /// <returns></returns>
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             AuthenticationProperties? properties = null;
             var query = Request.Query;
-            var state = query.GetValues("state")?.FirstOrDefault() ?? string.Empty;
+            var state = query.GetValues(State)?.FirstOrDefault() ?? string.Empty;
 
             if (!string.IsNullOrWhiteSpace(state))
             {
@@ -141,7 +146,7 @@ namespace GSS.Authentication.CAS.Owin
                 return new AuthenticationTicket(null, properties);
             }
 
-            var ticket = query.GetValues("ticket")?.FirstOrDefault() ?? string.Empty;
+            var ticket = query.GetValues(Constants.Parameters.Ticket)?.FirstOrDefault() ?? string.Empty;
 
             if (string.IsNullOrEmpty(ticket))
             {
@@ -154,7 +159,8 @@ namespace GSS.Authentication.CAS.Owin
 
             if (Options.ServiceTicketValidator != null)
             {
-                principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled).ConfigureAwait(false);
+                principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
+                    .ConfigureAwait(false);
             }
 
             if (principal == null)
@@ -174,14 +180,15 @@ namespace GSS.Authentication.CAS.Owin
                 principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Identity),
                 properties);
 
-            if (Options.Provider != null)
-            {
-                await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
-            }
+            await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
 
             return new AuthenticationTicket(context.Identity, context.Properties);
         }
 
+        /// <summary>
+        /// Handles SignIn
+        /// </summary>
+        /// <returns></returns>
         protected override Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode != 401)
@@ -221,7 +228,9 @@ namespace GSS.Authentication.CAS.Owin
                 ? Options.ServiceUrlBase.AbsoluteUri.TrimEnd('/')
                 : $"{Request.Scheme}://{Request.Host}{RequestPathBase}";
             return
-                state == null || string.IsNullOrWhiteSpace(state) ? $"{baseUrl}{Options.CallbackPath}" : $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
+                state == null || string.IsNullOrWhiteSpace(state)
+                    ? $"{baseUrl}{Options.CallbackPath}"
+                    : $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
         }
     }
 }

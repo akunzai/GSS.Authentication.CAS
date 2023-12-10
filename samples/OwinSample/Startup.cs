@@ -126,13 +126,14 @@ namespace OwinSample
                 options.SaveTokens = singleLogout || _configuration.GetValue("Authentication:CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
-                var protocolVersion = _configuration.GetValue("Authentication:CAS:ProtocolVersion", 3);
+                var protocolVersion = _configuration.GetValue("CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
+                    var httpClient = options.BackchannelFactory(options);
                     options.ServiceTicketValidator = protocolVersion switch
                     {
-                        1 => new Cas10ServiceTicketValidator(options),
-                        2 => new Cas20ServiceTicketValidator(options),
+                        1 => new Cas10ServiceTicketValidator(options, httpClient),
+                        2 => new Cas20ServiceTicketValidator(options, httpClient),
                         _ => options.ServiceTicketValidator
                     };
                 }

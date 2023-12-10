@@ -173,12 +173,8 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
         }
 
         var callbackUri = BuildRedirectUri($"{Options.CallbackPath}?{State}={Uri.EscapeDataString(state!)}");
-        ICasPrincipal? principal = null;
-        if (Options.ServiceTicketValidator != null)
-        {
-            principal = await Options.ServiceTicketValidator
-                .ValidateAsync(serviceTicket!, callbackUri, Context.RequestAborted).ConfigureAwait(false);
-        }
+        var principal = await Options.ServiceTicketValidator
+            .ValidateAsync(serviceTicket!, callbackUri, Context.RequestAborted).ConfigureAwait(false);
 
         if (principal == null)
         {
@@ -209,7 +205,7 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             assertion);
 
         await Events.CreatingTicket(context).ConfigureAwait(false);
-        
+
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(context.Principal);
 #else

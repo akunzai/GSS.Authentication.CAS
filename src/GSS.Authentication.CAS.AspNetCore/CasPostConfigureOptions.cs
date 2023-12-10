@@ -3,6 +3,7 @@ using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace GSS.Authentication.CAS.AspNetCore;
@@ -10,10 +11,12 @@ namespace GSS.Authentication.CAS.AspNetCore;
 internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthenticationOptions>
 {
     private readonly IDataProtectionProvider _dataProtection;
+    private readonly IConfiguration _configuration;
 
-    public CasPostConfigureOptions(IDataProtectionProvider dataProtection)
+    public CasPostConfigureOptions(IDataProtectionProvider dataProtection, IConfiguration configuration)
     {
         _dataProtection = dataProtection;
+        _configuration = configuration;
     }
 
     public void PostConfigure(string? name, CasAuthenticationOptions options)
@@ -24,7 +27,7 @@ internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthentication
         if (name == null) throw new ArgumentNullException(nameof(name));
 #endif
         options.DataProtectionProvider ??= _dataProtection;
-        
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (options.StateDataFormat == null)
         {
@@ -36,16 +39,22 @@ internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthentication
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (options.Backchannel == null)
         {
-#pragma warning disable CA2000 // Dispose objects before losing scope
-#pragma warning disable IDE0067 // Dispose objects before losing scope
             options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
-#pragma warning restore IDE0067 // Dispose objects before losing scope
-#pragma warning restore CA2000 // Dispose objects before losing scope
             options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core CAS handler");
             options.Backchannel.Timeout = options.BackchannelTimeout;
             options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
         }
-        
-        options.ServiceTicketValidator ??= new Cas30ServiceTicketValidator(options, options.Backchannel);
+
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (options.ServiceTicketValidator == null)
+        {
+            var protocolVersion = _configuration.GetValue("CAS:ProtocolVersion", 3);
+            options.ServiceTicketValidator = protocolVersion switch
+            {
+                1 => new Cas10ServiceTicketValidator(options, options.Backchannel),
+                2 => new Cas20ServiceTicketValidator(options, options.Backchannel),
+                _ => new Cas30ServiceTicketValidator(options, options.Backchannel)
+            };
+        }
     }
 }

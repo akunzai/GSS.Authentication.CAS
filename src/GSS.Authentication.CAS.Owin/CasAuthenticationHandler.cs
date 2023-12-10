@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GSS.Authentication.CAS.Security;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -132,7 +131,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (!string.IsNullOrWhiteSpace(state))
             {
-                properties = Options.StateDataFormat?.Unprotect(state);
+                properties = Options.StateDataFormat.Unprotect(state);
             }
 
             if (properties == null)
@@ -155,17 +154,12 @@ namespace GSS.Authentication.CAS.Owin
             }
 
             var service = BuildReturnTo(state);
-            ICasPrincipal? principal = null;
-
-            if (Options.ServiceTicketValidator != null)
-            {
-                principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
-                    .ConfigureAwait(false);
-            }
+            var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
+                .ConfigureAwait(false);
 
             if (principal == null)
             {
-                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator?.GetType().FullName}]");
+                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
                 return new AuthenticationTicket(null, properties);
             }
 
@@ -211,7 +205,7 @@ namespace GSS.Authentication.CAS.Owin
                 // Anti-CSRF
                 GenerateCorrelationId(Options.CookieManager, state);
 
-                var returnTo = BuildReturnTo(Options.StateDataFormat?.Protect(state));
+                var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
 
                 var authorizationEndpoint =
                     $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";

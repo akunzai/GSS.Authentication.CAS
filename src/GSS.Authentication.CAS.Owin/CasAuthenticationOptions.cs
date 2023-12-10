@@ -79,7 +79,7 @@ namespace GSS.Authentication.CAS.Owin
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
-        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
@@ -99,11 +99,23 @@ namespace GSS.Authentication.CAS.Owin
         /// Gets or sets the <see cref="IServiceTicketValidator"/> used to validate service ticket.
         /// Default is <see cref="Cas30ServiceTicketValidator"/>.
         /// </summary>
-        public IServiceTicketValidator? ServiceTicketValidator { get; set; }
+        public IServiceTicketValidator ServiceTicketValidator { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the <see cref="ICasAuthenticationProvider"/> used to handle authentication events.
         /// </summary>
         public ICasAuthenticationProvider Provider { get; set; } = default!;
+
+        public Func<CasAuthenticationOptions, HttpClient> BackchannelFactory { get; set; } = options =>
+        {
+            var httpClient = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler())
+            {
+                Timeout = options.BackchannelTimeout, MaxResponseContentBufferSize = 1024 * 1024 * 10 // 10 MB
+            };
+            httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET CAS middleware");
+            httpClient.DefaultRequestHeaders.ExpectContinue = false;
+            return httpClient;
+        };
     }
 }

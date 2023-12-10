@@ -12,11 +12,18 @@ namespace GSS.Authentication.CAS.AspNetCore;
 public class CasAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
     where TOptions : CasAuthenticationOptions, new()
 {
+#if NET8_0_OR_GREATER
+    public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+        : base(options, logger, encoder)
+    {
+    }
+#else
     public CasAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder,
         ISystemClock clock)
         : base(options, logger, encoder, clock)
     {
     }
+#endif
 
     protected new CasEvents Events
     {

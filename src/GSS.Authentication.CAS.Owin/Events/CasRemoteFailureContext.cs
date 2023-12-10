@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.Provider;
 
 // ReSharper disable once CheckNamespace
@@ -30,23 +31,25 @@ namespace GSS.Authentication.CAS.Owin
         /// Indicates that stage of authentication was directly handled by
         /// user intervention and no further processing should be attempted.
         /// </summary>
-        internal bool Handled { get; private set; }
+        internal bool Handled => State == NotificationResultState.HandledResponse;
 
         /// <summary>
         /// Indicates that the default authentication logic should be
         /// skipped and that the rest of the pipeline should be invoked.
         /// </summary>
-        internal bool Skipped { get; private set; }
+        internal bool Skipped => State == NotificationResultState.Skipped;
 
         /// <summary>
         /// Discontinue all processing for this request and return to the client.
         /// The caller is responsible for generating the full response.
         /// </summary>
-        public void HandleResponse() => Handled = true;
+        public void HandleResponse() => State = NotificationResultState.HandledResponse;
 
         /// <summary>
         /// Discontinue processing the request in the current handler.
         /// </summary>
-        public void SkipHandler() => Skipped = true;
+        public void SkipHandler() => State = NotificationResultState.Skipped;
+
+        private NotificationResultState State { get; set; }
     }
 }

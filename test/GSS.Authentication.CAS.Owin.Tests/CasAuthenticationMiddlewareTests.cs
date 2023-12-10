@@ -78,7 +78,7 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+        var validateUrl = QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
@@ -121,7 +121,7 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+        var validateUrl = QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
         Exception? exception = null;
         try
@@ -167,7 +167,7 @@ public class CasAuthenticationMiddlewareTests
         using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
 
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+        var validateUrl = QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
@@ -200,7 +200,7 @@ public class CasAuthenticationMiddlewareTests
 
         using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+        var validateUrl = QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
         Exception? exception = null;
         try
@@ -242,7 +242,7 @@ public class CasAuthenticationMiddlewareTests
 
         using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
-        var validateUrl = QueryHelpers.AddQueryString(query["service"], "ticket", ticket);
+        var validateUrl = QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);

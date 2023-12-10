@@ -104,6 +104,7 @@ namespace OwinSample
                         );
                         if (_configuration.GetValue("Authentication:CAS:SingleSignOut", false))
                         {
+                            context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName, context.CookieOptions);
                             // Single Sign-Out
                             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                             var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
@@ -112,7 +113,6 @@ namespace OwinSample
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
                         }
-
                         context.Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }

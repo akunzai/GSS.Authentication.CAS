@@ -131,7 +131,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (!string.IsNullOrWhiteSpace(state))
             {
-                properties = Options.StateDataFormat?.Unprotect(state);
+                properties = Options.StateDataFormat.Unprotect(state);
             }
 
             if (properties == null)
@@ -205,7 +205,7 @@ namespace GSS.Authentication.CAS.Owin
                 // Anti-CSRF
                 GenerateCorrelationId(Options.CookieManager, state);
 
-                var returnTo = BuildReturnTo(Options.StateDataFormat?.Protect(state));
+                var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
 
                 var authorizationEndpoint =
                     $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";

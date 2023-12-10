@@ -79,7 +79,7 @@ namespace GSS.Authentication.CAS.Owin
         /// <summary>
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
-        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.

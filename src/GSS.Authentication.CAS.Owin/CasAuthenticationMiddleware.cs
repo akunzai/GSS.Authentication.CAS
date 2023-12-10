@@ -35,6 +35,7 @@ namespace GSS.Authentication.CAS.Owin
                 Options.Provider = new CasAuthenticationProvider();
             }
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (Options.StateDataFormat == null)
             {
                 var dataProtector = app.CreateDataProtector(

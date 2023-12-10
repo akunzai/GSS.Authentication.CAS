@@ -1,12 +1,13 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
@@ -25,31 +26,17 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Events.OnSigningOut = context =>
+        options.Events.OnSigningOut = async context =>
         {
-            var redirectContext = new RedirectContext<CookieAuthenticationOptions>(
-                context.HttpContext,
-                context.Scheme,
-                context.Options,
-                context.Properties,
-                "/"
-            );
-            if (builder.Configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+            var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
+            var result = await authService.AuthenticateAsync(context.HttpContext, null);
+            var authScheme = result.Properties?.Items[".AuthScheme"];
+            if (string.Equals(authScheme,CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
             {
-                // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]!);
-                var request = context.Request;
-                var serviceUrl = context.Properties.RedirectUri ??
-                                 $"{request.Scheme}://{request.Host}/{request.PathBase}";
-                redirectContext.RedirectUri = UriHelper.BuildAbsolute(
-                    casUrl.Scheme,
-                    new HostString(casUrl.Host, casUrl.Port),
-                    casUrl.LocalPath, "/logout",
-                    QueryString.Create("service", serviceUrl));
+                options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
+                // redirecting to the identity provider to sign out
+                await context.HttpContext.SignOutAsync(authScheme);
             }
-
-            context.Options.Events.RedirectToLogout(redirectContext);
-            return Task.CompletedTask;
         };
     })
     .AddCAS(options =>

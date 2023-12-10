@@ -7,7 +7,7 @@ using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
@@ -40,30 +40,17 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Events.OnSigningOut = context =>
+        options.Events.OnSigningOut = async context =>
         {
-            var redirectContext = new RedirectContext<CookieAuthenticationOptions>(
-                context.HttpContext,
-                context.Scheme,
-                context.Options,
-                context.Properties,
-                "/"
-            );
-            if (builder.Configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+            var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
+            var result = await authService.AuthenticateAsync(context.HttpContext, null);
+            var authScheme = result.Properties?.Items[".AuthScheme"];
+            if (string.Equals(authScheme, CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
             {
-                // Single Sign-Out
-                var casUrl = new Uri(builder.Configuration["Authentication:CAS:ServerUrlBase"]!);
-                var links = context.HttpContext.RequestServices.GetRequiredService<LinkGenerator>();
-                var serviceUrl = context.Properties.RedirectUri ?? links.GetUriByPage(context.HttpContext, "/Index");
-                redirectContext.RedirectUri = UriHelper.BuildAbsolute(
-                    casUrl.Scheme,
-                    new HostString(casUrl.Host, casUrl.Port),
-                    casUrl.LocalPath, "/logout",
-                    QueryString.Create("service", serviceUrl!));
+                options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
+                // redirecting to the identity provider to sign out
+                await context.HttpContext.SignOutAsync(authScheme);
             }
-
-            context.Options.Events.RedirectToLogout(redirectContext);
-            return Task.CompletedTask;
         };
     })
     .AddCAS(options =>
@@ -89,7 +76,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             // Map claims from assertion
             var assertion = context.Assertion;
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrWhiteSpace(displayName))
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName) &&
+                !string.IsNullOrWhiteSpace(displayName))
             {
                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }

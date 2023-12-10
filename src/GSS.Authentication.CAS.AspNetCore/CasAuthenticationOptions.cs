@@ -23,7 +23,7 @@ public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
 
     public IServiceTicketValidator? ServiceTicketValidator { get; set; }
 
-    public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+    public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; } = default!;
     
     /// <summary>
     /// The request path within the application's base path where the user agent will be returned after sign out from the CAS server.

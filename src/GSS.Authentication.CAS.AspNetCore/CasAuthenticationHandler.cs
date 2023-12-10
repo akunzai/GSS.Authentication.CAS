@@ -91,7 +91,7 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             casUrl.LocalPath, Constants.Paths.Logout,
             QueryString.Create(Constants.Parameters.Service,
                 QueryHelpers.AddQueryString(BuildRedirectUri(Options.SignedOutCallbackPath), State,
-                    Options.StateDataFormat?.Protect(properties))));
+                    Options.StateDataFormat.Protect(properties))));
         var redirectContext = new CasRedirectContext(Context, Scheme, Options, properties, redirectUri);
 
         await Events.RedirectToAuthorizationEndpoint(redirectContext).ConfigureAwait(false);
@@ -113,7 +113,7 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
     {
         var query = Request.Query;
         var state = query[State];
-        var properties = Options.StateDataFormat?.Unprotect(state);
+        var properties = Options.StateDataFormat.Unprotect(state);
         Response.Redirect(!string.IsNullOrEmpty(properties?.RedirectUri)
             ? properties.RedirectUri
             : Options.SignedOutRedirectUri);
@@ -172,12 +172,12 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             return HandleRequestResult.Fail("Missing CAS ticket.");
         }
 
-        var callbackUri = BuildRedirectUri($"{Options.CallbackPath}?{State}={Uri.EscapeDataString(state)}");
+        var callbackUri = BuildRedirectUri($"{Options.CallbackPath}?{State}={Uri.EscapeDataString(state!)}");
         ICasPrincipal? principal = null;
         if (Options.ServiceTicketValidator != null)
         {
             principal = await Options.ServiceTicketValidator
-                .ValidateAsync(serviceTicket, callbackUri, Context.RequestAborted).ConfigureAwait(false);
+                .ValidateAsync(serviceTicket!, callbackUri, Context.RequestAborted).ConfigureAwait(false);
         }
 
         if (principal == null)

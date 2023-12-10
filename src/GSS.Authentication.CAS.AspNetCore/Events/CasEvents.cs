@@ -27,7 +27,7 @@ public class CasEvents : RemoteAuthenticationEvents
     /// <summary>
     /// Invoked before redirecting to the identity provider to sign out.
     /// </summary>
-    public Func<CasRedirectContext, Task> OnRedirectToIdentityProviderForSignOut { get; set; } = context => Task.CompletedTask;
+    public Func<CasRedirectContext, Task> OnRedirectToIdentityProviderForSignOut { get; set; } = _ => Task.CompletedTask;
 
     /// <summary>
     /// Invoked after the provider successfully authenticates a user.

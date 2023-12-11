@@ -1,5 +1,6 @@
 using System;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
@@ -19,6 +20,10 @@ using Microsoft.Owin.Security.OpenIdConnect;
 using NLog.Owin.Logging;
 using Owin;
 using OwinSample.DependencyInjection;
+using Sustainsys.Saml2;
+using Sustainsys.Saml2.Configuration;
+using Sustainsys.Saml2.Metadata;
+using Sustainsys.Saml2.Owin;
 
 [assembly: OwinStartup(typeof(OwinSample.Startup))]
 
@@ -161,6 +166,7 @@ namespace OwinSample
                     }
                 };
             });
+
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
                 CallbackPath = new PathString("/signin-oidc"),
@@ -179,10 +185,7 @@ namespace OwinSample
                     configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code)
                         .Contains(OpenIdConnectResponseType.Code),
                 Scope = configuration.GetValue("OIDC:Scope", OpenIdConnectScope.OpenIdProfile),
-                TokenValidationParameters =
-                {
-                    NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name")
-                },
+                TokenValidationParameters = { NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name") },
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications
@@ -215,6 +218,31 @@ namespace OwinSample
                     }
                 }
             });
+
+            app.UseSaml2Authentication(CreateSaml2Options(configuration));
+        }
+
+        private static Saml2AuthenticationOptions CreateSaml2Options(IConfiguration configuration)
+        {
+            var spOptions = new SPOptions() { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]) };
+            var certPath = configuration["SAML2:SP:Certificate:Path"];
+            if (certPath != null && certPath.StartsWith("~"))
+            {
+                certPath = HttpContext.Current.Server.MapPath(certPath);
+            }
+
+            spOptions.ServiceCertificates.Add(
+                new X509Certificate2(certPath, configuration["SAML2:SP:Certificate:Pass"]));
+            spOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
+            var options = new Saml2AuthenticationOptions(false) { SPOptions = spOptions };
+            var idp = new IdentityProvider(new EntityId(configuration["SAML2:IdP:EntityId"]), spOptions)
+            {
+                MetadataLocation = configuration["SAML2:IdP:MetadataLocation"]
+            };
+            options.IdentityProviders.Add(idp);
+            // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
+            options.CookieManager = new SystemWebCookieManager();
+            return options;
         }
     }
 }

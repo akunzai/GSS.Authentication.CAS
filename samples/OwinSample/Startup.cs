@@ -45,7 +45,7 @@ namespace OwinSample
                 .AddEnvironmentVariables()
                 .Build();
 
-            var singleLogout = _configuration.GetValue("Authentication:CAS:SingleLogout", false);
+            var singleLogout = _configuration.GetValue("CAS:SingleLogout", false);
             var services = new ServiceCollection();
             if (singleLogout)
             {
@@ -102,13 +102,13 @@ namespace OwinSample
                             context.Options,
                             "/"
                         );
-                        if (_configuration.GetValue("Authentication:CAS:SingleSignOut", false))
+                        if (_configuration.GetValue("CAS:SingleSignOut", false))
                         {
                             context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName, context.CookieOptions);
                             // Single Sign-Out
                             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                             var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
-                            var redirectUri = new UriBuilder(_configuration["Authentication:CAS:ServerUrlBase"]!);
+                            var redirectUri = new UriBuilder(_configuration["CAS:ServerUrlBase"]!);
                             redirectUri.Path += "/logout";
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
@@ -120,10 +120,10 @@ namespace OwinSample
 
             app.UseCasAuthentication(options =>
             {
-                options.CasServerUrlBase = _configuration["Authentication:CAS:ServerUrlBase"]!;
-                options.ServiceUrlBase = _configuration.GetValue<Uri>("Authentication:CAS:ServiceUrlBase");
+                options.CasServerUrlBase = _configuration["CAS:ServerUrlBase"]!;
+                options.ServiceUrlBase = _configuration.GetValue<Uri>("CAS:ServiceUrlBase");
                 // required for CasSingleLogoutMiddleware
-                options.SaveTokens = singleLogout || _configuration.GetValue("Authentication:CAS:SaveTokens", false);
+                options.SaveTokens = singleLogout || _configuration.GetValue("CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
                 var protocolVersion = _configuration.GetValue("CAS:ProtocolVersion", 3);
@@ -172,16 +172,16 @@ namespace OwinSample
 
             app.UseOAuthAuthentication(options =>
             {
-                options.ClientId = _configuration["Authentication:OAuth:ClientId"];
-                options.ClientSecret = _configuration["Authentication:OAuth:ClientSecret"];
-                options.AuthorizationEndpoint = _configuration["Authentication:OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = _configuration["Authentication:OAuth:TokenEndpoint"];
-                options.UserInformationEndpoint = _configuration["Authentication:OAuth:UserInformationEndpoint"];
+                options.ClientId = _configuration["OAuth:ClientId"];
+                options.ClientSecret = _configuration["OAuth:ClientSecret"];
+                options.AuthorizationEndpoint = _configuration["OAuth:AuthorizationEndpoint"];
+                options.TokenEndpoint = _configuration["OAuth:TokenEndpoint"];
+                options.UserInformationEndpoint = _configuration["OAuth:UserInformationEndpoint"];
                 options.Scopes.Clear();
-                _configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")
+                _configuration.GetValue("OAuth:Scope", "openid profile email")
                     .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList()
                     .ForEach(s => options.Scopes.Add(s));
-                options.SaveTokensAsClaims = _configuration.GetValue("Authentication:OAuth:SaveTokens", false);
+                options.SaveTokensAsClaims = _configuration.GetValue("OAuth:SaveTokens", false);
                 options.Events = new OAuthEvents
                 {
                     OnCreatingTicket = async context =>
@@ -190,7 +190,7 @@ namespace OwinSample
                         using var request =
                             new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                         request.Headers.Accept.ParseAdd("application/json");
-                        if (_configuration.GetValue("Authentication:OAuth:SendAccessTokenInQuery", false))
+                        if (_configuration.GetValue("OAuth:SendAccessTokenInQuery", false))
                         {
                             var uriBuilder = new UriBuilder(request.RequestUri)
                             {
@@ -268,19 +268,19 @@ namespace OwinSample
             {
                 AuthenticationMode = AuthenticationMode.Passive,
                 CallbackPath = new PathString("/signin-oidc"),
-                ClientId = _configuration["Authentication:OIDC:ClientId"],
-                ClientSecret = _configuration["Authentication:OIDC:ClientSecret"],
-                Authority = _configuration["Authentication:OIDC:Authority"],
-                MetadataAddress = _configuration["Authentication:OIDC:MetadataAddress"],
+                ClientId = _configuration["OIDC:ClientId"],
+                ClientSecret = _configuration["OIDC:ClientSecret"],
+                Authority = _configuration["OIDC:Authority"],
+                MetadataAddress = _configuration["OIDC:MetadataAddress"],
                 ResponseType =
-                    _configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code),
+                    _configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code),
                 ResponseMode =
-                    _configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
+                    _configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
                 // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
                 RedeemCode = true,
-                Scope = _configuration.GetValue("Authentication:OIDC:Scope", "openid profile email"),
+                Scope = _configuration.GetValue("OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
-                SaveTokens = _configuration.GetValue("Authentication:OIDC:SaveTokens", false),
+                SaveTokens = _configuration.GetValue("OIDC:SaveTokens", false),
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
                     RedirectToIdentityProvider = notification =>

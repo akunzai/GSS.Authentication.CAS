@@ -40,8 +40,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     })
     .AddCAS(options =>
     {
-        options.CasServerUrlBase = builder.Configuration["Authentication:CAS:ServerUrlBase"]!;
-        options.SaveTokens = builder.Configuration.GetValue("Authentication:CAS:SaveTokens", false);
+        options.CasServerUrlBase = builder.Configuration["CAS:ServerUrlBase"]!;
+        options.SaveTokens = builder.Configuration.GetValue("CAS:SaveTokens", false);
         options.Events.OnCreatingTicket = context =>
         {
             if (context.Identity == null)
@@ -65,12 +65,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddOAuth(OAuthDefaults.DisplayName, options =>
     {
         options.CallbackPath = "/signin-oauth";
-        options.ClientId = builder.Configuration["Authentication:OAuth:ClientId"]!;
-        options.ClientSecret = builder.Configuration["Authentication:OAuth:ClientSecret"]!;
-        options.AuthorizationEndpoint = builder.Configuration["Authentication:OAuth:AuthorizationEndpoint"]!;
-        options.TokenEndpoint = builder.Configuration["Authentication:OAuth:TokenEndpoint"]!;
-        options.UserInformationEndpoint = builder.Configuration["Authentication:OAuth:UserInformationEndpoint"]!;
-        builder.Configuration.GetValue("Authentication:OAuth:Scope", "openid profile email")!
+        options.ClientId = builder.Configuration["OAuth:ClientId"]!;
+        options.ClientSecret = builder.Configuration["OAuth:ClientSecret"]!;
+        options.AuthorizationEndpoint = builder.Configuration["OAuth:AuthorizationEndpoint"]!;
+        options.TokenEndpoint = builder.Configuration["OAuth:TokenEndpoint"]!;
+        options.UserInformationEndpoint = builder.Configuration["OAuth:UserInformationEndpoint"]!;
+        builder.Configuration.GetValue("OAuth:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
@@ -78,14 +78,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
         options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-        options.SaveTokens = builder.Configuration.GetValue("Authentication:OAuth:SaveTokens", false);
+        options.SaveTokens = builder.Configuration.GetValue("OAuth:SaveTokens", false);
         options.Events.OnCreatingTicket = async context =>
         {
             // Get the OAuth user
             using var request =
                 new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
             request.Headers.Accept.ParseAdd("application/json");
-            if (builder.Configuration.GetValue("Authentication:OAuth:SendAccessTokenInQuery", false))
+            if (builder.Configuration.GetValue("OAuth:SendAccessTokenInQuery", false))
             {
                 request.RequestUri =
                     new Uri(QueryHelpers.AddQueryString(request.RequestUri!.OriginalString, "access_token",
@@ -115,19 +115,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     })
     .AddOpenIdConnect(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:OIDC:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:OIDC:ClientSecret"];
-        options.Authority = builder.Configuration["Authentication:OIDC:Authority"];
-        options.MetadataAddress = builder.Configuration["Authentication:OIDC:MetadataAddress"];
+        options.ClientId = builder.Configuration["OIDC:ClientId"];
+        options.ClientSecret = builder.Configuration["OIDC:ClientSecret"];
+        options.Authority = builder.Configuration["OIDC:Authority"];
+        options.MetadataAddress = builder.Configuration["OIDC:MetadataAddress"];
         options.ResponseType =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
+            builder.Configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
         options.ResponseMode =
-            builder.Configuration.GetValue("Authentication:OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
+            builder.Configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.Scope.Clear();
-        builder.Configuration.GetValue("Authentication:OIDC:Scope", "openid profile email")!
+        builder.Configuration.GetValue("OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
-        options.SaveTokens = builder.Configuration.GetValue("Authentication:OIDC:SaveTokens", false);
+        options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
     });
 
 // Setup NLog for Dependency injection

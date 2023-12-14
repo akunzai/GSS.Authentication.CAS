@@ -9,8 +9,8 @@
     "lint": "./node_modules/.bin/eslint ./src/"
   },
   "dependencies": {
-    "@types/node": "^20.10.1",
-    "@types/react": "^18.2.39",
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.17",
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
@@ -18,14 +18,14 @@
     "react-dom": "^18.2.0",
     "react-router-bootstrap": "^0.26.2",
     "rimraf": "^5.0.5",
-    "typescript": "~5.3.2",
+    "typescript": "~5.1.6",
     "web-vitals": "^3.5.0",
     "wouter": "^2.12.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.0",
-    "eslint": "^8.54.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
     "eslint-config-react-app": "^7.0.1",
-    "vite": "^5.0.5"
+    "vite": "^5.0.8"
   }
 }

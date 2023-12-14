@@ -8,13 +8,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.github\workflows\cd.yml = .github\workflows\cd.yml
-		CHANGELOG.md = CHANGELOG.md
 		.github\workflows\ci.yml = .github\workflows\ci.yml
 		.github\dependabot.yml = .github\dependabot.yml
 		Directory.Build.props = Directory.Build.props
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		README.md = README.md
-		.github\renovate.json = .github\renovate.json
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject

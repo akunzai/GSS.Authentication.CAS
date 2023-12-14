@@ -45,12 +45,10 @@ jobs:
       - name: Build static assets
         if: matrix.os == 'ubuntu-latest'
         run: |
-          corepack enable
           cd samples/AspNetCoreReactSample/ClientApp
-          yarn --version
-          yarn install --immutable
-          yarn lint
-          yarn build
+          npm ci
+          npm run lint
+          npm run build
       - name: Test
         run: |
           dotnet test --collect:"XPlat Code Coverage"

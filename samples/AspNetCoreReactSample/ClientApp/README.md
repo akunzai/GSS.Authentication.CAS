@@ -7,12 +7,15 @@
 ## [Getting Started](https://create-react-app.dev/docs/getting-started)
 
 ```sh
+# activate the pnpm package manager
+corepack enable
+
 # install npm packages
-npm install
+pnpm install
 
 # watch and serve a dev server at https://localhost:3000/
-npm start
+pnpm start
 
 # build the project in production mode. The build artifacts will be stored in the `dist/` directory
-npm build
+pnpm build
 ```

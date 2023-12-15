@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@8.12.1",
   "scripts": {
     "start": "node aspnetcore-https && node aspnetcore-react && vite",
     "build": "tsc && vite build",

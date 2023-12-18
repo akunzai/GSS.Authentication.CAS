@@ -17,8 +17,6 @@ services:
   keycloak:
     build: 
       context: ./keycloak
-      args:
-        KEYCLOAK_VERSION: 23.0.2
     image: keycloak:cas
     environment:
       # https://www.keycloak.org/server/configuration

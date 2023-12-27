@@ -50,11 +50,6 @@ jobs:
           pnpm install
           pnpm lint
           pnpm build
-      - name: Build docker images
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cd .devcontainer
-          docker compose build
       - name: Test
         run: |
           dotnet test --collect:"XPlat Code Coverage"

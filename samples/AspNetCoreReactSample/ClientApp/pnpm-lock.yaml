@@ -36,8 +36,8 @@ dependencies:
     specifier: ~5.1.6
     version: 5.1.6
   web-vitals:
-    specifier: ^3.5.0
-    version: 3.5.0
+    specifier: ^3.5.1
+    version: 3.5.1
   wouter:
     specifier: ^2.12.1
     version: 2.12.1(react@18.2.0)
@@ -53,7 +53,7 @@ devDependencies:
     specifier: ^7.0.1
     version: 7.0.1(@babel/plugin-syntax-flow@7.23.3)(@babel/plugin-transform-react-jsx@7.23.4)(eslint@8.56.0)(typescript@5.1.6)
   vite:
-    specifier: ^5.0.8
+    specifier: ^5.0.10
     version: 5.0.10(@types/node@20.10.5)
 
 packages:
@@ -4618,8 +4618,8 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /web-vitals@3.5.0:
-    resolution: {integrity: sha512-f5YnCHVG9Y6uLCePD4tY8bO/Ge15NPEQWtvm3tPzDKygloiqtb4SVqRHBcrIAqo2ztqX5XueqDn97zHF0LdT6w==}
+  /web-vitals@3.5.1:
+    resolution: {integrity: sha512-xQ9lvIpfLxUj0eSmT79ZjRoU5wIRfIr7pNukL7ZE4EcWZSmfZQqOlhuAGfkVa3EFmzPHZhWhXfm2i5ys+THVPg==}
     dev: false
 
   /which-boxed-primitive@1.0.2:

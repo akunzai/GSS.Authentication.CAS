@@ -84,8 +84,7 @@ namespace GSS.Authentication.CAS.Validation
                 foreach (var attr in attributeElements)
                 {
                     var name = attr.Name.LocalName;
-                    attributes[name] = attributes.ContainsKey(name)
-                        ? StringValues.Concat(attributes[name], attr.Value)
+                    attributes[name] = attributes.TryGetValue(name, out var value) ? StringValues.Concat(value, attr.Value)
                         : new StringValues(attr.Value);
                 }
             }

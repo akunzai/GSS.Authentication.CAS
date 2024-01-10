@@ -11,7 +11,7 @@ public class DistributedCacheServiceTicketStoreTests
     private static readonly IDistributedCache _cache =
         new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
 
-    private readonly IServiceTicketStore _serviceTickets;
+    private readonly DistributedCacheServiceTicketStore _serviceTickets;
 
     public DistributedCacheServiceTicketStoreTests()
     {

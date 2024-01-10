@@ -8,6 +8,8 @@ namespace GSS.Authentication.CAS.AspNetCore.Tests;
 
 public class TicketStoreWrapperTests
 {
+    private static readonly string[] _roles = ["TEST"];
+
     [Fact]
     public async Task StoreGenericPrincipal_ShouldNotThrows()
     {
@@ -17,7 +19,7 @@ public class TicketStoreWrapperTests
             .Returns<ServiceTicket>(ticket => Task.FromResult(ticket.TicketId)).Verifiable();
         var tickets = new TicketStoreWrapper(serviceTickets.Object);
         var authenticationTicket =
-            new AuthenticationTicket(new GenericPrincipal(new GenericIdentity("TEST"), new[] { "TEST" }), "TEST");
+            new AuthenticationTicket(new GenericPrincipal(new GenericIdentity("TEST"), _roles), "TEST");
 
         // Act
         var actual = await tickets.StoreAsync(authenticationTicket);
@@ -142,7 +144,7 @@ public class TicketStoreWrapperTests
             .Verifiable();
         var tickets = new TicketStoreWrapper(serviceTickets.Object);
         var key = await tickets.StoreAsync(
-            new AuthenticationTicket(new GenericPrincipal(new GenericIdentity("TEST"), new[] { "TEST" }), "OLD"));
+            new AuthenticationTicket(new GenericPrincipal(new GenericIdentity("TEST"), _roles), "OLD"));
         var expected = new AuthenticationTicket(
             new ClaimsPrincipal(new ClaimsIdentity(new[]
             {

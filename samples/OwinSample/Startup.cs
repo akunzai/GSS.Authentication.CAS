@@ -1,9 +1,5 @@
 using System;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
@@ -24,7 +20,6 @@ using NLog;
 using NLog.Extensions.Logging;
 using NLog.Owin.Logging;
 using Owin;
-using Owin.OAuthGeneric;
 using OwinSample.DependencyInjection;
 
 [assembly: OwinStartup(typeof(OwinSample.Startup))]
@@ -51,6 +46,7 @@ namespace OwinSample
             {
                 services.AddSingleLogout(_configuration);
             }
+
             var resolver = services.BuildServiceProvider();
 
             // MVC
@@ -75,6 +71,7 @@ namespace OwinSample
                 {
                     context.Request.Scheme = "https";
                 }
+
                 await next.Invoke();
             });
 
@@ -104,7 +101,8 @@ namespace OwinSample
                         );
                         if (_configuration.GetValue("CAS:SingleSignOut", false))
                         {
-                            context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName, context.CookieOptions);
+                            context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName,
+                                context.CookieOptions);
                             // Single Sign-Out
                             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                             var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
@@ -113,6 +111,7 @@ namespace OwinSample
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
                         }
+
                         context.Options.Provider.ApplyRedirect(redirectContext);
                     }
                 }
@@ -147,12 +146,14 @@ namespace OwinSample
                             return Task.CompletedTask;
                         // Map claims from assertion
                         context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-                        if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrWhiteSpace(displayName))
+                        if (assertion.Attributes.TryGetValue("display_name", out var displayName) &&
+                            !string.IsNullOrWhiteSpace(displayName))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
 
-                        if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrWhiteSpace(email))
+                        if (assertion.Attributes.TryGetValue("email", out var email) &&
+                            !string.IsNullOrWhiteSpace(email))
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Email, email));
                         }
@@ -169,101 +170,6 @@ namespace OwinSample
                     }
                 };
             });
-
-            app.UseOAuthAuthentication(options =>
-            {
-                options.ClientId = _configuration["OAuth:ClientId"];
-                options.ClientSecret = _configuration["OAuth:ClientSecret"];
-                options.AuthorizationEndpoint = _configuration["OAuth:AuthorizationEndpoint"];
-                options.TokenEndpoint = _configuration["OAuth:TokenEndpoint"];
-                options.UserInformationEndpoint = _configuration["OAuth:UserInformationEndpoint"];
-                options.Scopes.Clear();
-                _configuration.GetValue("OAuth:Scope", "openid profile email")
-                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList()
-                    .ForEach(s => options.Scopes.Add(s));
-                options.SaveTokensAsClaims = _configuration.GetValue("OAuth:SaveTokens", false);
-                options.Events = new OAuthEvents
-                {
-                    OnCreatingTicket = async context =>
-                    {
-                        // Get the OAuth user
-                        using var request =
-                            new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Accept.ParseAdd("application/json");
-                        if (_configuration.GetValue("OAuth:SendAccessTokenInQuery", false))
-                        {
-                            var uriBuilder = new UriBuilder(request.RequestUri)
-                            {
-                                Query = $"access_token={Uri.EscapeDataString(context.AccessToken)}"
-                            };
-                            request.RequestUri = uriBuilder.Uri;
-                        }
-                        else
-                        {
-                            request.Headers.Authorization =
-                                new AuthenticationHeaderValue("Bearer", context.AccessToken);
-                        }
-
-                        using var response = await context.Backchannel.SendAsync(request, context.Request.CallCancelled)
-                            .ConfigureAwait(false);
-
-                        if (!response.IsSuccessStatusCode ||
-                            response.Content?.Headers?.ContentType?.MediaType.StartsWith("application/json") != true)
-                        {
-                            var responseText = response.Content == null
-                                ? string.Empty
-                                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            _logger.Error(
-                                $"An error occurred when retrieving OAuth user information ({response.StatusCode}). {responseText}");
-                            return;
-                        }
-
-                        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                        using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-                        var user = json.RootElement;
-                        if (user.TryGetProperty("id", out var id))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.GetString()));
-                        }
-                        if (user.TryGetProperty("sub", out var sub))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, sub.GetString()));
-                        }
-
-                        if (user.TryGetProperty("name", out var name))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()));
-                        }
-
-                        if (user.TryGetProperty("email", out var email))
-                        {
-                            context.Identity.AddClaim(new Claim(ClaimTypes.Email, email.GetString()));
-                        }
-
-                        if (user.TryGetProperty("attributes", out var attributes))
-                        {
-                            if (attributes.TryGetProperty("display_name", out var displayName))
-                            {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName.GetString()));
-                            }
-
-                            if (attributes.TryGetProperty("email", out var email2))
-                            {
-                                context.Identity.AddClaim(new Claim(ClaimTypes.Email, email2.GetString()));
-                            }
-                        }
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        var failure = context.Failure;
-                        _logger.Error(failure, failure.Message);
-                        context.Response.Redirect("/Account/ExternalLoginFailure");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
                 AuthenticationMode = AuthenticationMode.Passive,
@@ -281,6 +187,8 @@ namespace OwinSample
                 Scope = _configuration.GetValue("OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
                 SaveTokens = _configuration.GetValue("OIDC:SaveTokens", false),
+                // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
+                CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
                     RedirectToIdentityProvider = notification =>

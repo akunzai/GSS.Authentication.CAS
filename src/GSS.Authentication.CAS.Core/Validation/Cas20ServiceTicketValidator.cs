@@ -56,9 +56,11 @@ namespace GSS.Authentication.CAS.Validation
             </cas:serviceResponse>
             */
             var successElement = doc.Element(_authenticationSuccess);
-            if (successElement == null) return null;
+            if (successElement == null)
+                return null;
             var principalName = successElement.Element(_user)?.Value ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(principalName)) return null;
+            if (string.IsNullOrWhiteSpace(principalName))
+                return null;
             var attributes = new Dictionary<string, StringValues>();
             var attributeElements = successElement.Element(_attributes)?.Elements();
             /* User attributes may released in CAS v2 protocol with forward-compatible mode
@@ -82,8 +84,7 @@ namespace GSS.Authentication.CAS.Validation
                 foreach (var attr in attributeElements)
                 {
                     var name = attr.Name.LocalName;
-                    attributes[name] = attributes.ContainsKey(name)
-                        ? StringValues.Concat(attributes[name], attr.Value)
+                    attributes[name] = attributes.TryGetValue(name, out var value) ? StringValues.Concat(value, attr.Value)
                         : new StringValues(attr.Value);
                 }
             }

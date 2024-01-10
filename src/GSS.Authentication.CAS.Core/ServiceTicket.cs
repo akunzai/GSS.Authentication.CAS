@@ -15,7 +15,8 @@ namespace GSS.Authentication.CAS
             DateTimeOffset? issuedUtc = null,
             DateTimeOffset? expiresUtc = null)
         {
-            if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
+            if (string.IsNullOrWhiteSpace(ticketId))
+                throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType))
                 throw new ArgumentNullException(nameof(authenticationType));
             TicketId = ticketId;
@@ -36,7 +37,8 @@ namespace GSS.Authentication.CAS
             string? nameClaimType = null,
             string? roleClaimType = null)
         {
-            if (string.IsNullOrWhiteSpace(ticketId)) throw new ArgumentNullException(nameof(ticketId));
+            if (string.IsNullOrWhiteSpace(ticketId))
+                throw new ArgumentNullException(nameof(ticketId));
             if (string.IsNullOrWhiteSpace(authenticationType))
                 throw new ArgumentNullException(nameof(authenticationType));
             TicketId = ticketId;

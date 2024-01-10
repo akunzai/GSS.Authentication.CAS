@@ -12,7 +12,8 @@ namespace GSS.Authentication.CAS.Security
         public CasPrincipal(Assertion assertion, string authenticationType) : this(assertion, authenticationType, null) { }
 
         public CasPrincipal(Assertion assertion, string authenticationType, IEnumerable<string>? roles)
-        : base(new CasIdentity(assertion, authenticationType)){
+        : base(new CasIdentity(assertion, authenticationType))
+        {
             Assertion = assertion ?? throw new ArgumentNullException(nameof(assertion));
             this.roles = roles;
         }

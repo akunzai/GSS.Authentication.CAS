@@ -30,12 +30,17 @@ namespace GSS.Authentication.CAS.Validation
             string service,
             CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(ticket)) throw new ArgumentNullException(nameof(ticket));
-            if (string.IsNullOrEmpty(service)) throw new ArgumentNullException(nameof(service));
+            if (string.IsNullOrEmpty(ticket))
+                throw new ArgumentNullException(nameof(ticket));
+            if (string.IsNullOrEmpty(service))
+                throw new ArgumentNullException(nameof(service));
             var baseUri = new Uri(Options.CasServerUrlBase +
-                                  (Options.CasServerUrlBase.EndsWith("/", StringComparison.Ordinal)
-                                      ? string.Empty
-                                      : "/"));
+#if NETCOREAPP3_1_OR_GREATER
+            (Options.CasServerUrlBase.EndsWith('/') 
+#else
+            (Options.CasServerUrlBase.EndsWith("/")
+#endif
+                                      ? string.Empty : "/"));
 #pragma warning disable CS0618
             var validateUri = new Uri(baseUri, ValidateUrlSuffix);
 #pragma warning restore CS0618

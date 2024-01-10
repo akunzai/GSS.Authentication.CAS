@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+#if NET48
+using System.Net.Http;
+#endif
 
 namespace GSS.Authentication.CAS.Testing;
 
@@ -28,7 +30,7 @@ public static class HttpResponseExtensions
             cookies.Add(nameValue);
         }
 
-        request.Headers.Add("Cookie", string.Join("; ", cookies.ToArray()));
+        request.Headers.Add("Cookie", string.Join("; ", [.. cookies]));
         return request;
     }
 }

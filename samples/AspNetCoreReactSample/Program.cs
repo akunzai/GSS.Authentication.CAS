@@ -1,13 +1,9 @@
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text.Json;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
 using NLog.Web;
@@ -30,7 +26,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
             var result = await authService.AuthenticateAsync(context.HttpContext, null);
             var authScheme = result.Properties?.Items[".AuthScheme"];
-            if (string.Equals(authScheme,CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
+            if (string.Equals(authScheme, CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
             {
                 options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
                 // redirecting to the identity provider to sign out
@@ -60,57 +56,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             }
 
             return Task.CompletedTask;
-        };
-    })
-    .AddOAuth(OAuthDefaults.DisplayName, options =>
-    {
-        options.CallbackPath = "/signin-oauth";
-        options.ClientId = builder.Configuration["OAuth:ClientId"]!;
-        options.ClientSecret = builder.Configuration["OAuth:ClientSecret"]!;
-        options.AuthorizationEndpoint = builder.Configuration["OAuth:AuthorizationEndpoint"]!;
-        options.TokenEndpoint = builder.Configuration["OAuth:TokenEndpoint"]!;
-        options.UserInformationEndpoint = builder.Configuration["OAuth:UserInformationEndpoint"]!;
-        builder.Configuration.GetValue("OAuth:Scope", "openid profile email")!
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
-        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-        options.ClaimActions.MapJsonSubKey(ClaimTypes.Name, "attributes", "display_name");
-        options.ClaimActions.MapJsonSubKey(ClaimTypes.Email, "attributes", "email");
-        options.SaveTokens = builder.Configuration.GetValue("OAuth:SaveTokens", false);
-        options.Events.OnCreatingTicket = async context =>
-        {
-            // Get the OAuth user
-            using var request =
-                new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-            request.Headers.Accept.ParseAdd("application/json");
-            if (builder.Configuration.GetValue("OAuth:SendAccessTokenInQuery", false))
-            {
-                request.RequestUri =
-                    new Uri(QueryHelpers.AddQueryString(request.RequestUri!.OriginalString, "access_token",
-                        context.AccessToken!));
-            }
-            else
-            {
-                request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", context.AccessToken);
-            }
-
-            using var response =
-                await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted)
-                    .ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode ||
-                response.Content.Headers.ContentType?.MediaType?.StartsWith("application/json") != true)
-            {
-                throw new HttpRequestException(
-                    $"An error occurred when retrieving OAuth user information ({response.StatusCode}). Please check if the authentication information is correct.");
-            }
-
-            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            using var json = await JsonDocument.ParseAsync(stream).ConfigureAwait(false);
-            context.RunClaimActions(json.RootElement);
         };
     })
     .AddOpenIdConnect(options =>

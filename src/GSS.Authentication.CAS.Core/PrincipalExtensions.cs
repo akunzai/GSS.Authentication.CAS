@@ -27,17 +27,17 @@ namespace GSS.Authentication.CAS
                 case ICasPrincipal casPrincipal when !string.IsNullOrEmpty(casPrincipal.Assertion.PrincipalName):
                     return casPrincipal.Assertion.PrincipalName;
                 case ClaimsPrincipal claimsPrincipal:
-                {
-                    foreach (var identity in claimsPrincipal.Identities)
                     {
-                        if (identity.HasClaim(x => x.Type == identity.NameClaimType))
+                        foreach (var identity in claimsPrincipal.Identities)
                         {
-                            return identity.FindFirst(identity.NameClaimType).Value;
+                            if (identity.HasClaim(x => x.Type == identity.NameClaimType))
+                            {
+                                return identity.FindFirst(identity.NameClaimType).Value;
+                            }
                         }
-                    }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             return principal.Identity?.GetPrincipalName() ?? string.Empty;

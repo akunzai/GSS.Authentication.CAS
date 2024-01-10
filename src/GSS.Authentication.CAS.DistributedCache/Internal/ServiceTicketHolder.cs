@@ -35,8 +35,7 @@ namespace GSS.Authentication.CAS.Internal
 
         public DateTimeOffset? ExpiresUtc { get; set; }
 
-        public static explicit operator ServiceTicket(ServiceTicketHolder h) =>
-            new ServiceTicket(h.TicketId, h.Claims.Select(x => (Claim)x), h.AuthenticationType, h.IssuedUtc,
+        public static explicit operator ServiceTicket(ServiceTicketHolder h) => new(h.TicketId, h.Claims.Select(x => (Claim)x), h.AuthenticationType, h.IssuedUtc,
                 h.ExpiresUtc, h.NameClaimType, h.RoleClaimType);
     }
 }

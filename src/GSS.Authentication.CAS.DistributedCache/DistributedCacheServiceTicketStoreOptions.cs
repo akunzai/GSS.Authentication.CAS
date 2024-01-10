@@ -6,8 +6,7 @@ namespace GSS.Authentication.CAS
 {
     public class DistributedCacheServiceTicketStoreOptions
     {
-        public static readonly DistributedCacheServiceTicketStoreOptions Default =
-            new DistributedCacheServiceTicketStoreOptions();
+        public static readonly DistributedCacheServiceTicketStoreOptions Default = new();
 
         internal const string Prefix = "CAS-ST";
 

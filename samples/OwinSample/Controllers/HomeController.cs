@@ -11,7 +11,8 @@ namespace OwinSample.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            if (!User.Identity.IsAuthenticated) return View();
+            if (!User.Identity.IsAuthenticated)
+                return View();
             var result = await Request.GetOwinContext().Authentication
                 .AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationType);
             return View(result.Properties);

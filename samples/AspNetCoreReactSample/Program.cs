@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
             var result = await authService.AuthenticateAsync(context.HttpContext, null);
             var authScheme = result.Properties?.Items[".AuthScheme"];
-            if (string.Equals(authScheme,CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
+            if (string.Equals(authScheme, CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
             {
                 options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
                 // redirecting to the identity provider to sign out

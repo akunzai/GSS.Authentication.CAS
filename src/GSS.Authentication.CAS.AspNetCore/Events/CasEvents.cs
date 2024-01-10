@@ -23,7 +23,7 @@ public class CasEvents : RemoteAuthenticationEvents
         context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };
-    
+
     /// <summary>
     /// Invoked before redirecting to the identity provider to sign out.
     /// </summary>
@@ -42,7 +42,7 @@ public class CasEvents : RemoteAuthenticationEvents
     /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge.</param>
     /// <returns></returns>
     public virtual Task RedirectToAuthorizationEndpoint(RedirectContext<CasAuthenticationOptions> context) => OnRedirectToAuthorizationEndpoint(context);
-    
+
     /// <summary>
     /// Invoked before redirecting to the identity provider to sign out.
     /// </summary>

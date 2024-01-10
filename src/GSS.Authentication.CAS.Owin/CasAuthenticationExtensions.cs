@@ -10,7 +10,8 @@ namespace GSS.Authentication.CAS.Owin
     {
         public static IAppBuilder UseCasAuthentication(this IAppBuilder app, Action<CasAuthenticationOptions>? configureOptions = null)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
             var options = new CasAuthenticationOptions();
             configureOptions?.Invoke(options);
             return app.UseCasAuthentication(options);
@@ -18,8 +19,10 @@ namespace GSS.Authentication.CAS.Owin
 
         public static IAppBuilder UseCasAuthentication(this IAppBuilder app, CasAuthenticationOptions options)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
             return app.Use<CasAuthenticationMiddleware>(app, options);
         }
     }

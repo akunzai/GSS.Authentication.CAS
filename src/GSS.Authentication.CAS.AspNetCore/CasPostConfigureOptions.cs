@@ -24,7 +24,8 @@ internal class CasPostConfigureOptions : IPostConfigureOptions<CasAuthentication
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(name);
 #else
-        if (name == null) throw new ArgumentNullException(nameof(name));
+        if (name == null)
+            throw new ArgumentNullException(nameof(name));
 #endif
         options.DataProtectionProvider ??= _dataProtection;
 

@@ -12,7 +12,8 @@ namespace GSS.Authentication.CAS.Security
             DateTimeOffset? validFrom = null,
             DateTimeOffset? validUntil = null)
         {
-            if (string.IsNullOrWhiteSpace(principalName)) throw new ArgumentNullException(nameof(principalName));
+            if (string.IsNullOrWhiteSpace(principalName))
+                throw new ArgumentNullException(nameof(principalName));
             PrincipalName = principalName;
             Attributes = attributes ?? new Dictionary<string, StringValues>();
 #pragma warning disable CS0618

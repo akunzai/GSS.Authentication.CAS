@@ -4,11 +4,8 @@ using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using NLog;
-using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 // https://docs.microsoft.com/aspnet/core/security/authentication/identity
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -75,9 +72,6 @@ builder.Services.AddAuthentication()
             return Task.CompletedTask;
         };
     });
-// Setup NLog for Dependency injection
-builder.Logging.ClearProviders().SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-builder.Host.UseNLog();
 
 var app = builder.Build();
 
@@ -103,18 +97,4 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-try
-{
-    app.Run();
-}
-catch (Exception exception)
-{
-    // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception");
-    throw;
-}
-finally
-{
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    LogManager.Shutdown();
-}
+app.Run();

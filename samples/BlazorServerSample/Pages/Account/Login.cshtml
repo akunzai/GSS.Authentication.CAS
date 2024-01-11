@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authentication;
 @inject IOptions<AuthenticationOptions> AuthOptions;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model BlazorServerSample.Pages.Account.Login
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Login";

@@ -159,14 +159,6 @@ namespace OwinSample
                         }
 
                         return Task.CompletedTask;
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        var failure = context.Failure;
-                        _logger.Error(failure, failure.Message);
-                        context.Response.Redirect("/Account/ExternalLoginFailure");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
                     }
                 };
             });
@@ -215,14 +207,6 @@ namespace OwinSample
                                 notification.Options.CallbackPath;
                         }
 
-                        return Task.CompletedTask;
-                    },
-                    AuthenticationFailed = notification =>
-                    {
-                        var exception = notification.Exception;
-                        _logger.Error(exception, exception.Message);
-                        notification.Response.Redirect("/Account/ExternalLoginFailure");
-                        notification.HandleResponse();
                         return Task.CompletedTask;
                     }
                 }

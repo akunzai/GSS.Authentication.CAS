@@ -151,6 +151,11 @@ namespace OwinSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
+                        if (assertion.Attributes.TryGetValue("cn", out var fullName) &&
+                            !string.IsNullOrWhiteSpace(fullName))
+                        {
+                            context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName));
+                        }
 
                         if (assertion.Attributes.TryGetValue("email", out var email) &&
                             !string.IsNullOrWhiteSpace(email))
@@ -159,20 +164,11 @@ namespace OwinSample
                         }
 
                         return Task.CompletedTask;
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        var failure = context.Failure;
-                        _logger.Error(failure, failure.Message);
-                        context.Response.Redirect("/Account/ExternalLoginFailure");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
                     }
                 };
             });
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
-                AuthenticationMode = AuthenticationMode.Passive,
                 CallbackPath = new PathString("/signin-oidc"),
                 ClientId = _configuration["OIDC:ClientId"],
                 ClientSecret = _configuration["OIDC:ClientSecret"],
@@ -187,6 +183,10 @@ namespace OwinSample
                 Scope = _configuration.GetValue("OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
                 SaveTokens = _configuration.GetValue("OIDC:SaveTokens", false),
+                TokenValidationParameters =
+                {
+                    NameClaimType = _configuration.GetValue("OIDC:NameClaimType", "name")
+                },
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications
@@ -215,14 +215,6 @@ namespace OwinSample
                                 notification.Options.CallbackPath;
                         }
 
-                        return Task.CompletedTask;
-                    },
-                    AuthenticationFailed = notification =>
-                    {
-                        var exception = notification.Exception;
-                        _logger.Error(exception, exception.Message);
-                        notification.Response.Redirect("/Account/ExternalLoginFailure");
-                        notification.HandleResponse();
                         return Task.CompletedTask;
                     }
                 }

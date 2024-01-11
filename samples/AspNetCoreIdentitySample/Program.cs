@@ -36,6 +36,11 @@ builder.Services.AddAuthentication()
             {
                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
+            if (assertion.Attributes.TryGetValue("cn", out var fullName) &&
+                            !string.IsNullOrWhiteSpace(fullName))
+            {
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName));
+            }
 
             if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrEmpty(email))
             {
@@ -59,6 +64,7 @@ builder.Services.AddAuthentication()
         options.Scope.Clear();
         builder.Configuration.GetValue("OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        options.TokenValidationParameters.NameClaimType = builder.Configuration.GetValue("OIDC:NameClaimType", "name");
     });
 
 var app = builder.Build();

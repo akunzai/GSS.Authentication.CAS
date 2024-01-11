@@ -26,13 +26,5 @@ namespace OwinSample.Controllers
         {
             Request.GetOwinContext().Authentication.SignOut();
         }
-
-        // GET /Account/ExternalLoginFailure
-        [HttpGet]
-        public ActionResult ExternalLoginFailure()
-        {
-            Response.StatusCode = 500;
-            return View();
-        }
     }
 }

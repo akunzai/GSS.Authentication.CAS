@@ -59,18 +59,6 @@ builder.Services.AddAuthentication()
         options.Scope.Clear();
         builder.Configuration.GetValue("OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
-        options.Events.OnRemoteFailure = context =>
-        {
-            var failure = context.Failure;
-            if (!string.IsNullOrWhiteSpace(failure?.Message))
-            {
-                logger.Error(failure, "{Exception}", failure.Message);
-            }
-
-            context.Response.Redirect("/Account/ExternalLoginFailure");
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
     });
 
 var app = builder.Build();

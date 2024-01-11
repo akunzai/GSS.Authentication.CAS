@@ -5,11 +5,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using NLog;
-using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -58,18 +55,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
             return Task.CompletedTask;
         };
-        options.Events.OnRemoteFailure = context =>
-        {
-            var failure = context.Failure;
-            if (!string.IsNullOrWhiteSpace(failure?.Message))
-            {
-                logger.Error(failure, "{Exception}", failure.Message);
-            }
-
-            context.Response.Redirect("/Account/ExternalLoginFailure");
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
     })
     .AddOpenIdConnect(options =>
     {
@@ -86,22 +71,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         builder.Configuration.GetValue("OIDC:Scope", "openid profile email")!
             .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
         options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
-        options.Events.OnRemoteFailure = context =>
-        {
-            var failure = context.Failure;
-            if (!string.IsNullOrWhiteSpace(failure?.Message))
-            {
-                logger.Error(failure, "{Exception}", failure.Message);
-            }
-
-            context.Response.Redirect("/Account/ExternalLoginFailure");
-            context.HandleResponse();
-            return Task.CompletedTask;
-        };
     });
-// Setup NLog for Dependency injection
-builder.Logging.ClearProviders().SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-builder.Host.UseNLog();
 
 var app = builder.Build();
 
@@ -122,18 +92,4 @@ app.UseAuthorization();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-try
-{
-    app.Run();
-}
-catch (Exception exception)
-{
-    // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception");
-    throw;
-}
-finally
-{
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    LogManager.Shutdown();
-}
+app.Run();

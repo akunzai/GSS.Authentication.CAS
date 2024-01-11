@@ -5,11 +5,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using NLog;
-using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 var singleLogout = builder.Configuration.GetValue("CAS:SingleLogout", false);
 if (singleLogout)
 {
@@ -78,7 +75,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var failure = context.Failure;
             if (!string.IsNullOrWhiteSpace(failure?.Message))
             {
-                logger.Error(failure, "{Exception}", failure.Message);
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<CasAuthenticationHandler>>();
+                logger.LogError(failure, "{Exception}", failure.Message);
             }
 
             context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -106,7 +104,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var failure = context.Failure;
             if (!string.IsNullOrWhiteSpace(failure?.Message))
             {
-                logger.Error(failure, "{Exception}", failure.Message);
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<OpenIdConnectHandler>>();
+                logger.LogError(failure, "{Exception}", failure.Message);
             }
 
             context.Response.Redirect("/Account/ExternalLoginFailure");
@@ -114,10 +113,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
     });
-
-// Setup NLog for Dependency injection
-builder.Logging.ClearProviders().SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-builder.Host.UseNLog();
 
 var app = builder.Build();
 
@@ -142,18 +137,4 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-try
-{
-    app.Run();
-}
-catch (Exception exception)
-{
-    // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception");
-    throw;
-}
-finally
-{
-    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    LogManager.Shutdown();
-}
+app.Run();

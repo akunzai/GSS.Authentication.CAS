@@ -16,8 +16,6 @@ using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
-using NLog;
-using NLog.Extensions.Logging;
 using NLog.Owin.Logging;
 using Owin;
 using OwinSample.DependencyInjection;
@@ -28,23 +26,20 @@ namespace OwinSample
 {
     public class Startup
     {
-        private static ILogger _logger;
-        private static IConfiguration _configuration;
-
         public void Configuration(IAppBuilder app)
         {
             var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
-            _configuration = new ConfigurationBuilder()
+            var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            var singleLogout = _configuration.GetValue("CAS:SingleLogout", false);
+            var singleLogout = configuration.GetValue("CAS:SingleLogout", false);
             var services = new ServiceCollection();
             if (singleLogout)
             {
-                services.AddSingleLogout(_configuration);
+                services.AddSingleLogout(configuration);
             }
 
             var resolver = services.BuildServiceProvider();
@@ -59,8 +54,6 @@ namespace OwinSample
             );
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
 
-            // https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json
-            _logger = LogManager.Setup().LoadConfigurationFromSection(_configuration).GetCurrentClassLogger();
             app.UseNLog();
 
             // https://github.com/aspnet/AspNetKatana/issues/332
@@ -99,14 +92,14 @@ namespace OwinSample
                             context.Options,
                             "/"
                         );
-                        if (_configuration.GetValue("CAS:SingleSignOut", false))
+                        if (configuration.GetValue("CAS:SingleSignOut", false))
                         {
                             context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName,
                                 context.CookieOptions);
                             // Single Sign-Out
                             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                             var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
-                            var redirectUri = new UriBuilder(_configuration["CAS:ServerUrlBase"]!);
+                            var redirectUri = new UriBuilder(configuration["CAS:ServerUrlBase"]!);
                             redirectUri.Path += "/logout";
                             redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
                             redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
@@ -119,13 +112,13 @@ namespace OwinSample
 
             app.UseCasAuthentication(options =>
             {
-                options.CasServerUrlBase = _configuration["CAS:ServerUrlBase"]!;
-                options.ServiceUrlBase = _configuration.GetValue<Uri>("CAS:ServiceUrlBase");
+                options.CasServerUrlBase = configuration["CAS:ServerUrlBase"]!;
+                options.ServiceUrlBase = configuration.GetValue<Uri>("CAS:ServiceUrlBase");
                 // required for CasSingleLogoutMiddleware
-                options.SaveTokens = singleLogout || _configuration.GetValue("CAS:SaveTokens", false);
+                options.SaveTokens = singleLogout || configuration.GetValue("CAS:SaveTokens", false);
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 options.CookieManager = new SystemWebCookieManager();
-                var protocolVersion = _configuration.GetValue("CAS:ProtocolVersion", 3);
+                var protocolVersion = configuration.GetValue("CAS:ProtocolVersion", 3);
                 if (protocolVersion != 3)
                 {
                     var httpClient = options.BackchannelFactory(options);
@@ -170,22 +163,22 @@ namespace OwinSample
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
                 CallbackPath = new PathString("/signin-oidc"),
-                ClientId = _configuration["OIDC:ClientId"],
-                ClientSecret = _configuration["OIDC:ClientSecret"],
-                Authority = _configuration["OIDC:Authority"],
-                MetadataAddress = _configuration["OIDC:MetadataAddress"],
+                ClientId = configuration["OIDC:ClientId"],
+                ClientSecret = configuration["OIDC:ClientSecret"],
+                Authority = configuration["OIDC:Authority"],
+                MetadataAddress = configuration["OIDC:MetadataAddress"],
                 ResponseType =
-                    _configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code),
+                    configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code),
                 ResponseMode =
-                    _configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
+                    configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
                 // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
                 RedeemCode = true,
-                Scope = _configuration.GetValue("OIDC:Scope", "openid profile email"),
+                Scope = configuration.GetValue("OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
-                SaveTokens = _configuration.GetValue("OIDC:SaveTokens", false),
+                SaveTokens = configuration.GetValue("OIDC:SaveTokens", false),
                 TokenValidationParameters =
                 {
-                    NameClaimType = _configuration.GetValue("OIDC:NameClaimType", "name")
+                    NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name")
                 },
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),

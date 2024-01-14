@@ -1,5 +1,4 @@
 using System;
-using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Owin.Security;
@@ -18,9 +17,7 @@ namespace GSS.Authentication.CAS.Owin
                 return serviceTicket;
             }
 
-            var claimsIdentity = ticket.Identity;
-            var id = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return id ?? Guid.NewGuid().ToString();
+            return Guid.NewGuid().ToString();
         };
 
         public JsonSerializerOptions? SerializerOptions { get; set; }

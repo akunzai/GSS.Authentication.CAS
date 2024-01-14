@@ -25,8 +25,8 @@ public class DistributedCacheIAuthenticationSessionStoreTests
     public async Task StoreWithServiceTicket_ShouldStoreItAsTicketId()
     {
         // Arrange
-        var serviceTicket = Guid.NewGuid().ToString();
         var expected = GenerateNewTicket();
+        var serviceTicket = Guid.NewGuid().ToString();
         expected.Properties.SetServiceTicket(serviceTicket);
 
         // Act
@@ -38,7 +38,7 @@ public class DistributedCacheIAuthenticationSessionStoreTests
     }
 
     [Fact]
-    public async Task StoreWithoutServiceTicket_ShouldStoreNameIdAsTicketId()
+    public async Task StoreWithoutServiceTicket_ShouldGenerateNewTicketId()
     {
         // Arrange
         var expected = GenerateNewTicket();
@@ -48,7 +48,6 @@ public class DistributedCacheIAuthenticationSessionStoreTests
 
         // Assert
         Assert.NotNull(key);
-        Assert.Equal(expected.Identity.FindFirst(ClaimTypes.NameIdentifier)!.Value, key);
     }
 
     [Fact]
@@ -73,6 +72,9 @@ public class DistributedCacheIAuthenticationSessionStoreTests
     {
         // Arrange
         var existEntry = GenerateNewTicket();
+        var serviceTicket = Guid.NewGuid().ToString();
+        existEntry.Properties.SetServiceTicket(serviceTicket);
+
         var key = await _sessionStore.StoreAsync(existEntry);
         var newEntry = GenerateNewTicket();
 
@@ -91,6 +93,8 @@ public class DistributedCacheIAuthenticationSessionStoreTests
     {
         // Arrange
         var expected = GenerateNewTicket();
+        var serviceTicket = Guid.NewGuid().ToString();
+        expected.Properties.SetServiceTicket(serviceTicket);
         expected.Properties.IssuedUtc = DateTimeOffset.UtcNow;
         expected.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30);
         var key = await _sessionStore.StoreAsync(expected);
@@ -127,11 +131,7 @@ public class DistributedCacheIAuthenticationSessionStoreTests
     {
         var ticket = new AuthenticationTicket(
             new ClaimsIdentity(
-                new[]
-                {
-                    new Claim(ClaimTypes.Name, "TEST"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                }),
+                new[] { new Claim(ClaimTypes.Name, "TEST") }),
             new AuthenticationProperties());
         setupAction?.Invoke(ticket);
         return ticket;

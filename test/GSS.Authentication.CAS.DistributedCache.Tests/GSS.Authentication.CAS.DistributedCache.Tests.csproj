@@ -8,8 +8,4 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj" />
-  </ItemGroup>
-
 </Project>

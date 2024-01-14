@@ -109,10 +109,6 @@
       <Project>{7d78728a-b592-41e6-83bf-7a83d6e868ad}</Project>
       <Name>GSS.Authentication.CAS.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj">
-      <Project>{5e8f18a4-2648-4a87-b55d-092369b2f305}</Project>
-      <Name>GSS.Authentication.CAS.DistributedCache</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj">
       <Project>{9cd61773-631d-4ba7-a723-2bc1fff31c66}</Project>
       <Name>GSS.Authentication.CAS.Owin</Name>

@@ -7,6 +7,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" />
     <PackageReference Include="Microsoft.Owin.Testing" />
     <PackageReference Include="Moq" />

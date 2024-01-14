@@ -1,5 +1,4 @@
 using System;
-using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +22,7 @@ namespace OwinSample.DependencyInjection
 
             services
                 .AddSingleton(configuration)
-                .AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>()
-                .AddSingleton<IAuthenticationSessionStore, AuthenticationSessionStoreWrapper>()
+                .AddSingleton<IAuthenticationSessionStore, DistributedCacheIAuthenticationSessionStore>()
                 .BuildServiceProvider();
 
             return services;

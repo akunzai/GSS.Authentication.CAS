@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\src\GSS.Authentication.CAS.DistributedCache\GSS.Authentication.CAS.DistributedCache.csproj" />
   </ItemGroup>
 
 </Project>

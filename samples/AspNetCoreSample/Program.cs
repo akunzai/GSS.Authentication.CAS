@@ -17,8 +17,7 @@ if (singleLogout)
         builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConfiguration);
     }
 
-    builder.Services.AddSingleton<IServiceTicketStore, DistributedCacheServiceTicketStore>();
-    builder.Services.AddSingleton<ITicketStore, TicketStoreWrapper>();
+    builder.Services.AddSingleton<ITicketStore, DistributedCacheTicketStore>();
     builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
         .Configure<ITicketStore>((o, t) => o.SessionStore = t);
 }

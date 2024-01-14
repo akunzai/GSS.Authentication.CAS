@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace GSS.Authentication.CAS.Internal
+namespace GSS.Authentication.CAS.Owin.Internal
 {
     /// <summary>
     /// Claim Holder for Serialization

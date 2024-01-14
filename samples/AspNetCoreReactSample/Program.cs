@@ -23,7 +23,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
             var result = await authService.AuthenticateAsync(context.HttpContext, null);
             var authScheme = result.Properties?.Items[".AuthScheme"];
-            if (string.Equals(authScheme, CasDefaults.AuthenticationType) || string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
+            if (string.Equals(authScheme, CasDefaults.AuthenticationType) ||
+                string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
             {
                 options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
                 // redirecting to the identity provider to sign out
@@ -42,14 +43,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             // Map claims from assertion
             var assertion = context.Assertion;
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrWhiteSpace(displayName))
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName) &&
+                !string.IsNullOrWhiteSpace(displayName))
             {
                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
+
             if (assertion.Attributes.TryGetValue("cn", out var fullName) &&
-                            !string.IsNullOrWhiteSpace(fullName))
+                !string.IsNullOrWhiteSpace(fullName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName!));
             }
 
             if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrWhiteSpace(email))

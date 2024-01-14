@@ -32,14 +32,15 @@ builder.Services.AddAuthentication()
             // Map claims from assertion
             var assertion = context.Assertion;
             context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
-            if (assertion.Attributes.TryGetValue("display_name", out var displayName) && !string.IsNullOrEmpty(displayName))
+            if (assertion.Attributes.TryGetValue("display_name", out var displayName) &&
+                !string.IsNullOrEmpty(displayName))
             {
                 context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName!));
             }
-            if (assertion.Attributes.TryGetValue("cn", out var fullName) &&
-                            !string.IsNullOrWhiteSpace(fullName))
+
+            if (assertion.Attributes.TryGetValue("cn", out var fullName) && !string.IsNullOrWhiteSpace(fullName))
             {
-                context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName));
+                context.Identity.AddClaim(new Claim(ClaimTypes.Name, fullName!));
             }
 
             if (assertion.Attributes.TryGetValue("email", out var email) && !string.IsNullOrEmpty(email))

@@ -144,6 +144,7 @@ namespace OwinSample
                         {
                             context.Identity.AddClaim(new Claim(ClaimTypes.Name, displayName));
                         }
+
                         if (assertion.Attributes.TryGetValue("cn", out var fullName) &&
                             !string.IsNullOrWhiteSpace(fullName))
                         {
@@ -176,10 +177,7 @@ namespace OwinSample
                 Scope = configuration.GetValue("OIDC:Scope", "openid profile email"),
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
                 SaveTokens = configuration.GetValue("OIDC:SaveTokens", false),
-                TokenValidationParameters =
-                {
-                    NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name")
-                },
+                TokenValidationParameters = { NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name") },
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications

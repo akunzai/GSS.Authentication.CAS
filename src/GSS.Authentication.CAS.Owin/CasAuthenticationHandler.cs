@@ -54,9 +54,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (exception != null)
             {
-                _logger.WriteWarning(exception.Message);
                 var errorContext = new CasRemoteFailureContext(Context, exception) { Properties = properties };
-
                 await Options.Provider.RemoteFailure(errorContext).ConfigureAwait(false);
 
                 if (errorContext.Handled)
@@ -149,8 +147,7 @@ namespace GSS.Authentication.CAS.Owin
 
             if (string.IsNullOrEmpty(ticket))
             {
-                _logger.WriteWarning("Missing ticket parameter");
-                return new AuthenticationTicket(null, properties);
+                throw new InvalidOperationException("Missing ticket parameter from query");
             }
 
             var service = BuildReturnTo(state);
@@ -159,8 +156,8 @@ namespace GSS.Authentication.CAS.Owin
 
             if (principal == null)
             {
-                _logger.WriteError($"Principal missing in [{Options.ServiceTicketValidator.GetType().FullName}]");
-                return new AuthenticationTicket(null, properties);
+                throw new InvalidOperationException(
+                    $"Missing principal from [{Options.ServiceTicketValidator.GetType().FullName}]");
             }
 
             if (Options.SaveTokens)

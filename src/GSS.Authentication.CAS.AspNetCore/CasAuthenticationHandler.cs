@@ -156,20 +156,20 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
 
         if (properties == null)
         {
-            return HandleRequestResult.Fail("The state was missing or invalid.");
+            return HandleRequestResult.Fail("The state was missing or invalid");
         }
 
         // CSRF
         if (!ValidateCorrelationId(properties))
         {
-            return HandleRequestResult.Fail("Correlation failed.");
+            return HandleRequestResult.Fail("Correlation failed");
         }
 
         var serviceTicket = query[Constants.Parameters.Ticket];
 
         if (string.IsNullOrEmpty(serviceTicket))
         {
-            return HandleRequestResult.Fail("Missing CAS ticket.");
+            return HandleRequestResult.Fail("Missing ticket parameter from query");
         }
 
         var callbackUri = BuildRedirectUri($"{Options.CallbackPath}?{State}={Uri.EscapeDataString(state!)}");
@@ -178,7 +178,7 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
 
         if (principal == null)
         {
-            return HandleRequestResult.Fail("Missing Validate Principal.");
+            return HandleRequestResult.Fail($"Missing principal from [{Options.ServiceTicketValidator.GetType().FullName}]");
         }
 
         if (Options.SaveTokens)

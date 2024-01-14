@@ -10,20 +10,16 @@ namespace GSS.Authentication.CAS.Validation
     public abstract class CasServiceTicketValidator : IServiceTicketValidator
     {
         private readonly HttpClient _httpClient;
+        private readonly string _suffix;
 
         protected CasServiceTicketValidator(string suffix, ICasOptions options, HttpClient? httpClient = null)
         {
-#pragma warning disable CS0618
-            ValidateUrlSuffix = suffix;
-#pragma warning restore CS0618
+            _suffix = suffix;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _httpClient = httpClient ?? new HttpClient();
         }
 
         protected ICasOptions Options { get; }
-
-        [Obsolete("Use constructor parameter instead")]
-        protected string ValidateUrlSuffix { get; }
 
         public virtual async Task<ICasPrincipal?> ValidateAsync(
             string ticket,
@@ -41,9 +37,7 @@ namespace GSS.Authentication.CAS.Validation
             (Options.CasServerUrlBase.EndsWith("/")
 #endif
                                       ? string.Empty : "/"));
-#pragma warning disable CS0618
-            var validateUri = new Uri(baseUri, ValidateUrlSuffix);
-#pragma warning restore CS0618
+            var validateUri = new Uri(baseUri, _suffix);
             var requestUri =
                 new Uri(
                     $"{validateUri.AbsoluteUri}?ticket={Uri.EscapeDataString(ticket)}&service={Uri.EscapeDataString(service)}");

@@ -1,5 +1,4 @@
 using System;
-using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Distributed;
@@ -13,14 +12,7 @@ public class DistributedCacheTicketStoreOptions
     public Func<AuthenticationTicket, string> TicketIdFactory { get; set; } = ticket =>
     {
         var serviceTicket = ticket.Properties.GetServiceTicket();
-        if (!string.IsNullOrEmpty(serviceTicket))
-        {
-            return serviceTicket;
-        }
-
-        var claimsIdentity = ticket.Principal.Identity as ClaimsIdentity;
-        var id = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return id ?? Guid.NewGuid().ToString();
+        return !string.IsNullOrEmpty(serviceTicket) ? serviceTicket : Guid.NewGuid().ToString();
     };
 
     public JsonSerializerOptions? SerializerOptions { get; set; }

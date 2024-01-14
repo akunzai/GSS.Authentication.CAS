@@ -22,7 +22,7 @@ public class CasAuthenticationMiddlewareTests
     private const string CasServerUrlBase = "https://cas.example.org/cas";
 
     [Fact]
-    public async Task AnonymousRequest_ShouldRedirectToLoginPath()
+    public async Task AnonymousRequest_WithRootPath_ShouldRedirectToLoginPath()
     {
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
@@ -40,6 +40,29 @@ public class CasAuthenticationMiddlewareTests
             CookieAuthenticationDefaults.ReturnUrlParameter, "/");
         Assert.Equal(loginUri, response.Headers.Location?.AbsoluteUri);
     }
+    
+    [Fact]
+    public async Task AnonymousRequest_WithCallbackPath_ShouldThrows()
+    {
+        // Arrange
+        using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+
+        // Act
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            // Act
+            await client.GetAsync("/signin-cas");
+        });
+        
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.Equal("The state was missing or invalid", exception.InnerException!.Message);
+    }
 
     [Fact]
     public async Task SignInChallenge_ShouldRedirectToCasServer()
@@ -56,6 +79,289 @@ public class CasAuthenticationMiddlewareTests
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.StartsWith(CasServerUrlBase, response.Headers.Location?.AbsoluteUri ?? string.Empty);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithoutTicketInCallbackQuery_ShouldThrows()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket,
+                string.Empty);
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.Equal("Missing ticket parameter from query", exception.InnerException!.Message);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithoutValidPrincipal_ShouldThrows()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((ICasPrincipal)null!);
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.Contains("Missing principal from", exception.InnerException!.Message);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithValidTicketAndPrincipal_ShouldResponseWithAuthCookies()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Events = new CasEvents
+            {
+                OnCreatingTicket = context =>
+                {
+                    var assertion = context.Assertion;
+                    if (context.Principal?.Identity is not ClaimsIdentity identity)
+                        return Task.CompletedTask;
+                    identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
+                    return Task.CompletedTask;
+                }
+            };
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        // Act
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        var cookies = signInResponse.Headers.GetValues("Set-Cookie").ToList();
+        Assert.Equal(2, cookies.Count);
+        Assert.Contains(cookies,
+            x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix +
+                              CookieAuthenticationDefaults.AuthenticationScheme));
+        Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation"));
+        Assert.Equal("/", signInResponse.Headers.Location?.OriginalString);
+
+        using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
+        using var authorizedResponse = await client.SendAsync(authorizedRequest);
+
+        Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
+        var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
+        Assert.Equal(principal.GetPrincipalName(), bodyText);
+        ticketValidator
+            .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Once);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithValidatingException_ShouldThrows()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Throws(new NotSupportedException("test"));
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.IsType<NotSupportedException>(exception.InnerException);
+        Assert.Equal("test", exception.InnerException!.Message);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithValidatingExceptionAndHandledResponse_ShouldRedirectToAccessDeniedPath()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Throws(new NotSupportedException("test"));
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Events = new CasEvents
+            {
+                OnRemoteFailure = context =>
+                {
+                    context.Response.Redirect(CookieAuthenticationDefaults.AccessDeniedPath);
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+                }
+            };
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        // Act
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithTicketCreatingException_ShouldThrows()
+    {
+        // Arrange
+        var ticketValidator = new Mock<IServiceTicketValidator>();
+        var ticket = Guid.NewGuid().ToString();
+        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+        ticketValidator
+            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
+        using var host = CreateHost(options =>
+        {
+            options.ServiceTicketValidator = ticketValidator.Object;
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Events = new CasEvents { OnCreatingTicket = _ => throw new NotSupportedException("test") };
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await client.SendAsync(signInRequest);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+        Assert.IsType<NotSupportedException>(exception.InnerException);
+        Assert.Equal("test", exception.InnerException!.Message);
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithTicketCreatingExceptionAndHandledResponse_ShouldRedirectToAccessDeniedPath()
+    {
+        // Arrange
+        using var host = CreateHost(options =>
+        {
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Events = new CasEvents
+            {
+                OnCreatingTicket = _ => throw new NotSupportedException("test"),
+                OnRemoteFailure = context =>
+                {
+                    context.Response.Redirect(CookieAuthenticationDefaults.AccessDeniedPath);
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+                }
+            };
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync();
+        using var client = server.CreateClient();
+        var ticket = Guid.NewGuid().ToString();
+        using var challengeResponse =
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
+        var validateUrl =
+            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
+
+        // Act
+        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+        using var signInResponse = await client.SendAsync(signInRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -124,232 +430,6 @@ public class CasAuthenticationMiddlewareTests
         ticketValidator
             .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Once);
-    }
-
-    [Fact]
-    public async Task ValidatingAndCreatingTicketSuccess_ShouldResponseWithAuthCookies()
-    {
-        // Arrange
-        var ticketValidator = new Mock<IServiceTicketValidator>();
-        var ticket = Guid.NewGuid().ToString();
-        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
-        ticketValidator
-            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(principal);
-        using var host = CreateHost(options =>
-        {
-            options.ServiceTicketValidator = ticketValidator.Object;
-            options.CasServerUrlBase = CasServerUrlBase;
-            options.Events = new CasEvents
-            {
-                OnCreatingTicket = context =>
-                {
-                    var assertion = context.Assertion;
-                    if (context.Principal?.Identity is not ClaimsIdentity identity)
-                        return Task.CompletedTask;
-                    identity.AddClaim(new Claim(identity.NameClaimType, assertion.PrincipalName));
-                    return Task.CompletedTask;
-                }
-            };
-        });
-        var server = host.GetTestServer();
-        await host.StartAsync();
-        using var client = server.CreateClient();
-        using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
-        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl =
-            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
-
-        // Act
-        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
-        var cookies = signInResponse.Headers.GetValues("Set-Cookie").ToList();
-        Assert.Equal(2, cookies.Count);
-        Assert.Contains(cookies,
-            x => x.StartsWith(CookieAuthenticationDefaults.CookiePrefix +
-                              CookieAuthenticationDefaults.AuthenticationScheme));
-        Assert.Contains(cookies, x => x.StartsWith($"{CookieAuthenticationDefaults.CookiePrefix}Correlation"));
-        Assert.Equal("/", signInResponse.Headers.Location?.OriginalString);
-
-        using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
-        using var authorizedResponse = await client.SendAsync(authorizedRequest);
-
-        Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
-        var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
-        Assert.Equal(principal.GetPrincipalName(), bodyText);
-        ticketValidator
-            .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
-                Times.Once);
-    }
-
-    [Fact]
-    public async Task ValidatingTicketFailureWithoutHandledResponse_ShouldThrows()
-    {
-        // Arrange
-        var ticketValidator = new Mock<IServiceTicketValidator>();
-        using var host = CreateHost(options =>
-        {
-            options.ServiceTicketValidator = ticketValidator.Object;
-            options.CasServerUrlBase = CasServerUrlBase;
-        });
-        var server = host.GetTestServer();
-        await host.StartAsync();
-        using var client = server.CreateClient();
-        var ticket = Guid.NewGuid().ToString();
-        ticketValidator
-            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Throws(new NotSupportedException("test"));
-
-        using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
-        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl =
-            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
-
-        Exception? exception = null;
-        try
-        {
-            // Act
-            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
-        }
-        catch (Exception e)
-        {
-            exception = e;
-        }
-
-        // Assert
-        Assert.NotNull(exception);
-        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
-        Assert.IsType<NotSupportedException>(exception.InnerException);
-    }
-
-    [Fact]
-    public async Task ValidatingTicketFailureWithHandledResponse_ShouldRedirectToAccessDeniedPath()
-    {
-        // Arrange
-        var ticketValidator = new Mock<IServiceTicketValidator>();
-        using var host = CreateHost(options =>
-        {
-            options.ServiceTicketValidator = ticketValidator.Object;
-            options.CasServerUrlBase = CasServerUrlBase;
-            options.Events = new CasEvents
-            {
-                OnRemoteFailure = context =>
-                {
-                    context.Response.Redirect(CookieAuthenticationDefaults.AccessDeniedPath);
-                    context.HandleResponse();
-                    return Task.CompletedTask;
-                }
-            };
-        });
-        var server = host.GetTestServer();
-        await host.StartAsync();
-        using var client = server.CreateClient();
-        var ticket = Guid.NewGuid().ToString();
-        ticketValidator
-            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Throws(new NotSupportedException("test"));
-
-        using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
-        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl =
-            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
-
-        // Act
-        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
-        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task CreatingTicketFailureWithoutHandledResponse_ShouldThrows()
-    {
-        // Arrange
-        var ticketValidator = new Mock<IServiceTicketValidator>();
-        using var host = CreateHost(options =>
-        {
-            options.ServiceTicketValidator = ticketValidator.Object;
-            options.CasServerUrlBase = CasServerUrlBase;
-            options.Events = new CasEvents { OnCreatingTicket = _ => throw new NotSupportedException("test") };
-        });
-        var server = host.GetTestServer();
-        await host.StartAsync();
-        using var client = server.CreateClient();
-        var ticket = Guid.NewGuid().ToString();
-        var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
-        ticketValidator
-            .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(principal);
-
-        using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
-        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl =
-            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
-
-        Exception? exception = null;
-        try
-        {
-            // Act
-            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
-        }
-        catch (Exception e)
-        {
-            exception = e;
-        }
-
-        // Assert
-        Assert.NotNull(exception);
-        Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
-        Assert.IsType<NotSupportedException>(exception.InnerException);
-    }
-
-    [Fact]
-    public async Task CreatingTicketFailureWithHandledResponse_ShouldRedirectToAccessDeniedPath()
-    {
-        // Arrange
-        using var host = CreateHost(options =>
-        {
-            options.CasServerUrlBase = CasServerUrlBase;
-            options.Events = new CasEvents
-            {
-                OnCreatingTicket = _ => throw new NotSupportedException("test"),
-                OnRemoteFailure = context =>
-                {
-                    context.Response.Redirect(CookieAuthenticationDefaults.AccessDeniedPath);
-                    context.HandleResponse();
-                    return Task.CompletedTask;
-                }
-            };
-        });
-        var server = host.GetTestServer();
-        await host.StartAsync();
-        using var client = server.CreateClient();
-        var ticket = Guid.NewGuid().ToString();
-
-        using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
-        var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
-        var validateUrl =
-            QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
-
-        // Act
-        using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
-        Assert.Equal(CookieAuthenticationDefaults.AccessDeniedPath, signInResponse.Headers.Location?.OriginalString);
     }
 
     private static IHost CreateHost(Action<CasAuthenticationOptions> configureOptions,

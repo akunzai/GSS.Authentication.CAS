@@ -56,19 +56,6 @@ namespace GSS.Authentication.CAS.Owin
         /// </summary>
         public string? SignInAsAuthenticationType { get; set; }
 
-        [Obsolete("Use SaveTokens instead.")]
-        public bool UseAuthenticationSessionStore
-        {
-            get
-            {
-                return SaveTokens;
-            }
-            set
-            {
-                SaveTokens = value;
-            }
-        }
-
         /// <summary>
         /// Defines whether <c>service_ticket</c> tokens should be stored in the
         /// <see cref="AuthenticationProperties"/> after a successful authorization.

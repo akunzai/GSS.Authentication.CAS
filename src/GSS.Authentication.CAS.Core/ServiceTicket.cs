@@ -7,28 +7,6 @@ namespace GSS.Authentication.CAS
 {
     public class ServiceTicket
     {
-        [Obsolete("Use another constructor instead.")]
-        public ServiceTicket(string ticketId,
-            Assertion? assertion,
-            IEnumerable<Claim> claims,
-            string authenticationType,
-            DateTimeOffset? issuedUtc = null,
-            DateTimeOffset? expiresUtc = null)
-        {
-            if (string.IsNullOrWhiteSpace(ticketId))
-                throw new ArgumentNullException(nameof(ticketId));
-            if (string.IsNullOrWhiteSpace(authenticationType))
-                throw new ArgumentNullException(nameof(authenticationType));
-            TicketId = ticketId;
-#pragma warning disable CS0618
-            Assertion = assertion;
-#pragma warning restore CS0618
-            Claims = claims;
-            AuthenticationType = authenticationType;
-            IssuedUtc = issuedUtc;
-            ExpiresUtc = expiresUtc;
-        }
-
         public ServiceTicket(string ticketId,
             IEnumerable<Claim> claims,
             string authenticationType,
@@ -63,14 +41,5 @@ namespace GSS.Authentication.CAS
         public DateTimeOffset? IssuedUtc { get; }
 
         public DateTimeOffset? ExpiresUtc { get; }
-
-        [Obsolete("Use Claims instead. Will be removed in future release.")]
-        public Assertion? Assertion { get; }
-
-        [Obsolete("Use IssuedUtc instead. Will be removed in future release.")]
-        public DateTimeOffset? ValidFrom => IssuedUtc;
-
-        [Obsolete("Use ExpiresUtc instead. Will be removed in future release.")]
-        public DateTimeOffset? ValidUntil => ExpiresUtc;
     }
 }

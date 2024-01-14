@@ -4,9 +4,7 @@ using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 var singleLogout = builder.Configuration.GetValue("CAS:SingleLogout", false);
@@ -38,14 +36,37 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         {
             var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
             var result = await authService.AuthenticateAsync(context.HttpContext, null);
-            var authScheme = result.Properties?.Items[".AuthScheme"];
-            if (string.Equals(authScheme, CasDefaults.AuthenticationType) ||
-                string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme))
+            string? authScheme = null;
+            if (result.Properties != null || result.Properties!.Items.TryGetValue(".AuthScheme", out authScheme) &&
+                string.IsNullOrWhiteSpace(authScheme))
             {
-                options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!, context.CookieOptions);
-                // redirecting to the identity provider to sign out
-                await context.HttpContext.SignOutAsync(authScheme);
+                if (string.Equals(authScheme, CasDefaults.AuthenticationType))
+                {
+                    options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!,
+                        context.CookieOptions);
+                    // redirecting to the identity provider to sign out
+                    await context.HttpContext.SignOutAsync(authScheme);
+                    return;
+                }
+
+                if (string.Equals(authScheme, OpenIdConnectDefaults.AuthenticationScheme) &&
+                    builder.Configuration.GetValue("OIDC:SaveTokens", false))
+                {
+                    options.CookieManager.DeleteCookie(context.HttpContext, options.Cookie.Name!,
+                        context.CookieOptions);
+                    // redirecting to the identity provider to sign out
+                    await context.HttpContext.SignOutAsync(authScheme);
+                    return;
+                }
             }
+
+            await context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
+                context.HttpContext,
+                context.Scheme,
+                context.Options,
+                context.Properties,
+                "/"
+            ));
         };
     })
     .AddCAS(options =>

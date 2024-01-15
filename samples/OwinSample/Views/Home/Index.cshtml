@@ -3,31 +3,40 @@
 @{
     ViewData["Title"] = "Home";
 }
-
-<h1>Hello, @(User.Identity.IsAuthenticated ? User.Identity.Name : "anonymous")</h1>
-
 @if (User.Identity.IsAuthenticated)
 {
-    <h2>Claims</h2>
-    <dl>
-        @foreach (var claim in ((ClaimsIdentity) User.Identity).Claims)
-        {
-            <dt>@claim.Type</dt>
-            <dd>@claim.Value</dd>
-        }
-    </dl>
+    <h1>Hello, @User.Identity.Name</h1>
+    <p>
+        AuthenticationType: <code>@User.Identity.AuthenticationType</code>
+    </p>
+    <details>
+        <summary>Claims</summary>
+        <dl>
+            @foreach (var claim in ((ClaimsIdentity)User.Identity).Claims)
+            {
+                <dt>@claim.Type</dt>
+                <dd>@claim.Value</dd>
+            }
+        </dl>
+    </details>
     if (Model?.Dictionary?.Count > 0)
     {
-        <h2>Properties</h2>
-        foreach (var prop in Model?.Dictionary)
-        {
-            <dt>@prop.Key</dt>
-            <dd>@prop.Value</dd>
-        }
+        <details>
+            <summary>Properties</summary>
+            <dl>
+                @foreach (var prop in Model.Dictionary)
+                {
+                    <dt>@prop.Key</dt>
+                    <dd>@prop.Value</dd>
+                }
+            </dl>
+        </details>
     }
+
     @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "btn btn-danger" })
 }
 else
 {
+    <h1>Hello, anonymous</h1>
     @Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-primary" })
 }

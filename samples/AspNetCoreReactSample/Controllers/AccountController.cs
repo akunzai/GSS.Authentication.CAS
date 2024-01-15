@@ -32,8 +32,7 @@ public class AccountController : ControllerBase
         {
             Id =
                 User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? User.Identity!.Name!,
-            Name = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value ??
-                   User.Claims.FirstOrDefault(x => x.Type == "display_name")?.Value,
+            Name = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value,
             Email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value
         };
     }

@@ -6,6 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 
 namespace GSS.Authentication.CAS.Owin
 {
+    [Obsolete("Use DistributedCacheIAuthenticationSessionStore instead.")]
     public class AuthenticationSessionStoreWrapper : IAuthenticationSessionStore
     {
         private readonly IServiceTicketStore _store;

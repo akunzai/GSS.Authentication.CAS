@@ -1,6 +1,8 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Testing;
 using Moq;
 using Xunit;
@@ -9,12 +11,15 @@ namespace GSS.Authentication.CAS.Owin.Tests;
 
 public class CasSingleLogoutMiddlewareTests
 {
+    private readonly DistributedCacheIAuthenticationSessionStoreOptions _options =
+        new DistributedCacheIAuthenticationSessionStoreOptions();
+
     [Fact]
     public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()
     {
         // Arrange
-        var store = new Mock<IServiceTicketStore>();
-        using var server = CreateServer(store.Object);
+        var cache = new Mock<IDistributedCache>();
+        using var server = CreateServer(cache.Object);
         using var content = new StringContent("TEST");
         content.Headers.ContentType = null;
 
@@ -22,15 +27,15 @@ public class CasSingleLogoutMiddlewareTests
         using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
-        store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+        cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
     public async Task WithJsonLogoutRequest_ShouldNotRemoveTicket()
     {
         // Arrange
-        var store = new Mock<IServiceTicketStore>();
-        using var server = CreateServer(store.Object);
+        var cache = new Mock<IDistributedCache>();
+        using var server = CreateServer(cache.Object);
         var content = new StringContent(
             JsonSerializer.Serialize(new { logoutRequest = new { ticket = Guid.NewGuid().ToString() } }),
             Encoding.UTF8,
@@ -41,18 +46,18 @@ public class CasSingleLogoutMiddlewareTests
         using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
-        store.Verify(x => x.RemoveAsync(It.IsAny<string>()), Times.Never);
+        cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
     public async Task WithFormUrlEncodedLogoutRequest_ShouldRemoveTicket()
     {
         // Arrange
-        var store = new Mock<IServiceTicketStore>();
-        using var server = CreateServer(store.Object);
+        var cache = new Mock<IDistributedCache>();
+        using var server = CreateServer(cache.Object);
         var removedTicket = string.Empty;
-        store.Setup(x => x.RemoveAsync(It.IsAny<string>()))
-            .Callback<string>((x) => removedTicket = x)
+        cache.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, CancellationToken>((x, _) => removedTicket = x)
             .Returns(Task.CompletedTask);
         var ticket = Guid.NewGuid().ToString();
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -67,12 +72,14 @@ public class CasSingleLogoutMiddlewareTests
         using var response = await server.HttpClient.PostAsync("/", content);
 
         // Assert
-        Assert.Equal(ticket, removedTicket);
-        store.Verify(x => x.RemoveAsync(ticket), Times.Once);
+        Assert.Equal(_options.CacheKeyFactory(ticket), removedTicket);
+        cache.Verify(x => x.RemoveAsync(_options.CacheKeyFactory(ticket), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    private static TestServer CreateServer(IServiceTicketStore store)
+    private TestServer CreateServer(IDistributedCache cache)
     {
-        return TestServer.Create(app => app.UseCasSingleLogout(new AuthenticationSessionStoreWrapper(store)));
+        return TestServer.Create(app =>
+            app.UseCasSingleLogout(new DistributedCacheIAuthenticationSessionStore(cache,
+                Options.Create(_options))));
     }
 }

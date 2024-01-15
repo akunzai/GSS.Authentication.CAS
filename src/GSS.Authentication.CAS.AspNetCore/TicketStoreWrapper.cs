@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace GSS.Authentication.CAS.AspNetCore;
 
+[Obsolete("Use DistributedCacheTicketStore instead.")]
 public class TicketStoreWrapper : ITicketStore
 {
     private readonly IServiceTicketStore _store;

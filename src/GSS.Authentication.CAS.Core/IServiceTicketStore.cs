@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace GSS.Authentication.CAS
@@ -5,6 +6,7 @@ namespace GSS.Authentication.CAS
     /// <summary>
     /// preserve service ticket for Single Logout
     /// </summary>
+    [Obsolete("Will be removed in future release.")]
     public interface IServiceTicketStore
     {
         Task<string> StoreAsync(ServiceTicket ticket);

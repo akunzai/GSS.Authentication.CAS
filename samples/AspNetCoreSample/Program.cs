@@ -120,16 +120,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClientSecret = builder.Configuration["OIDC:ClientSecret"];
         options.Authority = builder.Configuration["OIDC:Authority"];
         options.MetadataAddress = builder.Configuration["OIDC:MetadataAddress"];
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
         options.ResponseType =
             builder.Configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
         options.ResponseMode =
             builder.Configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-        options.Scope.Clear();
-        builder.Configuration.GetValue("OIDC:Scope", "openid profile email")!
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
-        options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
-        options.TokenValidationParameters.NameClaimType = builder.Configuration.GetValue("OIDC:NameClaimType", "name");
+        var scope = builder.Configuration["OIDC:Scope"];
+        if (!string.IsNullOrWhiteSpace(scope))
+        {
+            scope.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => options.Scope.Add(s));
+        }
+
+        options.TokenValidationParameters.NameClaimType =
+            builder.Configuration.GetValue("OIDC:NameClaimType", "name");
         options.Events.OnRemoteFailure = context =>
         {
             var failure = context.Failure;

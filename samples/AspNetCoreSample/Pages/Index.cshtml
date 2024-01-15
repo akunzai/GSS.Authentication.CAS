@@ -5,46 +5,42 @@
 @{
     ViewData["Title"] = "Home";
 }
-<h1>Hello, @(User.Identity?.IsAuthenticated == true ? User.Identity.Name : "anonymous")</h1>
 
 @if (User.Identity?.IsAuthenticated == true)
 {
-    <h2>Claims</h2>
-    <dl>
-        @foreach (var claim in User.Claims)
-        {
-            <dt>@claim.Type</dt>
-            <dd>@claim.Value</dd>
-        }
-    </dl>
+    <h1>Hello, @User.Identity.Name</h1>
+    <p>
+        AuthenticationType: <code>@User.Identity.AuthenticationType</code>
+    </p>
+    <details>
+        <summary>Claims</summary>
+        <dl>
+            @foreach (var claim in User.Claims)
+            {
+                <dt>@claim.Type</dt>
+                <dd>@claim.Value</dd>
+            }
+        </dl>
+    </details>
     var result = await AuthenticationService.AuthenticateAsync(HttpContext, null);
-    var propertiesExcludeToken = result.Properties?.Items.Where(x => !(x.Key.StartsWith(".TokenNames") || x.Key.StartsWith(".Token."))).ToList();
-    if (propertiesExcludeToken?.Any() == true)
+    if (result.Properties?.Items.Any() == true)
     {
-        <h2>Properties</h2>
-        <dl>
-            @foreach (var (key, value) in propertiesExcludeToken)
-            {
-                <dt>@key</dt>
-                <dd>@value</dd>
-            }
-        </dl>
+        <details>
+            <summary>Properties</summary>
+            <dl>
+                @foreach (var (key, value) in result.Properties!.Items)
+                {
+                    <dt>@key</dt>
+                    <dd>@value</dd>
+                }
+            </dl>
+        </details>
     }
-    var tokens = result.Properties?.GetTokens().ToList();
-    @if (tokens?.Any() == true)
-    {
-        <h2>Tokens</h2>
-        <dl>
-            @foreach (var token in tokens)
-            {
-                <dt>@token.Name</dt>
-                <dd>@token.Value</dd>
-            }
-        </dl>
-    }
+
     <a class="btn btn-danger" asp-page="/Account/Logout">Logout</a>
 }
 else
 {
+    <h1>Hello, anonymous</h1>
     <a class="btn btn-primary" asp-page="/Account/Login">Login</a>
 }

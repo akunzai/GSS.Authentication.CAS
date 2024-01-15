@@ -168,16 +168,21 @@ namespace OwinSample
                 ClientSecret = configuration["OIDC:ClientSecret"],
                 Authority = configuration["OIDC:Authority"],
                 MetadataAddress = configuration["OIDC:MetadataAddress"],
+                RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
+                SaveTokens = configuration.GetValue("OIDC:SaveTokens", false),
                 ResponseType =
                     configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code),
                 ResponseMode =
                     configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query),
-                // Avoid 404 error when redirecting to the callback path. see https://github.com/aspnet/AspNetKatana/issues/348
-                RedeemCode = true,
-                Scope = configuration.GetValue("OIDC:Scope", "openid profile email"),
-                RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
-                SaveTokens = configuration.GetValue("OIDC:SaveTokens", false),
-                TokenValidationParameters = { NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name") },
+                // https://github.com/aspnet/AspNetKatana/issues/348
+                RedeemCode =
+                    configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code)
+                        .Contains(OpenIdConnectResponseType.Code),
+                Scope = configuration.GetValue("OIDC:Scope", OpenIdConnectScope.OpenIdProfile),
+                TokenValidationParameters =
+                {
+                    NameClaimType = configuration.GetValue("OIDC:NameClaimType", "name")
+                },
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications

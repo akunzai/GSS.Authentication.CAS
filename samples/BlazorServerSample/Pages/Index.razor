@@ -3,14 +3,19 @@
 <AuthorizeView>
     <Authorized>
         <h1>Hello, @context.User.Identity?.Name!</h1>
-        <h2>Claims</h2>
-        <dl>
-            @foreach (var claim in context.User.Claims)
-            {
-                <dt>@claim.Type</dt>
-                <dd>@claim.Value</dd>
-            }
-        </dl>
+        <p>
+            AuthenticationType: <code>@context.User.Identity?.AuthenticationType</code>
+        </p>
+        <details>
+            <summary>Claims</summary>
+            <dl>
+                @foreach (var claim in context.User.Claims)
+                {
+                    <dt>@claim.Type</dt>
+                    <dd>@claim.Value</dd>
+                }
+            </dl>
+        </details>
         <a class="btn btn-danger" href="/Account/Logout">Logout</a>
     </Authorized>
     <NotAuthorized>

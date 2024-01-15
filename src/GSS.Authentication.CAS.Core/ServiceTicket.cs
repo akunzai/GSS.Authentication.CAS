@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using GSS.Authentication.CAS.Security;
 
 namespace GSS.Authentication.CAS
 {
+    [Obsolete("Will be removed in future release.")]
     public class ServiceTicket
     {
         public ServiceTicket(string ticketId,

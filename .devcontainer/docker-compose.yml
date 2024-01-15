@@ -38,5 +38,15 @@ services:
       - 127.0.0.1:8080:8080
       - 127.0.0.1:443:443
 
+  redis:
+    # https://hub.docker.com/_/redis
+    image: redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    ports:
+      - 127.0.0.1:6379:6379
+
 volumes:
     keycloak-data:
+    redis-data:

@@ -20,10 +20,17 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Sustainsys.Saml2.AspNetCore2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="saml2.p12">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

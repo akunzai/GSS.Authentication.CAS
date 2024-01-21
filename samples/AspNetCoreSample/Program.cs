@@ -1,10 +1,14 @@
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Sustainsys.Saml2;
+using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 var singleLogout = builder.Configuration.GetValue("CAS:SingleLogout", false);
@@ -57,6 +61,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                     await context.HttpContext.SignOutAsync(authScheme);
                     return;
                 }
+            }
+
+            var saml2SessionIndex = context.HttpContext.User.FindFirst(Saml2ClaimTypes.SessionIndex);
+            if (saml2SessionIndex != null)
+            {
+                // redirecting to the identity provider to sign out
+                await context.HttpContext.SignOutAsync(Saml2Defaults.Scheme);
+                return;
             }
 
             await context.Options.Events.RedirectToLogout(new RedirectContext<CookieAuthenticationOptions>(
@@ -147,6 +159,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.HandleResponse();
             return Task.CompletedTask;
         };
+    })
+    .AddSaml2(options =>
+    {
+        options.SPOptions.EntityId = new EntityId(builder.Configuration["SAML2:SP:EntityId"]);
+        options.SPOptions.ServiceCertificates.Add(new X509Certificate2(
+            builder.Configuration["SAML2:SP:Certificate:Path"]!,
+            builder.Configuration["SAML2:SP:Certificate:Pass"]!));
+        options.SPOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
+        options.IdentityProviders.Add(
+            new IdentityProvider(new EntityId(builder.Configuration["SAML2:IdP:EntityId"]), options.SPOptions)
+            {
+                MetadataLocation = builder.Configuration["SAML2:IdP:MetadataLocation"],
+            });
     });
 
 var app = builder.Build();

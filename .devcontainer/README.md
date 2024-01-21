@@ -17,6 +17,9 @@
 # starting container
 docker compose up -d
 
+# export keycloak configurations
+docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/export/
+
 # run the sample app in Host
 cd ../samples/AspNetCoreSample
 dotnet run

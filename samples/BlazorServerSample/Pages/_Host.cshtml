@@ -1,9 +1,0 @@
-﻿@page "/"
-@using Microsoft.AspNetCore.Authorization
-@attribute [AllowAnonymous]
-@namespace BlazorServerSample.Pages ;
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@{
-    Layout = "_Layout";
-}
-<component type="typeof(App)" render-mode="ServerPrerendered"/>

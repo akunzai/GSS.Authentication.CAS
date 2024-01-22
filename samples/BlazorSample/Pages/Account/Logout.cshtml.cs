@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BlazorServerSample.Pages.Account;
+namespace BlazorSample.Pages.Account;
 
 public class Logout : PageModel
 {

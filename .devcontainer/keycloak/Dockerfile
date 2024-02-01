@@ -15,4 +15,6 @@ FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 # add CAS protocol for Keycloak
 COPY --from=downloader --chown=keycloak:keycloak /tmp/keycloak-protocol-cas.jar /opt/keycloak/providers/
 
+WORKDIR /opt/keycloak
+
 RUN /opt/keycloak/bin/kc.sh build

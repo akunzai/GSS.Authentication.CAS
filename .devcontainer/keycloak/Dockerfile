@@ -1,5 +1,5 @@
 # https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=23.0.3
+ARG KEYCLOAK_VERSION=23.0.5
 
 FROM alpine as downloader
 ARG KEYCLOAK_VERSION

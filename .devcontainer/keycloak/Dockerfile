@@ -1,5 +1,5 @@
 # https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=23.0.3
+ARG KEYCLOAK_VERSION=23.0.5
 
 FROM alpine as downloader
 ARG KEYCLOAK_VERSION
@@ -14,5 +14,7 @@ FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 
 # add CAS protocol for Keycloak
 COPY --from=downloader --chown=keycloak:keycloak /tmp/keycloak-protocol-cas.jar /opt/keycloak/providers/
+
+WORKDIR /opt/keycloak
 
 RUN /opt/keycloak/bin/kc.sh build

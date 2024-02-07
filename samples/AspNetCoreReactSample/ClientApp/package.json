@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@8.13.1",
+  "packageManager": "pnpm@8.15.1",
   "scripts": {
     "start": "node aspnetcore-https && node aspnetcore-react && vite",
     "build": "tsc && vite build",
     "lint": "./node_modules/.bin/eslint ./src/"
   },
   "dependencies": {
-    "@types/node": "^20.11.15",
-    "@types/react": "^18.2.50",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.18",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
@@ -21,7 +21,7 @@
     "rimraf": "^5.0.5",
     "typescript": "~5.1.6",
     "web-vitals": "^3.5.2",
-    "wouter": "^2.12.1"
+    "wouter": "^3.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",

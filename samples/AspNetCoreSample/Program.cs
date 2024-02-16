@@ -165,7 +165,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SPOptions.EntityId = new EntityId(builder.Configuration["SAML2:SP:EntityId"]);
         options.SPOptions.ServiceCertificates.Add(new X509Certificate2(
             builder.Configuration["SAML2:SP:Certificate:Path"]!,
-            builder.Configuration["SAML2:SP:Certificate:Pass"]!));
+            builder.Configuration["SAML2:SP:Certificate:Pass"],
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
+
+        var decryptionCertificatePath = builder.Configuration["SAML2:SP:Decryption:Certificate:Path"];
+        if (!string.IsNullOrWhiteSpace(decryptionCertificatePath) && File.Exists(decryptionCertificatePath))
+        {
+            options.SPOptions.ServiceCertificates.Add(new ServiceCertificate
+            {
+                Certificate = new X509Certificate2(decryptionCertificatePath,
+                    builder.Configuration["SAML2:SP:Decryption:Certificate:Pass"],
+                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet),
+                Use = CertificateUse.Encryption
+            });
+        }
+
         options.SPOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
         options.IdentityProviders.Add(
             new IdentityProvider(new EntityId(builder.Configuration["SAML2:IdP:EntityId"]), options.SPOptions)

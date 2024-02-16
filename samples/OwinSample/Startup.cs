@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -224,15 +225,24 @@ namespace OwinSample
 
         private static Saml2AuthenticationOptions CreateSaml2Options(IConfiguration configuration)
         {
-            var spOptions = new SPOptions() { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]) };
-            var certPath = configuration["SAML2:SP:Certificate:Path"];
-            if (certPath != null && certPath.StartsWith("~"))
+            var spOptions = new SPOptions { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]) };
+            spOptions.ServiceCertificates.Add(new X509Certificate2(
+                HttpContext.Current.Server.MapPath(configuration["SAML2:SP:Certificate:Path"]),
+                configuration["SAML2:SP:Certificate:Pass"],
+                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
+            var decryptionCertificatePath =
+                HttpContext.Current.Server.MapPath(configuration["SAML2:SP:Decryption:Certificate:Path"]);
+            if (!string.IsNullOrWhiteSpace(decryptionCertificatePath) && File.Exists(decryptionCertificatePath))
             {
-                certPath = HttpContext.Current.Server.MapPath(certPath);
+                spOptions.ServiceCertificates.Add(new ServiceCertificate
+                {
+                    Certificate = new X509Certificate2(decryptionCertificatePath,
+                        configuration["SAML2:SP:Decryption:Certificate:Pass"]!,
+                        X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet),
+                    Use = CertificateUse.Encryption
+                });
             }
 
-            spOptions.ServiceCertificates.Add(
-                new X509Certificate2(certPath, configuration["SAML2:SP:Certificate:Pass"]));
             spOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
             var options = new Saml2AuthenticationOptions(false) { SPOptions = spOptions };
             var idp = new IdentityProvider(new EntityId(configuration["SAML2:IdP:EntityId"]), spOptions)

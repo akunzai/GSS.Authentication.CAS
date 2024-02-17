@@ -947,6 +947,7 @@
       "saml.assertion.signature" : "false",
       "saml.force.post.binding" : "true",
       "saml.encrypt" : "false",
+      "post.logout.redirect.uris" : "+",
       "saml.server.signature" : "true",
       "saml.server.signature.keyinfo.ext" : "false",
       "saml.signing.certificate" : "MIIClzCCAX8CBgGMWViuFDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARzYW1sMB4XDTIzMTIxMTE0NDUzM1oXDTMzMTIxMTE0NDcxM1owDzENMAsGA1UEAwwEc2FtbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJv58Hu1ASYA1K+nY1qwcc9C+oOyusVn416xNeJIA1ZDXHv7d3u2jsjtScY9o/G4P04H5pikbQed6aW/BHvrgGjR9qYqC8uXiN1d0PfyfCDkOW3+2eQbTK3buC0t8ty/WtIAHfn7o0yYEx/qcZ0KIZaHbwYETux9qwVyx7UJRga1Nxgh3JTUQP9WXOAHMJGXFNQTOsqiLcaN2c+fJ71g+Js1IrT/8HKhTGb2BgAmTiT3Ly1kMrPkUpZX8MCBK8T7srVJ7nAb5I5K2wFX8zJP3QNWi6aFdLNzYQmAV/fEUx8AeKWG+1zMsOc5gSMZhhJuMLxwy/D05ySg+QWZmUXSXS8CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAOacJf764zEmGh2PKKIYye0Ah9qA0TnI1ocAZP/rmADsdv/tCOblodIR+TSnaLsNjyod4oAe431ydnp/ldyOZRNn63vJjL8NGyUwqgwH3JQdMl9/rMaMr1whQn4Y2pOEOe+ajTSW0ewUYi4vTJcQ0hZssTCll/4eVUtn20vgjaMnDCHaljxC7HmrfwTNmDgbto4+3Ku2oyoEEXUCGdANx86Iq7luPu+HzJrrtD0sjKIWlXFkjAwp2Fg4hue8AABPsrHTb4MfncFZrb3hpKOXyqKeGG4OZml4QYmWVENy0ZnMmja0nuGa+0hXKLYgmhrqX+r9Qz9Kq220/E6tVCUiU9w==",
@@ -980,6 +981,30 @@
         "jsonType.label" : "String"
       }
     }, {
+      "id" : "72dc38f3-7b73-4dda-95a6-496f66d63797",
+      "name" : "X500 email",
+      "protocol" : "saml",
+      "protocolMapper" : "saml-user-property-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "attribute.nameformat" : "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+        "user.attribute" : "email",
+        "friendly.name" : "email",
+        "attribute.name" : "urn:oid:1.2.840.113549.1.9.1"
+      }
+    }, {
+      "id" : "26a3c92e-31b4-49c5-aca7-5f19f5062878",
+      "name" : "X500 surname",
+      "protocol" : "saml",
+      "protocolMapper" : "saml-user-property-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "attribute.nameformat" : "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+        "user.attribute" : "lastName",
+        "friendly.name" : "surname",
+        "attribute.name" : "urn:oid:2.5.4.4"
+      }
+    }, {
       "id" : "d455ef4d-c4b0-436f-908e-8bd2a199789c",
       "name" : "email",
       "protocol" : "cas",
@@ -1001,6 +1026,18 @@
         "jsonType.label" : "String"
       }
     }, {
+      "id" : "9df70fcf-675b-4d6f-8d81-f71f8daf9f5b",
+      "name" : "X500 givenName",
+      "protocol" : "saml",
+      "protocolMapper" : "saml-user-property-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "attribute.nameformat" : "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+        "user.attribute" : "firstName",
+        "friendly.name" : "givenName",
+        "attribute.name" : "urn:oid:2.5.4.42"
+      }
+    }, {
       "id" : "b9897c0c-f492-49a3-8982-d1dfd0a10a36",
       "name" : "given name",
       "protocol" : "cas",
@@ -1010,6 +1047,28 @@
         "user.attribute" : "firstName",
         "claim.name" : "givenName",
         "jsonType.label" : "String"
+      }
+    }, {
+      "id" : "b7d17686-f75d-40a5-bede-890fffb050ba",
+      "name" : "emailVerified",
+      "protocol" : "saml",
+      "protocolMapper" : "saml-user-property-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.attribute" : "emailVerified",
+        "attribute.nameformat" : "Basic",
+        "attribute.name" : "emailVerified"
+      }
+    }, {
+      "id" : "538bd37e-a649-4aa6-b924-de619fe0fedc",
+      "name" : "ID",
+      "protocol" : "saml",
+      "protocolMapper" : "saml-user-property-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.attribute" : "id",
+        "attribute.nameformat" : "Basic",
+        "attribute.name" : "id"
       }
     } ],
     "defaultClientScopes" : [ "role_list" ],
@@ -1630,7 +1689,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "a7dfdd72-6318-4754-849a-b2d4cbb240f8",
@@ -1646,7 +1705,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "oidc-full-name-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "c040d26e-f82f-46d8-af31-fa51a695f323",

@@ -2,8 +2,8 @@
 
 [![Build Status][build-badge]][build] [![Code Coverage][codecov-badge]][codecov]
 
-[build]: https://github.com/akunzai/GSS.Authentication.CAS/actions?query=workflow%3ABuild
-[build-badge]: https://github.com/akunzai/GSS.Authentication.CAS/workflows/Build/badge.svg
+[build]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml
+[build-badge]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml/badge.svg
 [codecov]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS
 [codecov-badge]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS/branch/main/graph/badge.svg?token=JGG7Y07SR0
 

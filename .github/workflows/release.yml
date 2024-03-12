@@ -9,10 +9,11 @@ permissions:
     contents: write
 
 jobs:
-  release:
+  publish:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
@@ -24,6 +25,10 @@ jobs:
           dotnet pack -o packages
       - name: Publish to NuGet.org
         run: dotnet nuget push "packages/*.nupkg" -k ${{ secrets.NUGET_AUTH_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
       - name: Pre-release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/') && (contains(github.ref,'preview') || contains(github.ref,'beta') || contains(github.ref,'alpha') || contains(github.ref,'rc'))

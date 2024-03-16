@@ -13,7 +13,20 @@ on:
 permissions: read-all
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            owin-sample:
+              - 'samples/OwinSample/**'
+            react-sample-client:
+              - 'samples/AspNetCoreReactSample/ClientApp/**'
   msbuild:
+    needs: changes
+    if: ${{ needs.changes.outputs.owin-sample == 'true' }}
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -27,6 +40,8 @@ jobs:
           msbuild -version
           msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore
   build-react-sample:
+    needs: changes
+    if: ${{ needs.changes.outputs.react-sample-client == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -3,7 +3,7 @@
 {
   "name": ".NET and Keycloak",
   // https://containers.dev/guide/dockerfile
-  "dockerComposeFile": "docker-compose.yml",
+  "dockerComposeFile": "compose.yaml",
   "service": "dotnet",
   "workspaceFolder": "/workspaces",
   "postAttachCommand": "corepack enable",

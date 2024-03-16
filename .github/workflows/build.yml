@@ -7,50 +7,23 @@ on:
   pull_request:
     branches:
       - main
-  # Allow manually triggering the workflow.
-  workflow_dispatch:
 
 permissions: read-all
 
 jobs:
-  changes:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: changes
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
         with:
-          filters: |
-            owin-sample:
-              - 'samples/OwinSample/**'
-            react-sample-client:
-              - 'samples/AspNetCoreReactSample/ClientApp/**'
-  msbuild:
-    needs: changes
-    if: ${{ needs.changes.outputs.owin-sample == 'true' }}
-    runs-on: windows-latest
-    steps:
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2
-        with:
-          msbuild-architecture: x64
+          dotnet-version: 8.0.x
       - name: Build
         run: |
-          msbuild -version
-          msbuild samples/OwinSample/OwinSample.csproj -noLogo -verbosity:minimal -restore
-  build-react-sample:
-    needs: changes
-    if: ${{ needs.changes.outputs.react-sample-client == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        run: |
-          corepack enable
-          cd samples/AspNetCoreReactSample/ClientApp
-          pnpm install
-          pnpm lint
-          pnpm build
+          dotnet --info
+          dotnet build -c Release
   dotnet-test:
     runs-on: ubuntu-latest
     steps:

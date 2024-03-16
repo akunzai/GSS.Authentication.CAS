@@ -16,6 +16,8 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -29,8 +31,6 @@ jobs:
     if: ${{ needs.changes.outputs.owin-sample == 'true' }}
     runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
         with:
@@ -44,8 +44,6 @@ jobs:
     if: ${{ needs.changes.outputs.react-sample-client == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Build
         run: |
           corepack enable

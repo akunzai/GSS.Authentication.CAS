@@ -4,9 +4,19 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.config/**'
+      - 'src/**'
+      - 'test/**'
+      - 'Directory.*.props'
   pull_request:
     branches:
       - main
+    paths:
+      - '.config/**'
+      - 'src/**'
+      - 'test/**'
+      - 'Directory.*.props'
 
 permissions: read-all
 

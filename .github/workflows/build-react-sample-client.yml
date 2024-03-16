@@ -1,0 +1,25 @@
+name: Build React Sample Client
+
+on:
+  push:
+    paths:
+      - 'samples/AspNetCoreReactSample/ClientApp/**'
+  pull_request:
+    paths:
+      - 'samples/AspNetCoreReactSample/ClientApp/**'
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: |
+          corepack enable
+          cd samples/AspNetCoreReactSample/ClientApp
+          pnpm install
+          pnpm lint
+          pnpm build

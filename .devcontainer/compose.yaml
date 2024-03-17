@@ -9,7 +9,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       PATH: $PATH:/home/vscode/.dotnet:/home/vscode/.dotnet/tools
     volumes:
-      - ..:/workspaces:cached
+      - ..:/workspace:cached
       # https://learn.microsoft.com/aspnet/core/security/docker-compose-https
       - ~/.aspnet/https:/home/vscode/.aspnet/https:ro
     command: sleep infinity

@@ -5,7 +5,7 @@
   // https://containers.dev/guide/dockerfile
   "dockerComposeFile": "compose.yaml",
   "service": "dotnet",
-  "workspaceFolder": "/workspaces",
+  "workspaceFolder": "/workspace",
   "postAttachCommand": "corepack enable",
   "customizations": {
     "vscode": {

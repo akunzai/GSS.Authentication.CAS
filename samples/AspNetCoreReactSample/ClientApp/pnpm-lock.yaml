@@ -39,8 +39,8 @@ dependencies:
     specifier: ^3.5.2
     version: 3.5.2
   wouter:
-    specifier: ^3.0.1
-    version: 3.0.1(react@18.2.0)
+    specifier: ^3.1.0
+    version: 3.1.0(react@18.2.0)
 
 devDependencies:
   '@vitejs/plugin-react':
@@ -4686,8 +4686,8 @@ packages:
     dependencies:
       isexe: 2.0.0
 
-  /wouter@3.0.1(react@18.2.0):
-    resolution: {integrity: sha512-Wv2FSH56LchrKKoiGXn2F8ZA9gLgKiI3JVtI64DhZXXOtbgV/pFKSyMZ5ds94LoKxkGAyNEKK0LAnTMR0LMp3g==}
+  /wouter@3.1.0(react@18.2.0):
+    resolution: {integrity: sha512-hou3w+12BMTBckdWdyJp/z7+kKcbdLDWfz6omSyrO6bbx4irNuQQyLDQkfSGXXJCxmglea3c8On9XFUkBSU8+Q==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:

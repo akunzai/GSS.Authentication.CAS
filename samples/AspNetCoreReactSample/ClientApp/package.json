@@ -19,7 +19,7 @@
     "react-dom": "^18.2.0",
     "react-router-bootstrap": "^0.26.2",
     "rimraf": "^5.0.5",
-    "typescript": "~5.1.6",
+    "typescript": "~5.4.3",
     "web-vitals": "^3.5.2",
     "wouter": "^3.1.0"
   },

@@ -2,21 +2,21 @@
   "realm" : "demo",
   "users" : [ {
     "id" : "c89affef-77b9-48fa-b8d4-1eefed65976d",
-    "createdTimestamp" : 1696259429184,
     "username" : "test",
-    "enabled" : true,
-    "totp" : false,
-    "emailVerified" : false,
     "firstName" : "Foo",
     "lastName" : "Bar",
     "email" : "test@example.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1696259429184,
+    "enabled" : true,
+    "totp" : false,
     "credentials" : [ {
       "id" : "5e4023a4-d6f9-4918-bbb1-c04a6649987f",
       "type" : "password",
       "userLabel" : "test",
       "createdDate" : 1696259438392,
-      "secretData" : "{\"value\":\"UNngnaoiAKiPulaIhW1mSF55oMSxDdKcWnekH97Tl3o=\",\"salt\":\"VJMcteHowQ02H9JOO5Ti1Q==\",\"additionalParameters\":{}}",
-      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      "secretData" : "{\"value\":\"Da0FG5IjJYj5jvdxVWVb+9JCc1K2gVlW5s3R/Ky81lJ2vHjpvbS3uvNQt/QkKndpROjGy+uWySFXYWPg+/exEw==\",\"salt\":\"ShOHAKffRF0SMPBPF1YKmw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],

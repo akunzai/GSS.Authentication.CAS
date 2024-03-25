@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Sustainsys.Saml2;
 using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Configuration;
 using Sustainsys.Saml2.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -163,21 +164,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddSaml2(options =>
     {
         options.SPOptions.EntityId = new EntityId(builder.Configuration["SAML2:SP:EntityId"]);
-        options.SPOptions.ServiceCertificates.Add(new X509Certificate2(
-            builder.Configuration["SAML2:SP:Certificate:Path"]!,
-            builder.Configuration["SAML2:SP:Certificate:Pass"],
-            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
-
-        var decryptionCertificatePath = builder.Configuration["SAML2:SP:Decryption:Certificate:Path"];
-        if (!string.IsNullOrWhiteSpace(decryptionCertificatePath) && File.Exists(decryptionCertificatePath))
+        options.SPOptions.AuthenticateRequestSigningBehavior = SigningBehavior.Never;
+        var spSigningCertPath = builder.Configuration["SAML2:SP:SigningCertificate:Path"];
+        if (!string.IsNullOrWhiteSpace(spSigningCertPath) && File.Exists(spSigningCertPath))
         {
-            options.SPOptions.ServiceCertificates.Add(new ServiceCertificate
-            {
-                Certificate = new X509Certificate2(decryptionCertificatePath,
-                    builder.Configuration["SAML2:SP:Decryption:Certificate:Pass"],
-                    X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet),
-                Use = CertificateUse.Encryption
-            });
+            options.SPOptions.ServiceCertificates.Add(new X509Certificate2(
+                spSigningCertPath,
+                builder.Configuration["SAML2:SP:Certificate:Pass"],
+                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
+            options.SPOptions.AuthenticateRequestSigningBehavior = SigningBehavior.IfIdpWantAuthnRequestsSigned;
         }
 
         options.SPOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
@@ -186,6 +181,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             {
                 MetadataLocation = builder.Configuration["SAML2:IdP:MetadataLocation"],
             });
+        options.Notifications.MetadataCreated = (metadata, _) =>
+        {
+            var ssoDescriptor = metadata.RoleDescriptors.OfType<SpSsoDescriptor>().First();
+            ssoDescriptor.WantAssertionsSigned = true;
+        };
+        // Avoid browsers downloading metadata as file
+        options.Notifications.MetadataCommandResultCreated = result =>
+        {
+            result.ContentType = "application/xml";
+            result.Headers.Remove("Content-Disposition");
+        };
     });
 
 var app = builder.Build();

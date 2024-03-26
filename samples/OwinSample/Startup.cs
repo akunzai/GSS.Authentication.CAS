@@ -1,7 +1,6 @@
 using System;
-using System.IO;
+using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
@@ -225,24 +224,7 @@ namespace OwinSample
 
         private static Saml2AuthenticationOptions CreateSaml2Options(IConfiguration configuration)
         {
-            var spOptions = new SPOptions { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]) };
-            spOptions.ServiceCertificates.Add(new X509Certificate2(
-                HttpContext.Current.Server.MapPath(configuration["SAML2:SP:Certificate:Path"]),
-                configuration["SAML2:SP:Certificate:Pass"],
-                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
-            var decryptionCertificatePath =
-                HttpContext.Current.Server.MapPath(configuration["SAML2:SP:Decryption:Certificate:Path"]);
-            if (!string.IsNullOrWhiteSpace(decryptionCertificatePath) && File.Exists(decryptionCertificatePath))
-            {
-                spOptions.ServiceCertificates.Add(new ServiceCertificate
-                {
-                    Certificate = new X509Certificate2(decryptionCertificatePath,
-                        configuration["SAML2:SP:Decryption:Certificate:Pass"]!,
-                        X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet),
-                    Use = CertificateUse.Encryption
-                });
-            }
-
+            var spOptions = new SPOptions { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]), AuthenticateRequestSigningBehavior = SigningBehavior.Never };
             spOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
             var options = new Saml2AuthenticationOptions(false) { SPOptions = spOptions };
             var idp = new IdentityProvider(new EntityId(configuration["SAML2:IdP:EntityId"]), spOptions)
@@ -250,6 +232,17 @@ namespace OwinSample
                 MetadataLocation = configuration["SAML2:IdP:MetadataLocation"]
             };
             options.IdentityProviders.Add(idp);
+            options.Notifications.MetadataCreated = (metadata, _) =>
+            {
+                var ssoDescriptor = metadata.RoleDescriptors.OfType<SpSsoDescriptor>().First();
+                ssoDescriptor.WantAssertionsSigned = true;
+            };
+            // Avoid browsers downloading metadata as file
+            options.Notifications.MetadataCommandResultCreated = result =>
+            {
+                result.ContentType = "application/xml";
+                result.Headers.Remove("Content-Disposition");
+            };
             // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
             options.CookieManager = new SystemWebCookieManager();
             return options;

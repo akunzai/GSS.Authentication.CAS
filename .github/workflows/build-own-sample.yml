@@ -6,9 +6,11 @@ on:
       - main
     paths:
       - 'samples/OwinSample/**'
+      - 'Directory.*.props'
   pull_request:
     paths:
       - 'samples/OwinSample/**'
+      - 'Directory.*.props'
 
 permissions: read-all
 

@@ -83,9 +83,6 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="App_Data\*.p12">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Mvc" />

@@ -165,13 +165,18 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.SPOptions.EntityId = new EntityId(builder.Configuration["SAML2:SP:EntityId"]);
         options.SPOptions.AuthenticateRequestSigningBehavior = SigningBehavior.Never;
-        var spSigningCertPath = builder.Configuration["SAML2:SP:SigningCertificate:Path"];
-        if (!string.IsNullOrWhiteSpace(spSigningCertPath) && File.Exists(spSigningCertPath))
+        var signingCertPath = builder.Configuration["SAML2:SP:SigningCertificate:Path"];
+        if (!string.IsNullOrWhiteSpace(signingCertPath) && File.Exists(signingCertPath))
         {
-            options.SPOptions.ServiceCertificates.Add(new X509Certificate2(
-                spSigningCertPath,
-                builder.Configuration["SAML2:SP:Certificate:Pass"],
-                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet));
+            // required for single logout
+            options.SPOptions.ServiceCertificates.Add(new ServiceCertificate
+            {
+                Use = CertificateUse.Signing,
+                Certificate = new X509Certificate2(
+                signingCertPath,
+                builder.Configuration["SAML2:SP:SigningCertificate:Pass"],
+                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet)
+            });
             options.SPOptions.AuthenticateRequestSigningBehavior = SigningBehavior.IfIdpWantAuthnRequestsSigned;
         }
 

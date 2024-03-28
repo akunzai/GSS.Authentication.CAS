@@ -17,7 +17,23 @@
         "action": "openExternally",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
       },
+      "justMyCode": false,
+      "requireExactSource": false,
+      "suppressJITOptimizations": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true,
+        "moduleFilter": {
+          "mode": "loadOnlyIncluded",
+          "includedModules": [
+            "Microsoft.AspNetCore.Authorization.dll",
+            "Microsoft.AspNetCore.Authentication.*.dll"
+          ]
+        }
+      },
       "env": {
+        "COMPlus_ZapDisable": "1",
+        "COMPlus_ReadyToRun": "0",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sourceFileMap": {

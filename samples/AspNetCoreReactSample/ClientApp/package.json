@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.69",
-    "@types/react-dom": "^18.2.22",
+    "@types/react-dom": "^18.2.23",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "react": "^18.2.0",

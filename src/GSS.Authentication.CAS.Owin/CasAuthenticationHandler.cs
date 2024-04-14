@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
@@ -25,12 +26,28 @@ namespace GSS.Authentication.CAS.Owin
         /// <returns>True if the request was handled, false if the next middleware should be invoked.</returns>
         public override async Task<bool> InvokeAsync()
         {
+            if (Options.SignedOutCallbackPath.HasValue && Options.SignedOutCallbackPath == Request.Path)
+            {
+                return await HandleSignOutCallbackAsync();
+            }
+
             if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path)
             {
                 return await InvokeReturnPathAsync().ConfigureAwait(false);
             }
 
             return false;
+        }
+
+        private Task<bool> HandleSignOutCallbackAsync()
+        {
+            var query = Request.Query;
+            var state = query[State];
+            var properties = Options.StateDataFormat.Unprotect(state);
+            Response.Redirect(!string.IsNullOrEmpty(properties?.RedirectUri)
+                ? properties!.RedirectUri
+                : Options.SignedOutRedirectUri);
+            return Task.FromResult(true);
         }
 
         private async Task<bool> InvokeReturnPathAsync()
@@ -41,7 +58,7 @@ namespace GSS.Authentication.CAS.Owin
             try
             {
                 ticket = await AuthenticateAsync().ConfigureAwait(false);
-                if (ticket?.Identity == null || !ticket.Identity.IsAuthenticated)
+                if (ticket?.Identity is not { IsAuthenticated: true })
                 {
                     exception = new InvalidOperationException("Invalid return state, unable to redirect.");
                     properties = ticket?.Properties;
@@ -89,7 +106,7 @@ namespace GSS.Authentication.CAS.Owin
 
             await Options.Provider.RedirectToAuthorizationEndpoint(context).ConfigureAwait(false);
 
-            if (context.SignInAsAuthenticationType != null && context.Identity != null)
+            if (context is { SignInAsAuthenticationType: not null, Identity: not null })
             {
                 var signInIdentity = context.Identity;
                 if (!string.Equals(signInIdentity.AuthenticationType, context.SignInAsAuthenticationType,
@@ -102,7 +119,7 @@ namespace GSS.Authentication.CAS.Owin
                 Context.Authentication.SignIn(context.Properties, signInIdentity);
             }
 
-            if (!context.IsRequestCompleted && context.RedirectUri != null)
+            if (context is { IsRequestCompleted: false, RedirectUri: not null })
             {
                 if (context.Identity == null)
                 {
@@ -150,7 +167,7 @@ namespace GSS.Authentication.CAS.Owin
                 throw new InvalidOperationException("Missing ticket parameter from query");
             }
 
-            var service = BuildReturnTo(state);
+            var service = QueryHelpers.AddQueryString(BuildRedirectUri(properties.RedirectUri ?? "/"), State, state);
             var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
                 .ConfigureAwait(false);
 
@@ -174,6 +191,43 @@ namespace GSS.Authentication.CAS.Owin
             await Options.Provider.CreatingTicket(context).ConfigureAwait(false);
 
             return new AuthenticationTicket(context.Identity, context.Properties);
+        }
+
+        /// <summary>
+        /// Handles SignOut
+        /// </summary>
+        /// <returns></returns>
+        protected override async Task ApplyResponseGrantAsync()
+        {
+            var signOut = Helper.LookupSignOut(Options.AuthenticationType, Options.AuthenticationMode);
+            if (signOut != null)
+            {
+                AuthenticationTicket? ticket = null;
+                var redirectContext = new CasRedirectContext(Context, ticket)
+                {
+                    RedirectUri = signOut.Properties.RedirectUri
+                };
+                await Options.Provider.RedirectToIdentityProviderForSignOut(redirectContext).ConfigureAwait(false);
+                if (redirectContext.Handled)
+                {
+                    return;
+                }
+
+                var properties = new AuthenticationProperties { RedirectUri = Options.SignedOutRedirectUri };
+                if (!string.IsNullOrWhiteSpace(signOut.Properties.RedirectUri))
+                {
+                    properties.RedirectUri = signOut.Properties.RedirectUri;
+                }
+
+                var returnTo = QueryHelpers.AddQueryString(
+                    BuildRedirectUriIfRelative(Options.SignedOutCallbackPath.Value), State,
+                    Options.StateDataFormat.Protect(properties));
+                var logoutUrl = new UriBuilder(Options.CasServerUrlBase);
+                logoutUrl.Path += Constants.Paths.Logout;
+                var redirectUri =
+                    QueryHelpers.AddQueryString(logoutUrl.Uri.AbsoluteUri, Constants.Parameters.Service, returnTo);
+                Response.Redirect(redirectUri);
+            }
         }
 
         /// <summary>
@@ -202,7 +256,8 @@ namespace GSS.Authentication.CAS.Owin
                 // Anti-CSRF
                 GenerateCorrelationId(Options.CookieManager, state);
 
-                var returnTo = BuildReturnTo(Options.StateDataFormat.Protect(state));
+                var returnTo = QueryHelpers.AddQueryString(BuildRedirectUri(Options.CallbackPath.Value), State,
+                    Options.StateDataFormat.Protect(state));
 
                 var authorizationEndpoint =
                     $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";
@@ -213,15 +268,27 @@ namespace GSS.Authentication.CAS.Owin
             return Task.CompletedTask;
         }
 
-        private string BuildReturnTo(string? state)
+        private string BuildRedirectUri(string path)
         {
             var baseUrl = Options.ServiceUrlBase?.IsAbsoluteUri == true
                 ? Options.ServiceUrlBase.AbsoluteUri.TrimEnd('/')
                 : $"{Request.Scheme}://{Request.Host}{RequestPathBase}";
-            return
-                state == null || string.IsNullOrWhiteSpace(state)
-                    ? $"{baseUrl}{Options.CallbackPath}"
-                    : $"{baseUrl}{Options.CallbackPath}?state={Uri.EscapeDataString(state)}";
+            return $"{baseUrl}{path}";
+        }
+
+        /// <summary>
+        /// Build a redirect path if the given path is a relative path.
+        /// </summary>
+        private string BuildRedirectUriIfRelative(string uriString)
+        {
+            if (string.IsNullOrWhiteSpace(uriString))
+            {
+                return uriString;
+            }
+
+            return Uri.TryCreate(uriString, UriKind.Absolute, out _)
+                ? uriString
+                : BuildRedirectUri(uriString);
         }
     }
 }

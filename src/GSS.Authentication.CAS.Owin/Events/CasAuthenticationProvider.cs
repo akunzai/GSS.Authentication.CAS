@@ -23,12 +23,22 @@ namespace GSS.Authentication.CAS.Owin
             context.Response.Redirect(context.RedirectUri);
             return Task.CompletedTask;
         };
+        
+        /// <summary>
+        /// Invoked before redirecting to the identity provider to sign out.
+        /// </summary>
+        public Func<CasRedirectContext, Task> OnRedirectToIdentityProviderForSignOut { get; set; } = _ => Task.CompletedTask;
 
         public Func<CasRemoteFailureContext, Task> OnRemoteFailure { get; set; } = _ => Task.CompletedTask;
 
         public virtual Task CreatingTicket(CasCreatingTicketContext context) => OnCreatingTicket(context);
 
         public virtual Task RedirectToAuthorizationEndpoint(CasRedirectToAuthorizationEndpointContext context) => OnRedirectToAuthorizationEndpoint(context);
+        
+        /// <summary>
+        /// Invoked before redirecting to the identity provider to sign out.
+        /// </summary>
+        public virtual Task RedirectToIdentityProviderForSignOut(CasRedirectContext context) => OnRedirectToIdentityProviderForSignOut(context);
 
         public Task RemoteFailure(CasRemoteFailureContext context) => OnRemoteFailure(context);
     }

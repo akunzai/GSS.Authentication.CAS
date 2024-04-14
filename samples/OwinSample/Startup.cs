@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Routing;
+using GSS.Authentication.CAS;
 using GSS.Authentication.CAS.Owin;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
@@ -86,33 +86,7 @@ namespace OwinSample
                 LogoutPath = CookieAuthenticationDefaults.LogoutPath,
                 // https://github.com/aspnet/AspNetKatana/wiki/System.Web-response-cookie-integration-issues
                 CookieManager = new SystemWebCookieManager(),
-                SessionStore = singleLogout ? resolver.GetRequiredService<IAuthenticationSessionStore>() : null,
-                Provider = new CookieAuthenticationProvider
-                {
-                    OnResponseSignOut = context =>
-                    {
-                        var redirectContext = new CookieApplyRedirectContext
-                        (
-                            context.OwinContext,
-                            context.Options,
-                            "/"
-                        );
-                        if (configuration.GetValue("CAS:SingleSignOut", false))
-                        {
-                            context.Options.CookieManager.DeleteCookie(context.OwinContext, context.Options.CookieName,
-                                context.CookieOptions);
-                            // Single Sign-Out
-                            var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                            var serviceUrl = urlHelper.Action("Index", "Home", null, context.Request.Scheme);
-                            var redirectUri = new UriBuilder(configuration["CAS:ServerUrlBase"]!);
-                            redirectUri.Path += "/logout";
-                            redirectUri.Query = $"service={Uri.EscapeDataString(serviceUrl)}";
-                            redirectContext.RedirectUri = redirectUri.Uri.AbsoluteUri;
-                        }
-
-                        context.Options.Provider.ApplyRedirect(redirectContext);
-                    }
-                }
+                SessionStore = singleLogout ? resolver.GetRequiredService<IAuthenticationSessionStore>() : null
             });
 
             app.UseCasAuthentication(options =>
@@ -143,6 +117,7 @@ namespace OwinSample
                         if (assertion == null)
                             return Task.CompletedTask;
                         // Map claims from assertion
+                        context.Identity.AddClaim(new Claim("auth_scheme", CasDefaults.AuthenticationType));
                         context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, assertion.PrincipalName));
                         if (assertion.Attributes.TryGetValue("display_name", out var displayName) &&
                             !string.IsNullOrWhiteSpace(displayName))
@@ -174,6 +149,7 @@ namespace OwinSample
                 ClientSecret = configuration["OIDC:ClientSecret"],
                 Authority = configuration["OIDC:Authority"],
                 RequireHttpsMetadata = !env.Equals("Development", StringComparison.OrdinalIgnoreCase),
+                // required for single logout
                 SaveTokens = configuration.GetValue("OIDC:SaveTokens", false),
                 ResponseType = OpenIdConnectResponseType.Code,
                 // https://github.com/aspnet/AspNetKatana/issues/348
@@ -184,10 +160,17 @@ namespace OwinSample
                 CookieManager = new SystemWebCookieManager(),
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
-                    RedirectToIdentityProvider = notification =>
+                    SecurityTokenValidated = notification =>
                     {
-                        // generate the redirect_uri parameter automatically
-                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        notification.AuthenticationTicket.Identity.AddClaim(new Claim("auth_scheme",
+                            OpenIdConnectAuthenticationDefaults.AuthenticationType));
+                        return Task.CompletedTask;
+                    },
+                    RedirectToIdentityProvider = async notification =>
+                    {
+                        // fix redirect_uri
+                        if (notification.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication &&
+                            string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
                         {
                             notification.ProtocolMessage.RedirectUri =
                                 notification.Request.Scheme + Uri.SchemeDelimiter +
@@ -195,20 +178,28 @@ namespace OwinSample
                                 notification.Options.CallbackPath;
                         }
 
-                        return Task.CompletedTask;
-                    },
-                    AuthorizationCodeReceived = notification =>
-                    {
-                        // generate the redirect_uri parameter automatically
-                        if (string.IsNullOrWhiteSpace(notification.Options.RedirectUri))
+                        if (notification.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
                         {
-                            notification.TokenEndpointRequest.RedirectUri =
-                                notification.Request.Scheme + Uri.SchemeDelimiter +
-                                notification.Request.Host + notification.Request.PathBase +
-                                notification.Options.CallbackPath;
-                        }
+                            // fix post_logout_redirect_uri
+                            if (!Uri.IsWellFormedUriString(notification.ProtocolMessage.PostLogoutRedirectUri,
+                                    UriKind.Absolute))
+                            {
+                                notification.ProtocolMessage.PostLogoutRedirectUri = notification.Request.Scheme +
+                                    Uri.SchemeDelimiter +
+                                    notification.Request.Host + notification.Request.PathBase +
+                                    notification.ProtocolMessage.PostLogoutRedirectUri;
+                            }
 
-                        return Task.CompletedTask;
+                            // fix id_token_hint
+                            if (string.IsNullOrWhiteSpace(notification.ProtocolMessage.IdTokenHint))
+                            {
+                                var result =
+                                    await notification.OwinContext.Authentication.AuthenticateAsync(
+                                        CookieAuthenticationDefaults.AuthenticationType);
+                                var idToken = result.Properties.Dictionary[OpenIdConnectParameterNames.IdToken];
+                                notification.ProtocolMessage.IdTokenHint = idToken;
+                            }
+                        }
                     }
                 }
             });
@@ -218,14 +209,25 @@ namespace OwinSample
 
         private static Saml2AuthenticationOptions CreateSaml2Options(IConfiguration configuration)
         {
-            var spOptions = new SPOptions { EntityId = new EntityId(configuration["SAML2:SP:EntityId"]), AuthenticateRequestSigningBehavior = SigningBehavior.Never };
-            spOptions.TokenValidationParametersTemplate.NameClaimType = ClaimTypes.NameIdentifier;
+            var spOptions = new SPOptions
+            {
+                EntityId = new EntityId(configuration["SAML2:SP:EntityId"]),
+                AuthenticateRequestSigningBehavior = SigningBehavior.Never,
+                TokenValidationParametersTemplate = { NameClaimType = ClaimTypes.NameIdentifier }
+            };
             var options = new Saml2AuthenticationOptions(false) { SPOptions = spOptions };
             var idp = new IdentityProvider(new EntityId(configuration["SAML2:IdP:EntityId"]), spOptions)
             {
                 MetadataLocation = configuration["SAML2:IdP:MetadataLocation"]
             };
             options.IdentityProviders.Add(idp);
+            options.Notifications.AcsCommandResultCreated = (result, _) =>
+            {
+                if (result.Principal.Identity is ClaimsIdentity identity)
+                {
+                    identity.AddClaim(new Claim("auth_scheme", "Saml2"));
+                }
+            };
             options.Notifications.MetadataCreated = (metadata, _) =>
             {
                 var ssoDescriptor = metadata.RoleDescriptors.OfType<SpSsoDescriptor>().First();

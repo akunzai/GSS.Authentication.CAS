@@ -1,6 +1,7 @@
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
 
 namespace OwinSample.Controllers
 {
@@ -22,9 +23,20 @@ namespace OwinSample.Controllers
 
         // GET /Account/Logout
         [HttpGet]
-        public void Logout()
+        public void Logout(string redirectUrl)
         {
-            Request.GetOwinContext().Authentication.SignOut();
+            if (string.IsNullOrWhiteSpace(redirectUrl))
+            {
+                redirectUrl = "/";
+            }
+            var owinContext = Request.GetOwinContext();
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            owinContext.Authentication.SignOut(properties, CookieAuthenticationDefaults.AuthenticationType);
+            var authScheme = owinContext.Authentication.User.FindFirst("auth_scheme")?.Value;
+            if (!string.IsNullOrWhiteSpace(authScheme))
+            {
+                owinContext.Authentication.SignOut(properties, authScheme);
+            }
         }
     }
 }

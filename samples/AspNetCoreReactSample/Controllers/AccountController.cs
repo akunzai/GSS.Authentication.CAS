@@ -48,9 +48,20 @@ public class AccountController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("/account/logout")]
-    public IActionResult Logout()
+    public async Task Logout(string? redirectUrl)
     {
-        return SignOut();
+        if (string.IsNullOrWhiteSpace(redirectUrl))
+        {
+            redirectUrl = "/";
+        }
+
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        await HttpContext.SignOutAsync(properties);
+        var authScheme = User.Claims.FirstOrDefault(x => string.Equals(x.Type, "auth_scheme"))?.Value;
+        if (!string.IsNullOrWhiteSpace(authScheme))
+        {
+            await HttpContext.SignOutAsync(authScheme, properties);
+        }
     }
 }
 

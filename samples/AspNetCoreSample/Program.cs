@@ -132,13 +132,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClientId = builder.Configuration["OIDC:ClientId"];
         options.ClientSecret = builder.Configuration["OIDC:ClientSecret"];
         options.Authority = builder.Configuration["OIDC:Authority"];
-        options.MetadataAddress = builder.Configuration["OIDC:MetadataAddress"];
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
-        options.ResponseType =
-            builder.Configuration.GetValue("OIDC:ResponseType", OpenIdConnectResponseType.Code)!;
-        options.ResponseMode =
-            builder.Configuration.GetValue("OIDC:ResponseMode", OpenIdConnectResponseMode.Query)!;
+        options.ResponseType = OpenIdConnectResponseType.Code;
         var scope = builder.Configuration["OIDC:Scope"];
         if (!string.IsNullOrWhiteSpace(scope))
         {

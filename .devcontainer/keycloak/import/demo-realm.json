@@ -248,11 +248,11 @@
         "attributes" : { }
       } ],
       "cas" : [ ],
-      "https://localhost:44345/Saml2/" : [ ],
+      "https://localhost:44345/Saml2" : [ ],
       "security-admin-console" : [ ],
       "admin-cli" : [ ],
       "account-console" : [ ],
-      "https://localhost:5001/Saml2/" : [ ],
+      "https://localhost:5001/Saml2" : [ ],
       "broker" : [ {
         "id" : "cb6fbe16-406d-45a1-97ef-fa2fca4b8862",
         "name" : "read-token",
@@ -770,7 +770,7 @@
     "optionalClientScopes" : [ ]
   }, {
     "id" : "32c71ab9-7e98-4781-a13f-6db99753381e",
-    "clientId" : "https://localhost:44345/Saml2/",
+    "clientId" : "https://localhost:44345/Saml2",
     "name" : "OwinSample",
     "description" : "",
     "rootUrl" : "https://localhost:44345",
@@ -886,7 +886,7 @@
     "optionalClientScopes" : [ ]
   }, {
     "id" : "0a520b4c-2073-4e21-97f8-b9aa043cfada",
-    "clientId" : "https://localhost:5001/Saml2/",
+    "clientId" : "https://localhost:5001/Saml2",
     "name" : "AspNetCoreSample",
     "description" : "",
     "rootUrl" : "https://localhost:5001",

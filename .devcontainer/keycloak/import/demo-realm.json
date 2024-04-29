@@ -917,7 +917,7 @@
       "saml.signing.certificate" : "MIIClzCCAX8CBgGMWViuFDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARzYW1sMB4XDTIzMTIxMTE0NDUzM1oXDTMzMTIxMTE0NDcxM1owDzENMAsGA1UEAwwEc2FtbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJv58Hu1ASYA1K+nY1qwcc9C+oOyusVn416xNeJIA1ZDXHv7d3u2jsjtScY9o/G4P04H5pikbQed6aW/BHvrgGjR9qYqC8uXiN1d0PfyfCDkOW3+2eQbTK3buC0t8ty/WtIAHfn7o0yYEx/qcZ0KIZaHbwYETux9qwVyx7UJRga1Nxgh3JTUQP9WXOAHMJGXFNQTOsqiLcaN2c+fJ71g+Js1IrT/8HKhTGb2BgAmTiT3Ly1kMrPkUpZX8MCBK8T7srVJ7nAb5I5K2wFX8zJP3QNWi6aFdLNzYQmAV/fEUx8AeKWG+1zMsOc5gSMZhhJuMLxwy/D05ySg+QWZmUXSXS8CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAOacJf764zEmGh2PKKIYye0Ah9qA0TnI1ocAZP/rmADsdv/tCOblodIR+TSnaLsNjyod4oAe431ydnp/ldyOZRNn63vJjL8NGyUwqgwH3JQdMl9/rMaMr1whQn4Y2pOEOe+ajTSW0ewUYi4vTJcQ0hZssTCll/4eVUtn20vgjaMnDCHaljxC7HmrfwTNmDgbto4+3Ku2oyoEEXUCGdANx86Iq7luPu+HzJrrtD0sjKIWlXFkjAwp2Fg4hue8AABPsrHTb4MfncFZrb3hpKOXyqKeGG4OZml4QYmWVENy0ZnMmja0nuGa+0hXKLYgmhrqX+r9Qz9Kq220/E6tVCUiU9w==",
       "saml.artifact.binding.identifier" : "KrXTZEZ4jv5lKJLhd8JD8LtnSMw=",
       "saml.artifact.binding" : "true",
-      "saml_single_logout_service_url_redirect" : "/Saml2/Logout",
+      "saml_single_logout_service_url_redirect" : "https://localhost:5001/Saml2/Logout",
       "saml.signature.algorithm" : "RSA_SHA256",
       "saml_force_name_id_format" : "false",
       "saml.client.signature" : "true",

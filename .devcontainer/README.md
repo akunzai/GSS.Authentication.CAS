@@ -11,8 +11,12 @@
 ## Getting Start
 
 ```sh
-# set up TLS certs and hosts in Host
-./init.sh auth.dev.local
+# set up TLS certs in Host
+mkdir -p .secrets
+mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem 'auth.dev.local'
+
+# set up hosts in Host
+echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
 
 # starting container
 docker compose up -d

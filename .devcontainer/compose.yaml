@@ -25,17 +25,19 @@ services:
       KC_HOSTNAME: auth.dev.local
       KC_HTTP_ENABLED: 'true'
       KC_HTTPS_PORT: 443
-      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/cert.pem
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/key.pem
+      KC_HTTPS_CERTIFICATE_FILE: /run/secrets/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /run/secrets/key.pem
     volumes:
       - keycloak-data:/opt/keycloak/data
-      - ./certs:/opt/keycloak/certs
       - ./keycloak/export:/opt/keycloak/data/export
       - ./keycloak/import:/opt/keycloak/data/import
     command: start --optimized --import-realm
     ports:
       - 127.0.0.1:8080:8080
       - 127.0.0.1:443:443
+    secrets:
+      - cert.pem
+      - key.pem
 
   redis:
     # https://hub.docker.com/_/redis
@@ -45,6 +47,12 @@ services:
       - redis-data:/data
     ports:
       - 127.0.0.1:6379:6379
+
+secrets:
+  cert.pem:
+    file: .secrets/cert.pem
+  key.pem:
+    file: .secrets/key.pem
 
 volumes:
     keycloak-data:

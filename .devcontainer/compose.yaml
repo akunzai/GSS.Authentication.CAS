@@ -27,6 +27,8 @@ services:
       KC_HTTPS_PORT: 443
       KC_HTTPS_CERTIFICATE_FILE: /run/secrets/cert.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /run/secrets/key.pem
+      # https://github.com/keycloak/keycloak/issues/13933
+      QUARKUS_HTTP_HTTP2: 'false'
     volumes:
       - keycloak-data:/opt/keycloak/data
       - ./keycloak/export:/opt/keycloak/data/export

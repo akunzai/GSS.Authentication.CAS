@@ -4,43 +4,44 @@
 
 - [Docker Engine](https://docs.docker.com/install/)
 - [Docker Compose V2](https://docs.docker.com/compose/cli-command/)
-- [mkcert](https://github.com/FiloSottile/mkcert)
 - [Visual Studio Code](https://code.visualstudio.com/)
 - Bash
 
 ## Getting Start
 
 ```sh
-# set up TLS certs in Host
-mkdir -p .secrets
-mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem 'auth.dev.local'
-
-# set up hosts in Host
-echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
-
 # starting container
 docker compose up -d
 
-# export keycloak configurations
-docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/export/
+# run the AspNetCoreSample in Host
+dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
 
-# run the sample app in Host
-cd ../samples/AspNetCoreSample
-dotnet run
+# build the OwinSample
+sh ./install_mono.sh
+msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 ```
 
-## Admin URLs
+## URLs
 
-- [Keycloak](https://auth.dev.local)
+- [Keycloak Master Admin Console](http://localhost:8080/admin/master/console)
+- [Keycloak Demo Account Console](http://localhost:8080/realms/demo/account)
 
 ## Credentials
 
-### Keycloak admin
+### Keycloak admin in Master realm
 
 - Username: `admin`
 - Password: `admin`
 
-### Keycloak user
+### Keycloak user in Demo realm
 
 - Username: `test`
 - Password: `test`
+
+## Troubleshooting
+
+### [Exporting Keycloak](https://www.keycloak.org/server/importExport)
+
+```sh
+docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/export/ --realm demo
+```

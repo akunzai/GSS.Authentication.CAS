@@ -13,6 +13,11 @@
   "remoteEnv": {
     "ASPNETCORE_ENVIRONMENT": "Development"
   },
+  "forwardPorts": [
+    3000,
+    5001,
+    8080
+  ],
   "portsAttributes": {
     "3000": {
       "label": "ASP.NET Core Spa proxy",

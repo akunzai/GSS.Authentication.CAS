@@ -13,7 +13,7 @@
 # starting container
 docker compose up -d
 
-# run the AspNetCoreSample in Host
+# run the AspNetCoreSample
 dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
 
 # build the OwinSample
@@ -44,4 +44,10 @@ msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 
 ```sh
 docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/export/ --realm demo
+```
+
+### Enabling HTTPS in ASP.NET using your own dev certificate
+
+```sh
+dotnet dev-certs https --export-path "${HOME}/.aspnet/https/aspnetapp.pem" --format Pem --no-password
 ```

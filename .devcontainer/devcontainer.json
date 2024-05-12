@@ -1,12 +1,15 @@
 // https://aka.ms/devcontainer.json
 {
   "name": ".NET and Keycloak",
-  // https://containers.dev/guide/dockerfile
+  // https://github.com/devcontainers/images/blob/main/src/dotnet
   "image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
+  "mounts": [
+    "source=${env:HOME}${env:USERPROFILE}/.aspnet/https,target=/home/vscode/.aspnet/https,type=bind"
+  ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-  "onCreateCommand": "cd .devcontainer; docker compose up -d; cd -",
-  "postAttachCommand": "corepack enable; dotnet dev-certs https --trust",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postAttachCommand": ". .devcontainer/env.sh",
   "remoteEnv": {
     "ASPNETCORE_ENVIRONMENT": "Development"
   },
@@ -23,7 +26,8 @@
       "label": "Redis"
     },
     "8080": {
-      "label": "Keycloak"
+      "label": "Keycloak",
+      "protocol": "http"
     }
   },
   "otherPortsAttributes": {

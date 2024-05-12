@@ -11,8 +11,8 @@ services:
       KC_PROXY_HEADERS: xforwarded
     volumes:
       - keycloak_data:/opt/keycloak/data
-      - ./keycloak/export:/opt/keycloak/data/export
-      - ./keycloak/import:/opt/keycloak/data/import
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/.devcontainer/keycloak/export:/opt/keycloak/data/export
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/.devcontainer/keycloak/import:/opt/keycloak/data/import
     command: start-dev --import-realm
     ports:
       - 127.0.0.1:8080:8080

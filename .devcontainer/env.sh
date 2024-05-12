@@ -2,6 +2,8 @@
 
 corepack enable
 
+[ -d "$HOME/.dotnet/tools" ] && export PATH="$PATH:$HOME/.dotnet/tools"
+
 # override URLs for GitHub Codespaces
 if [ -n "$CODESPACE_NAME" ]; then
     export CAS__ServerUrlBase="https://${CODESPACE_NAME}-8080.app.github.dev/realms/demo/protocol/cas"

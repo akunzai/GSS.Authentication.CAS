@@ -10,6 +10,9 @@
 ## Getting Start
 
 ```sh
+# source environments
+. env.sh
+
 # starting container
 docker compose up -d
 
@@ -17,7 +20,6 @@ docker compose up -d
 dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
 
 # build the OwinSample
-sh ./install_mono.sh
 msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 ```
 

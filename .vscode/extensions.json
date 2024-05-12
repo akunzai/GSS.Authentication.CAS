@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "mhutchie.git-graph",
+    "ms-dotnettools.csdevkit",
+    "josefpihrt-vscode.roslynator"
+  ]
+}

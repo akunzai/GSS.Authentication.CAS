@@ -1,23 +1,45 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+// https://aka.ms/devcontainer.json
 {
   "name": ".NET and Keycloak",
   // https://containers.dev/guide/dockerfile
-  "dockerComposeFile": "compose.yaml",
-  "service": "dotnet",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-  "postAttachCommand": "corepack enable",
+  "onCreateCommand": "cd .devcontainer; docker compose up -d; cd -",
+  "postAttachCommand": "corepack enable; dotnet dev-certs https --trust",
+  "remoteEnv": {
+    "ASPNETCORE_ENVIRONMENT": "Development"
+  },
+  "portsAttributes": {
+    "3000": {
+      "label": "ASP.NET Core Spa proxy",
+      "protocol": "https"
+    },
+    "5001": {
+      "label": "ASP.NET Core Sample",
+      "protocol": "https"
+    },
+    "6379": {
+      "label": "Redis"
+    },
+    "8080": {
+      "label": "Keycloak"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-dotnettools.csharp",
-        "josefpihrt-vscode.roslynator"
+        "josefpihrt-vscode.roslynator",
+        "mhutchie.git-graph"
       ]
     }
   },
   // https://containers.dev/features
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/node:1": {}
   }
 }

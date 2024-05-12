@@ -1,61 +1,31 @@
 name: auth-cas_devcontainer
 services:
-  dotnet:
-    # https://github.com/devcontainers/images/blob/main/src/dotnet
-    build: .
-    image: dotnet-sdk:mono
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      PATH: $PATH:/home/vscode/.dotnet:/home/vscode/.dotnet/tools
-    volumes:
-      - ..:/workspace:cached
-      # https://learn.microsoft.com/aspnet/core/security/docker-compose-https
-      - ~/.aspnet/https:/home/vscode/.aspnet/https:ro
-    command: sleep infinity
-
   keycloak:
-    build: 
-      context: ./keycloak
+    build: ./keycloak
     image: keycloak:cas
     environment:
       # https://www.keycloak.org/server/configuration
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      # https://www.keycloak.org/server/all-config
-      KC_HOSTNAME: auth.dev.local
-      KC_HTTP_ENABLED: 'true'
-      KC_HTTPS_PORT: 443
-      KC_HTTPS_CERTIFICATE_FILE: /run/secrets/cert.pem
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /run/secrets/key.pem
-      # https://github.com/keycloak/keycloak/issues/13933
-      QUARKUS_HTTP_HTTP2: 'false'
+      # https://www.keycloak.org/server/reverseproxy
+      KC_PROXY_HEADERS: xforwarded
     volumes:
-      - keycloak-data:/opt/keycloak/data
+      - keycloak_data:/opt/keycloak/data
       - ./keycloak/export:/opt/keycloak/data/export
       - ./keycloak/import:/opt/keycloak/data/import
-    command: start --optimized --import-realm
+    command: start-dev --import-realm
     ports:
       - 127.0.0.1:8080:8080
-      - 127.0.0.1:443:443
-    secrets:
-      - cert.pem
-      - key.pem
 
   redis:
     # https://hub.docker.com/_/redis
     image: redis
     restart: unless-stopped
     volumes:
-      - redis-data:/data
+      - redis_data:/data
     ports:
       - 127.0.0.1:6379:6379
 
-secrets:
-  cert.pem:
-    file: .secrets/cert.pem
-  key.pem:
-    file: .secrets/key.pem
-
 volumes:
-    keycloak-data:
-    redis-data:
+    keycloak_data:
+    redis_data:

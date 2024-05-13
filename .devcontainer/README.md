@@ -48,7 +48,7 @@ msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/export/ --realm demo
 ```
 
-### Enabling HTTPS in ASP.NET using your own dev certificate
+### [Enabling HTTPS in ASP.NET using your own dev certificate](https://learn.microsoft.com/aspnet/core/security/docker-compose-https)
 
 ```sh
 dotnet dev-certs https --export-path "${HOME}/.aspnet/https/aspnetapp.pem" --format Pem --no-password

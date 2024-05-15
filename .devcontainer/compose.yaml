@@ -1,5 +1,23 @@
 name: auth-cas_devcontainer
 services:
+
+  dotnet:
+    build: .
+    image: dotnet-sdk:mono
+    environment:
+      PATH: $PATH:/home/vscode/.dotnet:/home/vscode/.dotnet/tools
+    volumes:
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}
+        target: /workspace
+        consistency: cached
+      # https://learn.microsoft.com/aspnet/core/security/docker-compose-https#macos-or-linux
+      - type: bind
+        source: ~/.aspnet/https
+        target: /https
+        read_only: true
+    command: sleep infinity
+
   keycloak:
     build: ./keycloak
     image: keycloak:cas
@@ -10,19 +28,32 @@ services:
       # https://www.keycloak.org/server/reverseproxy
       KC_PROXY_HEADERS: xforwarded
     volumes:
-      - keycloak_data:/opt/keycloak/data
-      - ${LOCAL_WORKSPACE_FOLDER:-.}/.devcontainer/keycloak/export:/opt/keycloak/data/export
-      - ${LOCAL_WORKSPACE_FOLDER:-.}/.devcontainer/keycloak/import:/opt/keycloak/data/import
+      - type: volume
+        source: keycloak_data
+        target: /opt/keycloak/data
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/export
+        target: /opt/keycloak/data/export
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/import
+        target: /opt/keycloak/data/import
     command: start-dev --import-realm
     ports:
       - 127.0.0.1:8080:8080
+    networks:
+      default:
+        aliases:
+          - auth.dev.local
 
   redis:
     # https://hub.docker.com/_/redis
     image: redis
-    restart: unless-stopped
     volumes:
-      - redis_data:/data
+      - type: volume
+        source: redis_data
+        target: /data
     ports:
       - 127.0.0.1:6379:6379
 

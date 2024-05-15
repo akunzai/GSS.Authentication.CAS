@@ -10,8 +10,8 @@
 ## Getting Start
 
 ```sh
-# source environments
-. env.sh
+# set up hosts in Host
+echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
 
 # starting container
 docker compose up -d
@@ -25,8 +25,8 @@ msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 
 ## URLs
 
-- [Keycloak Master Admin Console](http://localhost:8080/admin/master/console)
-- [Keycloak Demo Account Console](http://localhost:8080/realms/demo/account)
+- [Keycloak Master Admin Console](http://auth.dev.local:8080/admin/master/console)
+- [Keycloak Demo Account Console](http://auth.dev.local:8080/realms/demo/account)
 
 ## Credentials
 
@@ -51,5 +51,5 @@ docker compose exec keycloak /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/
 ### [Enabling HTTPS in ASP.NET using your own dev certificate](https://learn.microsoft.com/aspnet/core/security/docker-compose-https)
 
 ```sh
-dotnet dev-certs https --export-path "${HOME}/.aspnet/https/aspnetapp.pem" --format Pem --no-password
+dotnet dev-certs https --export-path "${HOME}${env:USERPROFILE}/.aspnet/https/aspnetapp.pem" --format Pem --no-password
 ```

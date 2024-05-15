@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
-if [ -n "$CODESPACE_NAME" ]; then
+# https://learn.microsoft.com/aspnet/core/security/docker-compose-https#macos-or-linux
+if [ -f "/https/aspnetapp.pem" ] && [ -f "/https/aspnetapp.key" ]; then
+    cat >> /home/vscode/.bashrc <<EOF
+export ASPNETCORE_Kestrel__Certificates__Default__Path="/https/aspnetapp.pem"
+export ASPNETCORE_Kestrel__Certificates__Default__KeyPath="/https/aspnetapp.key"
+EOF
+else
 	dotnet dev-certs https --trust
 fi
-
-cd $(dirname "$0")
-
-docker compose up -d
-
-cd -
-sudo apt-get update
-sudo apt-get install --no-install-recommends -yqq dnsutils

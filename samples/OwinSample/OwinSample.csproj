@@ -103,7 +103,7 @@
     <PackageReference Include="NLog.Web" />
     <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="Sustainsys.Saml2.Owin" />
-    <PackageReference Include="System.Security.Cryptography.Xml" VersionOverride="8.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" VersionOverride="8.0.1" />
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
   <ItemGroup>

@@ -42,13 +42,13 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.2" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
     <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.2" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.9.0" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.10.0" />
     <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />

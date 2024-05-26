@@ -48,7 +48,7 @@
     <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
     <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.2" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.9.0" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.10.0" />
     <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
@@ -60,7 +60,7 @@
     <PackageVersion Include="Sustainsys.Saml2.Owin" Version="2.9.2" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
     <PackageVersion Include="xunit" Version="2.8.0" />
   </ItemGroup>
 </Project>

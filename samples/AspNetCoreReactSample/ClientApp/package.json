@@ -5,7 +5,8 @@
   "private": true,
   "packageManager": "pnpm@9.1.2",
   "scripts": {
-    "start": "node aspnetcore-https && node aspnetcore-react && vite",
+    "prestart": "node aspnetcore-https && node aspnetcore-react",
+    "start": "vite",
     "build": "tsc && vite build",
     "lint": "./node_modules/.bin/eslint ./src/"
   },

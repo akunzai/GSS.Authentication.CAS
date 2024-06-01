@@ -36,8 +36,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       wouter:
-        specifier: ^3.1.3
-        version: 3.1.3(react@18.3.1)
+        specifier: ^3.2.0
+        version: 3.2.0(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.13.0
@@ -1308,8 +1308,8 @@ packages:
     engines: {node: '>= 8'}
     hasBin: true
 
-  wouter@3.1.3:
-    resolution: {integrity: sha512-peIjHLma9MWDb9PAxVV+h+yYxpx9y5V6O1jF49ru8NEvLaDhwZR4y4FMYN5C3FM7CSXFn3ZmBeTq3g+V8b+hRQ==}
+  wouter@3.2.0:
+    resolution: {integrity: sha512-6g+5H4zYcGtqSte99EpZbgaZNfl1M9H5wk6fLwZ1p5vPRvsDdk4LqRKVz3ka0KHBcire4IuaFvM2zRsgt16t6g==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -2520,7 +2520,7 @@ snapshots:
     dependencies:
       isexe: 2.0.0
 
-  wouter@3.1.3(react@18.3.1):
+  wouter@3.2.0(react@18.3.1):
     dependencies:
       mitt: 3.0.1
       react: 18.3.1

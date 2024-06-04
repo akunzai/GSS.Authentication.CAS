@@ -1,0 +1,51 @@
+name: Docker Push
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.devcontainer/compose.yaml'
+      - '.devcontainer/keycloak/**'
+      - '.github/workflows/docker-push.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.devcontainer/compose.yaml'
+      - '.devcontainer/keycloak/**'
+      - '.github/workflows/docker-push.yml'
+  # Allow manually triggering the workflow.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  docker-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ vars.PROJECT_ID }}
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Set up Docker auth
+        run: gcloud auth configure-docker ${{ vars.REGION }}-docker.pkg.dev --quiet
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .devcontainer/keycloak
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/docker/keycloak

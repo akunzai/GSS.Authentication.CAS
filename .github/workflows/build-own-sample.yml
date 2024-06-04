@@ -8,6 +8,8 @@ on:
       - 'samples/OwinSample/**'
       - 'Directory.*.props'
   pull_request:
+    branches:
+      - main
     paths:
       - 'samples/OwinSample/**'
       - 'Directory.*.props'

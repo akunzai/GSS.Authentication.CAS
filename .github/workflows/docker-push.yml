@@ -19,11 +19,8 @@ jobs:
   docker-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Authenticate to Google Cloud
@@ -39,6 +36,5 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .devcontainer/keycloak
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/docker/keycloak

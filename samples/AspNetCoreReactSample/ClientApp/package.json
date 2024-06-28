@@ -20,7 +20,7 @@
     "typescript": "~5.4.5",
     "typescript-eslint": "^7.14.1",
     "web-vitals": "^4.2.0",
-    "wouter": "^3.2.0"
+    "wouter": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.7",

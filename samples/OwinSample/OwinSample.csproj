@@ -105,6 +105,7 @@
     <PackageReference Include="Sustainsys.Saml2.Owin" />
     <PackageReference Include="System.Security.Cryptography.Xml" />
     <PackageReference Include="System.Text.Encodings.Web" />
+    <PackageReference Include="System.Text.Json" VersionOverride="8.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj">

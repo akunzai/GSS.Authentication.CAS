@@ -1,8 +1,10 @@
 changelog:
   exclude:
+    labels:
+      - ignore-for-release
     authors:
-      - dependabot[bot]
-      - renovate[bot]
+      - dependabot
+      - renovate
   categories:
     - title: ⚡️ Breaking Changes
       labels:

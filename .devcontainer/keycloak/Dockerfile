@@ -4,7 +4,7 @@ ARG KEYCLOAK_VERSION=25.0.4
 FROM alpine as downloader
 ARG KEYCLOAK_VERSION
 RUN set -eux; \
-    apk add curl; \
+    apk add --no-cache curl; \
     # https://github.com/jacekkow/keycloak-protocol-cas
     curl -Lo /tmp/keycloak-protocol-cas.jar https://github.com/jacekkow/keycloak-protocol-cas/releases/download/${KEYCLOAK_VERSION}/keycloak-protocol-cas-${KEYCLOAK_VERSION}.jar;
 

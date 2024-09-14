@@ -1,0 +1,37 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.md'
+      - '**/*.sh'
+      - '**/Dockerfile'
+      - '.github/workflows/*.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.md'
+      - '**/*.sh'
+      - '**/Dockerfile'
+      - '.github/workflows/*.yml'
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: '**/*.md'
+      - name: Lint Dockerfile
+        uses: reviewdog/action-hadolint@v1
+      - name: Lint shell script
+        uses: reviewdog/action-shellcheck@v1
+      - name: Lint GitHub Actions workflow
+        uses: reviewdog/action-actionlint@v1

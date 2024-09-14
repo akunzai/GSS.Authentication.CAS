@@ -1,11 +1,13 @@
 # GSS.Authentication.CAS
 
-[![Build Status][build-badge]][build] [![Code Coverage][codecov-badge]][codecov]
+[![Build Status][build-badge]][build] [![Code Coverage][codecov-badge]][codecov] [![Lint][lint-badge]][lint]
 
 [build]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml
 [build-badge]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml/badge.svg
 [codecov]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS
 [codecov-badge]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS/branch/main/graph/badge.svg?token=JGG7Y07SR0
+[lint]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/lint.yml
+[lint-badge]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/lint.yml/badge.svg
 
 CAS Authentication Middleware for OWIN & ASP.NET Core
 

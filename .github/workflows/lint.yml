@@ -5,16 +5,16 @@ on:
     branches:
       - main
     paths:
-      - '**/*.md'
-      - '**/*.sh'
+      - '**.md'
+      - '**.sh'
       - '**/Dockerfile'
       - '.github/workflows/*.yml'
   pull_request:
     branches:
       - main
     paths:
-      - '**/*.md'
-      - '**/*.sh'
+      - '**.md'
+      - '**.sh'
       - '**/Dockerfile'
       - '.github/workflows/*.yml'
 

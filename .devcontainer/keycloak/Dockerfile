@@ -1,7 +1,7 @@
 # https://www.keycloak.org/server/containers
 ARG KEYCLOAK_VERSION=25.0.6
 
-FROM alpine as downloader
+FROM alpine AS downloader
 ARG KEYCLOAK_VERSION
 RUN set -eux; \
     apk add --no-cache curl; \

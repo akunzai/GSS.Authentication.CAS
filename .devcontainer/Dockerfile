@@ -1,5 +1,5 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bookworm-slim as dotnet-lts-runtime
-FROM docker.io/library/mono as mono
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-bookworm-slim AS dotnet-lts-runtime
+FROM docker.io/library/mono AS mono
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk/
 FROM mcr.microsoft.com/dotnet/sdk:8.0

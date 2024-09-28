@@ -386,3 +386,6 @@ yarn-error.log*
 
 # pnpm
 .pnpm-store/
+
+# coverage reports
+/coverage/

@@ -51,7 +51,8 @@ jobs:
         run: |
           dotnet test --collect:"XPlat Code Coverage"
           dotnet tool restore
-          dotnet tool run reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coverlet/reports" "-reporttypes:Cobertura"
+          dotnet tool run reportgenerator
+          [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"
       - uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

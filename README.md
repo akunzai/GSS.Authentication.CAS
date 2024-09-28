@@ -1,13 +1,13 @@
 # GSS.Authentication.CAS
 
-[![Build Status][build-badge]][build] [![Code Coverage][codecov-badge]][codecov] [![Lint][lint-badge]][lint]
+[![Build Status][build-badge]][build] [![Lint][lint-badge]][lint] [![Code Coverage][codecov-badge]][codecov]
 
 [build]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml
 [build-badge]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/build.yml/badge.svg
-[codecov]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS
-[codecov-badge]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS/branch/main/graph/badge.svg?token=JGG7Y07SR0
 [lint]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/lint.yml
 [lint-badge]: https://github.com/akunzai/GSS.Authentication.CAS/actions/workflows/lint.yml/badge.svg
+[codecov]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS
+[codecov-badge]: https://codecov.io/gh/akunzai/GSS.Authentication.CAS/branch/main/graph/badge.svg?token=JGG7Y07SR0
 
 CAS Authentication Middleware for OWIN & ASP.NET Core
 
@@ -40,6 +40,7 @@ Check out these [samples](./samples/) to learn the basics and key features.
 - [ASP.NET Core with React.js](./samples/AspNetCoreReactSample/)
 - [ASP.NET Core Identity](./samples/AspNetCoreIdentitySample/)
 - [ASP.NET Core Blazor](./samples/BlazorSample/)
+- [ASP.NET Core MVC](./samples/AspNetCoreMvcSample/)
 - [OWIN](./samples/OwinSample/)
 
 ## FAQ

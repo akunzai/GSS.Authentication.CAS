@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@inject IAuthenticationService AuthenticationService
+@{
+    ViewData["Title"] = "Home";
+}
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <h1>Hello, @User.Identity.Name</h1>
+    <p>
+        AuthenticationType: <code>@User.Identity.AuthenticationType</code>
+    </p>
+    <details>
+        <summary>Claims</summary>
+        <dl>
+            @foreach (var claim in User.Claims)
+            {
+                <dt>@claim.Type</dt>
+                <dd>@claim.Value</dd>
+            }
+        </dl>
+    </details>
+    var result = await AuthenticationService.AuthenticateAsync(Context, null);
+    if (result.Properties?.Items.Any() == true)
+    {
+        <details>
+            <summary>Properties</summary>
+            <dl>
+                @foreach (var (key, value) in result.Properties!.Items)
+                {
+                    <dt>@key</dt>
+                    <dd>@value</dd>
+                }
+            </dl>
+        </details>
+    }
+
+    @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "btn btn-danger" })
+}
+else
+{
+    <h1>Hello, anonymous</h1>
+    @Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-primary" })
+}

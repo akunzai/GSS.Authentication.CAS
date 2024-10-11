@@ -5,12 +5,16 @@ on:
     branches:
       - main
     paths:
+      - '*.sln'
+      - '*.slnx'
       - 'samples/OwinSample/**'
       - 'Directory.*.props'
   pull_request:
     branches:
       - main
     paths:
+      - '*.sln'
+      - '*.slnx'
       - 'samples/OwinSample/**'
       - 'Directory.*.props'
 

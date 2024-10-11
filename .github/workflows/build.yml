@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - '.config/**'
+      - '*.sln'
+      - '*.slnx'
       - 'src/**'
       - 'test/**'
       - 'Directory.*.props'
@@ -14,6 +16,8 @@ on:
       - main
     paths:
       - '.config/**'
+      - '*.sln'
+      - '*.slnx'
       - 'src/**'
       - 'test/**'
       - 'Directory.*.props'

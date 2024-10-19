@@ -1,5 +1,5 @@
 # https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=26.0.0
+ARG KEYCLOAK_VERSION=26.0.1
 
 # https://hub.docker.com/_/buildpack-deps
 FROM buildpack-deps:curl AS downloader

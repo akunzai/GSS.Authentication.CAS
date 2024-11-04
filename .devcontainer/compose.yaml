@@ -23,8 +23,8 @@ services:
     image: keycloak:cas
     environment:
       # https://www.keycloak.org/server/configuration
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
       # https://www.keycloak.org/server/reverseproxy
       KC_PROXY_HEADERS: xforwarded
     volumes:

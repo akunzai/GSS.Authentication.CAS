@@ -2,4 +2,4 @@
 [ReportGenerator]
 	reports = "**/coverage.cobertura.xml"
 	targetdir = "coverage"
-	reporttypes = "Cobertura;TextSummary"
+	reporttypes = Cobertura,TextSummary

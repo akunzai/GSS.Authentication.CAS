@@ -85,7 +85,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 
@@ -94,7 +94,7 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-app.MapRazorPages();
+app.MapRazorPages().WithStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

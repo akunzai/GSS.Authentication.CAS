@@ -77,14 +77,14 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().WithStaticAssets();
 app.MapFallbackToFile("index.html").AllowAnonymous();
 
 app.Run();

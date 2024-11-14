@@ -1,0 +1,26 @@
+# All file types
+* text=auto
+
+# Solutions
+*.sln   text=auto eol=crlf
+*.slnx  text=auto
+
+# Projects
+*.csproj    text=auto
+*.props    text=auto
+
+# Sources
+*.cs    text=auto diff=csharp
+
+# Scripts
+*.sh   text eol=lf
+
+# Images
+*.ico  binary
+*.png  binary
+*.jpg  binary
+*.gif  binary
+
+# Keys
+*.snk  binary
+*.p12  binary

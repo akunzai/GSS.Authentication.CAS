@@ -1,14 +1,10 @@
 ﻿<Solution>
   <Folder Name="/samples/">
     <Project Path="samples\AspNetCoreIdentitySample\AspNetCoreIdentitySample.csproj" />
-    <Project Path="samples\AspNetCoreMvcSample\AspNetCoreMvcSample.csproj" Type="Classic C#" />
+    <Project Path="samples\AspNetCoreMvcSample\AspNetCoreMvcSample.csproj" />
     <Project Path="samples\AspNetCoreReactSample\AspNetCoreReactSample.csproj" />
     <Project Path="samples\AspNetCoreSample\AspNetCoreSample.csproj" />
-    <Project Path="samples\BlazorSample\BlazorSample.csproj" Type="Classic C#" />
-    <Project Path="samples\OwinSample\OwinSample.csproj" Type="Classic C#">
-      <Configuration Solution="Debug|Any CPU" Project="Debug|Any CPU|NoBuild" />
-      <Configuration Solution="Release|Any CPU" Project="Release|Any CPU|NoBuild" />
-    </Project>
+    <Project Path="samples\BlazorSample\BlazorSample.csproj" />
     <File Path="samples\Directory.Build.props" />
   </Folder>
   <Folder Name="/Solution Items/">

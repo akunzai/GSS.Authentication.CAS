@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bookworm-slim AS dotnet-lts-runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim AS dotnet-lts-runtime
 FROM docker.io/library/mono AS mono
 
 # https://hub.docker.com/_/microsoft-dotnet-sdk/
-FROM mcr.microsoft.com/dotnet/sdk:8.0
+FROM mcr.microsoft.com/dotnet/sdk:9.0
 
-# install ASP.NET Core 6.0 Runtime
+# install ASP.NET Core 8.0 Runtime
 COPY --from=dotnet-lts-runtime /usr/share/dotnet /usr/share/dotnet
 
 # install msbuild for Mono

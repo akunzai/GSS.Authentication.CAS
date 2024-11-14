@@ -130,7 +130,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             options.SPOptions.ServiceCertificates.Add(new ServiceCertificate
             {
                 Use = CertificateUse.Signing,
-                Certificate = new X509Certificate2(
+                Certificate = X509CertificateLoader.LoadPkcs12FromFile(
                 signingCertPath,
                 builder.Configuration["SAML2:SP:SigningCertificate:Pass"],
                 X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet)
@@ -173,7 +173,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 
@@ -185,6 +185,6 @@ if (singleLogout)
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+app.MapRazorPages().WithStaticAssets();
 
 app.Run();

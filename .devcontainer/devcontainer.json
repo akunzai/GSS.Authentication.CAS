@@ -15,7 +15,7 @@
   ],
   "portsAttributes": {
     "3000": {
-      "label": "ASP.NET Core Spa proxy",
+      "label": "ASP.NET Core SPA proxy",
       "protocol": "https"
     },
     "5001": {

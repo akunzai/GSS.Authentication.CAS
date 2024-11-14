@@ -94,6 +94,7 @@ public class CasSingleLogoutMiddlewareTests
         var host = new HostBuilder()
             .ConfigureWebHostDefaults(builder =>
             {
+                builder.UseTestServer();
                 builder.ConfigureServices(services => services.AddSingleton(Mock.Of<ITicketStore>()));
                 builder.Configure(app => app.UseCasSingleLogout());
             })

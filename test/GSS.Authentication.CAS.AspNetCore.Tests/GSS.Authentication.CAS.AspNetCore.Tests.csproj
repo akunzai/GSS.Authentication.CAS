@@ -13,12 +13,11 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" VersionOverride="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" VersionOverride="8.0.12" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
 </Project>

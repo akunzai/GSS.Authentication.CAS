@@ -1,7 +1,3 @@
-#if NET48
-using System.Net.Http;
-#endif
-
 namespace GSS.Authentication.CAS.Testing;
 
 public static class HttpResponseExtensions

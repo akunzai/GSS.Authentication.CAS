@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		.github\dependabot.yml = .github\dependabot.yml
 		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		README.md = README.md
-		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1D7E648F-A3B2-4443-A06D-E5C96D015E43}"
@@ -30,11 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{92CCEC97-9
 		test\Directory.Build.props = test\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Testing", "test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj", "{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Core.Tests", "test\GSS.Authentication.CAS.Core.Tests\GSS.Authentication.CAS.Core.Tests.csproj", "{161F8D5C-BAB6-4769-A859-1B565B46BD7A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.Owin.Tests", "test\GSS.Authentication.CAS.Owin.Tests\GSS.Authentication.CAS.Owin.Tests.csproj", "{A489BE29-7066-4B8C-A3AE-4016EE9600CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSS.Authentication.CAS.AspNetCore.Tests", "test\GSS.Authentication.CAS.AspNetCore.Tests\GSS.Authentication.CAS.AspNetCore.Tests.csproj", "{FD31BBED-1977-4872-BD93-49F70182F7E9}"
 EndProject
@@ -71,18 +67,10 @@ Global
 		{9A29D6A6-2B15-411F-BCB2-973991D0853B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A29D6A6-2B15-411F-BCB2-973991D0853B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A29D6A6-2B15-411F-BCB2-973991D0853B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A489BE29-7066-4B8C-A3AE-4016EE9600CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A489BE29-7066-4B8C-A3AE-4016EE9600CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A489BE29-7066-4B8C-A3AE-4016EE9600CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A489BE29-7066-4B8C-A3AE-4016EE9600CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD31BBED-1977-4872-BD93-49F70182F7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -115,9 +103,7 @@ Global
 		{815A6FCE-B2E2-4D56-98D5-DB73731772D8} = {1D7E648F-A3B2-4443-A06D-E5C96D015E43}
 		{6D38722F-F183-42B3-AD72-31C2C1E35F32} = {1D7E648F-A3B2-4443-A06D-E5C96D015E43}
 		{9A29D6A6-2B15-411F-BCB2-973991D0853B} = {1D7E648F-A3B2-4443-A06D-E5C96D015E43}
-		{E8E2CD5A-E21B-4410-8A16-DF7C0F428EF4} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
 		{161F8D5C-BAB6-4769-A859-1B565B46BD7A} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
-		{A489BE29-7066-4B8C-A3AE-4016EE9600CD} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
 		{FD31BBED-1977-4872-BD93-49F70182F7E9} = {92CCEC97-9E16-444E-BD4B-4791AFEB1FFE}
 		{AB5054E3-28CE-4FF1-B9CA-4F6D8EC43EFF} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}
 		{AF9F6FAF-873B-4C4C-BD6D-0CA09D189B6B} = {EF050CD3-59F8-432E-9E77-7CF8A5F5CD91}

@@ -3,19 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{fae04ec0-301f-11d3-bf4b-00c04f79efbc}") = "OwinSample", "OwinSample\OwinSample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinSample", "OwinSample\OwinSample.csproj", "{BB89E35B-F73F-426F-8E66-456D6A49FDF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Core", "..\src\GSS.Authentication.CAS.Core\GSS.Authentication.CAS.Core.csproj", "{C41BBB42-F6C3-4DC0-B5D6-B6F18AC2EB9D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Owin", "..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj", "{F0F064C5-9A25-4879-AC2D-2AAAF75C7FDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Owin.Tests", "GSS.Authentication.CAS.Owin.Tests\GSS.Authentication.CAS.Owin.Tests.csproj", "{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +29,12 @@ Global
 		{F0F064C5-9A25-4879-AC2D-2AAAF75C7FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0F064C5-9A25-4879-AC2D-2AAAF75C7FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0F064C5-9A25-4879-AC2D-2AAAF75C7FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

@@ -1,62 +1,55 @@
-name: Build
+name: Build OWIN
 
 on:
   push:
     branches:
       - main
     paths:
-      - '.config/**'
-      - '*.sln'
-      - '*.slnx'
-      - 'src/**'
-      - 'test/**'
       - 'Directory.*.props'
+      - 'owin/**'
+      - 'src/GSS.Authentication.Owin/**'
   pull_request:
     branches:
       - main
     paths:
-      - '.config/**'
-      - '*.sln'
-      - '*.slnx'
-      - 'src/**'
-      - 'test/**'
       - 'Directory.*.props'
+      - 'owin/**'
+      - 'src/GSS.Authentication.Owin/**'
 
 permissions: read-all
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  msbuild:
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
         with:
-          dotnet-version: 9.0.x
+          msbuild-architecture: x64
       - name: Build
         run: |
-          dotnet --info
-          dotnet build -c Release
+          cd owin
+          msbuild -version
+          msbuild -noLogo -verbosity:minimal -restore
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8.0.x
-            9.0.x
       - name: Test
         run: |
+          cd owin
           dotnet test --collect:"XPlat Code Coverage"
           dotnet tool restore
           dotnet tool run reportgenerator
-          [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"
       - uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+

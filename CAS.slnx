@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/samples/">
     <Project Path="samples\AspNetCoreIdentitySample\AspNetCoreIdentitySample.csproj" />
     <Project Path="samples\AspNetCoreMvcSample\AspNetCoreMvcSample.csproj" />
@@ -25,7 +25,6 @@
   <Folder Name="/test/">
     <Project Path="test\GSS.Authentication.CAS.AspNetCore.Tests\GSS.Authentication.CAS.AspNetCore.Tests.csproj" />
     <Project Path="test\GSS.Authentication.CAS.Core.Tests\GSS.Authentication.CAS.Core.Tests.csproj" />
-    <Project Path="test\GSS.Authentication.CAS.Owin.Tests\GSS.Authentication.CAS.Owin.Tests.csproj" />
     <Project Path="test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
     <File Path="test\Directory.Build.props" />
   </Folder>

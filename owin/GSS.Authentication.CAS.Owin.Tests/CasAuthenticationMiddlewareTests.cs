@@ -45,7 +45,6 @@ public class CasAuthenticationMiddlewareTests
             // Act
             await server.HttpClient.GetAsync("/signin-cas");
         });
-        
 
         // Assert
         Assert.NotNull(exception);

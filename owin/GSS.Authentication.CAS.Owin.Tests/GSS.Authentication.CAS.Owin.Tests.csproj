@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
   
@@ -13,10 +17,10 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.Owin\GSS.Authentication.CAS.Owin.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
+    <ProjectReference Include="..\..\test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
 </Project>

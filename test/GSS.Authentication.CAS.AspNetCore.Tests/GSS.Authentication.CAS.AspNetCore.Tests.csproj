@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" VersionOverride="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" VersionOverride="8.0.12" />
   </ItemGroup>
 
   <ItemGroup>

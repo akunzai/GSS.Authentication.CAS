@@ -9,8 +9,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
-    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
-  </ItemGroup>
-
 </Project>

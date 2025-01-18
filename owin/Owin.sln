@@ -11,15 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Owin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Owin.Tests", "GSS.Authentication.CAS.Owin.Tests\GSS.Authentication.CAS.Owin.Tests.csproj", "{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSS.Authentication.CAS.Testing", "..\test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj", "{8FF75667-B22D-41B2-9915-8B905DF8DA4E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BB89E35B-F73F-426F-8E66-456D6A49FDF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -38,9 +33,8 @@ Global
 		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC9C58DD-BA5D-4EE4-8006-0B1595896AF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8FF75667-B22D-41B2-9915-8B905DF8DA4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8FF75667-B22D-41B2-9915-8B905DF8DA4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8FF75667-B22D-41B2-9915-8B905DF8DA4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8FF75667-B22D-41B2-9915-8B905DF8DA4E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

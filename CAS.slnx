@@ -25,7 +25,6 @@
   <Folder Name="/test/">
     <Project Path="test\GSS.Authentication.CAS.AspNetCore.Tests\GSS.Authentication.CAS.AspNetCore.Tests.csproj" />
     <Project Path="test\GSS.Authentication.CAS.Core.Tests\GSS.Authentication.CAS.Core.Tests.csproj" />
-    <Project Path="test\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
     <File Path="test\Directory.Build.props" />
   </Folder>
 </Solution>

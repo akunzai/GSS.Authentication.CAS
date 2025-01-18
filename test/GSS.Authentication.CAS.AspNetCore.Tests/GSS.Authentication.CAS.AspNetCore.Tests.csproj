@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GSS.Authentication.CAS.AspNetCore\GSS.Authentication.CAS.AspNetCore.csproj" />
-    <ProjectReference Include="..\GSS.Authentication.CAS.Testing\GSS.Authentication.CAS.Testing.csproj" />
   </ItemGroup>
 
 </Project>

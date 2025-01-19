@@ -1,7 +1,6 @@
 using System.Net;
 using System.Security.Claims;
 using GSS.Authentication.CAS.Security;
-using GSS.Authentication.CAS.Testing;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;

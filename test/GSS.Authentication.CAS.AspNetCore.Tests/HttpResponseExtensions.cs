@@ -1,4 +1,4 @@
-namespace GSS.Authentication.CAS.Testing;
+namespace GSS.Authentication.CAS.AspNetCore.Tests;
 
 public static class HttpResponseExtensions
 {
@@ -26,7 +26,7 @@ public static class HttpResponseExtensions
             cookies.Add(nameValue);
         }
 
-        request.Headers.Add("Cookie", string.Join("; ", [.. cookies]));
+        request.Headers.Add("Cookie", string.Join("; ", cookies));
         return request;
     }
 }

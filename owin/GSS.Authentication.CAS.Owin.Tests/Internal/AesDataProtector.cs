@@ -3,42 +3,43 @@ using System.Text;
 using Microsoft.Owin.Security.DataProtection;
 
 // ReSharper disable once CheckNamespace
-namespace GSS.Authentication.CAS.Owin.Tests;
-
-internal class AesDataProtector : IDataProtector
+namespace GSS.Authentication.CAS.Owin.Tests
 {
-    private readonly byte[] _key;
-    private readonly byte[] _iv;
-
-    public AesDataProtector(string? key = null)
+    internal class AesDataProtector : IDataProtector
     {
-        if (!string.IsNullOrWhiteSpace(key))
+        private readonly byte[] _key;
+        private readonly byte[] _iv;
+
+        public AesDataProtector(string? key = null)
         {
-            using var sha = SHA256.Create();
-            _key = sha.ComputeHash(Encoding.UTF8.GetBytes(key));
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                using var sha = SHA256.Create();
+                _key = sha.ComputeHash(Encoding.UTF8.GetBytes(key));
+            }
+
+            using var aes = Aes.Create();
+            _key ??= aes.Key;
+
+            _iv = aes.IV;
         }
 
-        using var aes = Aes.Create();
-        _key ??= aes.Key;
+        public byte[] Protect(byte[] userData)
+        {
+            using var aes = Aes.Create();
+            aes.Key = _key;
+            aes.IV = _iv;
+            using var transform = aes.CreateEncryptor();
+            return transform.TransformFinalBlock(userData, 0, userData.Length);
+        }
 
-        _iv = aes.IV;
-    }
-
-    public byte[] Protect(byte[] userData)
-    {
-        using var aes = Aes.Create();
-        aes.Key = _key;
-        aes.IV = _iv;
-        using var transform = aes.CreateEncryptor();
-        return transform.TransformFinalBlock(userData, 0, userData.Length);
-    }
-
-    public byte[] Unprotect(byte[] protectedData)
-    {
-        using var aes = Aes.Create();
-        aes.Key = _key;
-        aes.IV = _iv;
-        using var transform = aes.CreateDecryptor();
-        return transform.TransformFinalBlock(protectedData, 0, protectedData.Length);
+        public byte[] Unprotect(byte[] protectedData)
+        {
+            using var aes = Aes.Create();
+            aes.Key = _key;
+            aes.IV = _iv;
+            using var transform = aes.CreateDecryptor();
+            return transform.TransformFinalBlock(protectedData, 0, protectedData.Length);
+        }
     }
 }

@@ -16,15 +16,10 @@ public static class HttpResponseExtensions
         var request = new HttpRequestMessage(method ?? HttpMethod.Get, path);
         if (!response.Headers.TryGetValues("Set-Cookie", out var values))
             return request;
-        var cookies = new List<string>();
-        foreach (var value in values)
-        {
-            var nameValue = value.Split(';')[0];
-            var parts = nameValue.Split('=');
-            if (string.IsNullOrWhiteSpace(parts[1]))
-                continue;
-            cookies.Add(nameValue);
-        }
+        var cookies = values.Select(value => value.Split(';')[0])
+            .Select(nameValue => new { nameValue, parts = nameValue.Split('=') })
+            .Where(t => !string.IsNullOrWhiteSpace(t.parts[1]))
+            .Select(t => t.nameValue).ToList();
 
         request.Headers.Add("Cookie", string.Join("; ", cookies));
         return request;

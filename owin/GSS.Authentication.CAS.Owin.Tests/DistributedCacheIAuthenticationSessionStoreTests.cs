@@ -1,139 +1,142 @@
+using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security;
 using Xunit;
 
-namespace GSS.Authentication.CAS.Owin.Tests;
-
-public class DistributedCacheIAuthenticationSessionStoreTests
+namespace GSS.Authentication.CAS.Owin.Tests
 {
-    private static readonly IDistributedCache _cache =
-        new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-
-    private readonly DistributedCacheIAuthenticationSessionStore _sessionStore;
-    private readonly DistributedCacheIAuthenticationSessionStoreOptions _options;
-
-    public DistributedCacheIAuthenticationSessionStoreTests()
+    public class DistributedCacheIAuthenticationSessionStoreTests
     {
-        _options = new DistributedCacheIAuthenticationSessionStoreOptions();
-        _sessionStore = new DistributedCacheIAuthenticationSessionStore(_cache, Options.Create(_options));
-    }
+        private static readonly IDistributedCache _cache =
+            new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
 
-    [Fact]
-    public async Task StoreWithServiceTicket_ShouldStoreItAsTicketId()
-    {
-        // Arrange
-        var expected = GenerateNewTicket();
-        var serviceTicket = Guid.NewGuid().ToString();
-        expected.Properties.SetServiceTicket(serviceTicket);
+        private readonly DistributedCacheIAuthenticationSessionStore _sessionStore;
+        private readonly DistributedCacheIAuthenticationSessionStoreOptions _options;
 
-        // Act
-        var key = await _sessionStore.StoreAsync(expected);
+        public DistributedCacheIAuthenticationSessionStoreTests()
+        {
+            _options = new DistributedCacheIAuthenticationSessionStoreOptions();
+            _sessionStore = new DistributedCacheIAuthenticationSessionStore(_cache, Options.Create(_options));
+        }
 
-        // Assert
-        Assert.NotNull(key);
-        Assert.Equal(serviceTicket, key);
-    }
+        [Fact]
+        public async Task StoreWithServiceTicket_ShouldStoreItAsTicketId()
+        {
+            // Arrange
+            var expected = GenerateNewTicket();
+            var serviceTicket = Guid.NewGuid().ToString();
+            expected.Properties.SetServiceTicket(serviceTicket);
 
-    [Fact]
-    public async Task StoreWithoutServiceTicket_ShouldGenerateNewTicketId()
-    {
-        // Arrange
-        var expected = GenerateNewTicket();
+            // Act
+            var key = await _sessionStore.StoreAsync(expected);
 
-        // Act
-        var key = await _sessionStore.StoreAsync(expected);
+            // Assert
+            Assert.NotNull(key);
+            Assert.Equal(serviceTicket, key);
+        }
 
-        // Assert
-        Assert.NotNull(key);
-    }
+        [Fact]
+        public async Task StoreWithoutServiceTicket_ShouldGenerateNewTicketId()
+        {
+            // Arrange
+            var expected = GenerateNewTicket();
 
-    [Fact]
-    public async Task RenewWithNotExistKey_ShouldStoreNewEntry()
-    {
-        // Arrange
-        var key = Guid.NewGuid().ToString();
-        var expected = GenerateNewTicket();
+            // Act
+            var key = await _sessionStore.StoreAsync(expected);
 
-        // Act
-        await _sessionStore.RenewAsync(key, expected);
+            // Assert
+            Assert.NotNull(key);
+        }
 
-        // Assert
-        var ignored = await _sessionStore.RetrieveAsync(_options.TicketIdFactory(expected));
-        Assert.Null(ignored);
-        var actual = await _sessionStore.RetrieveAsync(key);
-        Assert.NotNull(actual);
-    }
+        [Fact]
+        public async Task RenewWithNotExistKey_ShouldStoreNewEntry()
+        {
+            // Arrange
+            var key = Guid.NewGuid().ToString();
+            var expected = GenerateNewTicket();
 
-    [Fact]
-    public async Task RenewWithExistKey_ShouldNotRemoveExistEntry()
-    {
-        // Arrange
-        var existEntry = GenerateNewTicket();
-        var serviceTicket = Guid.NewGuid().ToString();
-        existEntry.Properties.SetServiceTicket(serviceTicket);
+            // Act
+            await _sessionStore.RenewAsync(key, expected);
 
-        var key = await _sessionStore.StoreAsync(existEntry);
-        var newEntry = GenerateNewTicket();
+            // Assert
+            var ignored = await _sessionStore.RetrieveAsync(_options.TicketIdFactory(expected));
+            Assert.Null(ignored);
+            var actual = await _sessionStore.RetrieveAsync(key);
+            Assert.NotNull(actual);
+        }
 
-        // Act
-        await _sessionStore.RenewAsync(key, newEntry);
+        [Fact]
+        public async Task RenewWithExistKey_ShouldNotRemoveExistEntry()
+        {
+            // Arrange
+            var existEntry = GenerateNewTicket();
+            var serviceTicket = Guid.NewGuid().ToString();
+            existEntry.Properties.SetServiceTicket(serviceTicket);
 
-        // Assert
-        var exist = await _sessionStore.RetrieveAsync(_options.TicketIdFactory(existEntry));
-        Assert.NotNull(exist);
-        var actual = await _sessionStore.RetrieveAsync(key);
-        Assert.NotNull(actual);
-    }
+            var key = await _sessionStore.StoreAsync(existEntry);
+            var newEntry = GenerateNewTicket();
 
-    [Fact]
-    public async Task RetrieveWithExistKey_ShouldReturnEntry()
-    {
-        // Arrange
-        var expected = GenerateNewTicket();
-        var serviceTicket = Guid.NewGuid().ToString();
-        expected.Properties.SetServiceTicket(serviceTicket);
-        expected.Properties.IssuedUtc = DateTimeOffset.UtcNow;
-        expected.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30);
-        var key = await _sessionStore.StoreAsync(expected);
+            // Act
+            await _sessionStore.RenewAsync(key, newEntry);
 
-        // Act
-        var actual = await _sessionStore.RetrieveAsync(key);
+            // Assert
+            var exist = await _sessionStore.RetrieveAsync(_options.TicketIdFactory(existEntry));
+            Assert.NotNull(exist);
+            var actual = await _sessionStore.RetrieveAsync(key);
+            Assert.NotNull(actual);
+        }
 
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Equal(expected.Identity.AuthenticationType, actual.Identity.AuthenticationType);
-        Assert.Equal(_options.TicketIdFactory(expected), _options.TicketIdFactory(actual));
-        Assert.Equal(expected.Identity?.Name,
-            actual.Identity?.Name);
-        Assert.Equal(expected.Properties.IssuedUtc, actual.Properties.IssuedUtc);
-        Assert.Equal(expected.Properties.ExpiresUtc, actual.Properties.ExpiresUtc);
-    }
+        [Fact]
+        public async Task RetrieveWithExistKey_ShouldReturnEntry()
+        {
+            // Arrange
+            var expected = GenerateNewTicket();
+            var serviceTicket = Guid.NewGuid().ToString();
+            expected.Properties.SetServiceTicket(serviceTicket);
+            expected.Properties.IssuedUtc = DateTimeOffset.UtcNow;
+            expected.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30);
+            var key = await _sessionStore.StoreAsync(expected);
 
-    [Fact]
-    public async Task RemoveWithExistKey_ShouldRemoveEntry()
-    {
-        // Arrange
-        var expected = GenerateNewTicket();
-        var key = await _sessionStore.StoreAsync(expected);
+            // Act
+            var actual = await _sessionStore.RetrieveAsync(key);
 
-        // Act
-        await _sessionStore.RemoveAsync(key);
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(expected.Identity.AuthenticationType, actual.Identity.AuthenticationType);
+            Assert.Equal(_options.TicketIdFactory(expected), _options.TicketIdFactory(actual));
+            Assert.Equal(expected.Identity?.Name,
+                actual.Identity?.Name);
+            Assert.Equal(expected.Properties.IssuedUtc, actual.Properties.IssuedUtc);
+            Assert.Equal(expected.Properties.ExpiresUtc, actual.Properties.ExpiresUtc);
+        }
 
-        // Assert
-        var actual = await _sessionStore.RetrieveAsync(key);
-        Assert.Null(actual);
-    }
+        [Fact]
+        public async Task RemoveWithExistKey_ShouldRemoveEntry()
+        {
+            // Arrange
+            var expected = GenerateNewTicket();
+            var key = await _sessionStore.StoreAsync(expected);
 
-    private static AuthenticationTicket GenerateNewTicket(Action<AuthenticationTicket>? setupAction = null)
-    {
-        var ticket = new AuthenticationTicket(
-            new ClaimsIdentity(
-                new[] { new Claim(ClaimTypes.Name, "TEST") }),
-            new AuthenticationProperties());
-        setupAction?.Invoke(ticket);
-        return ticket;
+            // Act
+            await _sessionStore.RemoveAsync(key);
+
+            // Assert
+            var actual = await _sessionStore.RetrieveAsync(key);
+            Assert.Null(actual);
+        }
+
+        private static AuthenticationTicket GenerateNewTicket(Action<AuthenticationTicket>? setupAction = null)
+        {
+            var ticket = new AuthenticationTicket(
+                new ClaimsIdentity(
+                    new[] { new Claim(ClaimTypes.Name, "TEST") }),
+                new AuthenticationProperties());
+            setupAction?.Invoke(ticket);
+            return ticket;
+        }
     }
 }

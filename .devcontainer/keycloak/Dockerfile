@@ -1,8 +1,5 @@
-# https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=26.1.0
-
-# https://github.com/keycloak/keycloak/tree/main/quarkus/container
-# https://quay.io/repository/keycloak/keycloak?tab=tags
+# https://github.com/keycloak/keycloak/releases
+ARG KEYCLOAK_VERSION=26.1.2
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 ARG KEYCLOAK_VERSION
 

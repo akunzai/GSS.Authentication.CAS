@@ -70,3 +70,5 @@ jobs:
           commit-message: "Fix assembly binding redirects"
           branch: "update-web-config"
           title: "Fix assembly binding redirects"
+          add-paths: |
+            owin/OwinSample/web.config

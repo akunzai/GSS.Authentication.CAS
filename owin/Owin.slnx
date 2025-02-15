@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../src/GSS.Authentication.CAS.Core/GSS.Authentication.CAS.Core.csproj" />
+  <Project Path="../src/GSS.Authentication.CAS.Owin/GSS.Authentication.CAS.Owin.csproj" />
+  <Project Path="GSS.Authentication.CAS.Owin.Tests/GSS.Authentication.CAS.Owin.Tests.csproj" />
+  <Project Path="OwinSample/OwinSample.csproj" />
+</Solution>

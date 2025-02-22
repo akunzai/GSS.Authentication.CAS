@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/samples/">
+    <File Path="samples/Directory.Build.props" />
+    <Project Path="samples/AspNetCoreIdentitySample/AspNetCoreIdentitySample.csproj" />
+    <Project Path="samples/AspNetCoreMvcSample/AspNetCoreMvcSample.csproj" />
+    <Project Path="samples/AspNetCoreReactSample/AspNetCoreReactSample.csproj" />
+    <Project Path="samples/AspNetCoreSample/AspNetCoreSample.csproj" />
+    <Project Path="samples/BlazorSample/BlazorSample.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".editorconfig" />
+    <File Path=".github/dependabot.yml" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/GSS.Authentication.CAS.AspNetCore/GSS.Authentication.CAS.AspNetCore.csproj" />
+    <Project Path="src/GSS.Authentication.CAS.Core/GSS.Authentication.CAS.Core.csproj" />
+    <Project Path="src/GSS.Authentication.CAS.Owin/GSS.Authentication.CAS.Owin.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <File Path="test/Directory.Build.props" />
+    <Project Path="test/GSS.Authentication.CAS.AspNetCore.Tests/GSS.Authentication.CAS.AspNetCore.Tests.csproj" />
+    <Project Path="test/GSS.Authentication.CAS.Core.Tests/GSS.Authentication.CAS.Core.Tests.csproj" />
+  </Folder>
+</Solution>

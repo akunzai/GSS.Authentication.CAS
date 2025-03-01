@@ -43,8 +43,8 @@ importers:
         specifier: ^9.21.0
         version: 9.21.0
       '@types/node':
-        specifier: ^22.13.7
-        version: 22.13.7
+        specifier: ^22.13.8
+        version: 22.13.8
       '@types/react':
         specifier: ^19.0.10
         version: 19.0.10
@@ -53,13 +53,13 @@ importers:
         version: 19.0.4(@types/react@19.0.10)
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.3.4(vite@6.2.0(@types/node@22.13.7))
+        version: 4.3.4(vite@6.2.0(@types/node@22.13.8))
       eslint:
         specifier: ^9.21.0
         version: 9.21.0
       vite:
         specifier: ^6.2.0
-        version: 6.2.0(@types/node@22.13.7)
+        version: 6.2.0(@types/node@22.13.8)
 
 packages:
 
@@ -525,8 +525,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@22.13.7':
-    resolution: {integrity: sha512-oU2q+BsQldB9lYxHNp/5aZO+/Bs0Usa74Abo9mAKulz4ahQyXRHK6UVKYIN8KSC8HXwhWSi7b49JnX+txuac0w==}
+  '@types/node@22.13.8':
+    resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
 
   '@types/react-dom@19.0.4':
     resolution: {integrity: sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==}
@@ -1673,7 +1673,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@22.13.7':
+  '@types/node@22.13.8':
     dependencies:
       undici-types: 6.20.0
 
@@ -1762,14 +1762,14 @@ snapshots:
       '@typescript-eslint/types': 8.25.0
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-react@4.3.4(vite@6.2.0(@types/node@22.13.7))':
+  '@vitejs/plugin-react@4.3.4(vite@6.2.0(@types/node@22.13.8))':
     dependencies:
       '@babel/core': 7.26.0
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.0)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 6.2.0(@types/node@22.13.7)
+      vite: 6.2.0(@types/node@22.13.8)
     transitivePeerDependencies:
       - supports-color
 
@@ -2376,13 +2376,13 @@ snapshots:
     dependencies:
       react: 19.0.0
 
-  vite@6.2.0(@types/node@22.13.7):
+  vite@6.2.0(@types/node@22.13.8):
     dependencies:
       esbuild: 0.25.0
       postcss: 8.5.3
       rollup: 4.34.0
     optionalDependencies:
-      '@types/node': 22.13.7
+      '@types/node': 22.13.8
       fsevents: 2.3.3
 
   web-vitals@4.2.4: {}

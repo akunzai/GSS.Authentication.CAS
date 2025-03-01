@@ -27,6 +27,10 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
       # https://www.keycloak.org/server/reverseproxy
       KC_PROXY_HEADERS: xforwarded
+      # https://www.keycloak.org/server/all-config
+      KC_HOSTNAME: auth.dev.local
+      KC_HTTPS_CERTIFICATE_FILE: /run/secrets/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /run/secrets/key.pem
     volumes:
       - type: volume
         source: keycloak_data
@@ -39,9 +43,12 @@ services:
       - type: bind
         source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/import
         target: /opt/keycloak/data/import
-    command: start-dev --import-realm
+    command: start --optimized --import-realm
     ports:
-      - 127.0.0.1:8080:8080
+      - 127.0.0.1:8443:8443
+    secrets:
+      - cert.pem
+      - key.pem
     networks:
       default:
         aliases:
@@ -56,6 +63,12 @@ services:
         target: /data
     ports:
       - 127.0.0.1:6379:6379
+
+secrets:
+  cert.pem:
+    file: .secrets/cert.pem
+  key.pem:
+    file: .secrets/key.pem
 
 volumes:
     keycloak_data:

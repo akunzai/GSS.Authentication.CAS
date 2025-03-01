@@ -4,12 +4,17 @@
 
 - [Docker Engine](https://docs.docker.com/install/)
 - [Docker Compose V2](https://docs.docker.com/compose/cli-command/)
+- [mkcert](https://github.com/FiloSottile/mkcert)
 - [Visual Studio Code](https://code.visualstudio.com/)
 - Bash
 
 ## Getting Start
 
 ```sh
+# set up TLS certs in Host
+mkdir -p .secrets
+mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem 'auth.dev.local'
+
 # set up hosts in Host
 echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
 
@@ -25,8 +30,8 @@ msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 
 ## URLs
 
-- [Keycloak Master Admin Console](http://auth.dev.local:8080/admin/master/console)
-- [Keycloak Demo Account Console](http://auth.dev.local:8080/realms/demo/account)
+- [Keycloak Master Admin Console](https://auth.dev.local:8443/admin/master/console)
+- [Keycloak Demo Account Console](https://auth.dev.local:8443/realms/demo/account)
 
 ## Credentials
 

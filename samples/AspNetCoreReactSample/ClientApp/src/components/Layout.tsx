@@ -4,7 +4,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function Layout({ children }: Props): JSX.Element {
+export function Layout({ children }: Props): React.JSX.Element {
   return (
     <div className="container">
       <main role="main" className="pb-3">

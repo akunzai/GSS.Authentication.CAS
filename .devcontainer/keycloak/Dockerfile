@@ -1,5 +1,5 @@
 # https://github.com/keycloak/keycloak/releases
-ARG KEYCLOAK_VERSION=26.1.2
+ARG KEYCLOAK_VERSION=25.0.6
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 ARG KEYCLOAK_VERSION
 

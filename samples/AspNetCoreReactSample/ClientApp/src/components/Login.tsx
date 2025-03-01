@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserManager } from '../api';
 
-export function Login(): JSX.Element {
+export function Login(): React.JSX.Element {
   const userManager = useMemo(() => new UserManager(), []);
   const [schemes, setSchemes] = useState<string[]>([]);
 

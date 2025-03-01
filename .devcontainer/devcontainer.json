@@ -10,9 +10,6 @@
     "ASPNETCORE_ENVIRONMENT": "Development",
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
   },
-  "forwardPorts": [
-    8080
-  ],
   "portsAttributes": {
     "3000": {
       "label": "ASP.NET Core SPA proxy",
@@ -22,9 +19,9 @@
       "label": "ASP.NET Core Sample",
       "protocol": "https"
     },
-    "8080": {
+    "8443": {
       "label": "Keycloak",
-      "protocol": "http"
+      "protocol": "https"
     }
   },
   "otherPortsAttributes": {

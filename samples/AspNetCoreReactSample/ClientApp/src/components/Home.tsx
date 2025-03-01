@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { UserManager } from '../api';
 import { User } from '../types';
 
-export function Home(): JSX.Element {
+export function Home(): React.JSX.Element {
   const userManager = useMemo(() => new UserManager(), []);
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);

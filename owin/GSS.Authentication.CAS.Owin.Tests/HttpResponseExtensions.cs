@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Net.Http;
 
 namespace GSS.Authentication.CAS.Owin.Tests

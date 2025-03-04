@@ -28,7 +28,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase);
 
             // Act
-            using var response = await server.HttpClient.GetAsync("/");
+            using var response = await server.HttpClient.GetAsync("/", TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.Found, response.StatusCode);
@@ -37,7 +37,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 CookieAuthenticationDefaults.ReturnUrlParameter, "/");
             Assert.Equal(loginUri, response.Headers.Location.AbsoluteUri);
         }
-    
+
         [Fact]
         public async Task AnonymousRequest_WithCallbackPath_ShouldThrows()
         {
@@ -46,7 +46,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             var exception = await Record.ExceptionAsync(async () =>
             {
                 // Act
-                await server.HttpClient.GetAsync("/signin-cas");
+                await server.HttpClient.GetAsync("/signin-cas", TestContext.Current.CancellationToken);
             });
 
             // Assert
@@ -62,7 +62,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase);
 
             // Act
-            using var response = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var response = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -95,14 +95,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     }
                 };
             });
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            using var signInResponse = await server.HttpClient.SendAsync(signInRequest);
+            using var signInResponse = await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
             // Assert
             var cookies = signInResponse.Headers.GetValues("Set-Cookie").ToList();
@@ -115,7 +115,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             Assert.Equal("/", signInResponse.Headers.Location.OriginalString);
 
             using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
-            using var authorizedResponse = await server.HttpClient.SendAsync(authorizedRequest);
+            using var authorizedResponse = await server.HttpClient.SendAsync(authorizedRequest, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
             var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
@@ -134,7 +134,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 options.ServiceTicketValidator = ticketValidator.Object;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, string.Empty);
@@ -142,7 +142,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             {
                 // Act
                 using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-                await server.HttpClient.SendAsync(signInRequest);
+                await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
             });
 
             // Assert
@@ -165,7 +165,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 options.ServiceTicketValidator = ticketValidator.Object;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
@@ -173,7 +173,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             {
                 // Act
                 using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-                await server.HttpClient.SendAsync(signInRequest);
+                await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
             });
 
             // Assert
@@ -196,7 +196,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 options.ServiceTicketValidator = ticketValidator.Object;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
@@ -204,7 +204,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             {
                 // Act
                 using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-                await server.HttpClient.SendAsync(signInRequest);
+                await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
             });
 
             // Assert
@@ -237,14 +237,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     }
                 };
             });
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            using var signInResponse = await server.HttpClient.SendAsync(signInRequest);
+            using var signInResponse = await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -271,7 +271,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 };
             });
 
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
@@ -279,7 +279,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             {
                 // Act
                 using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-                await server.HttpClient.SendAsync(signInRequest);
+                await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
             });
 
             // Assert
@@ -308,14 +308,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 };
             });
             var ticket = Guid.NewGuid().ToString();
-            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
             var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
             var validateUrl =
                 QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
 
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            using var signInResponse = await server.HttpClient.SendAsync(signInRequest);
+            using var signInResponse = await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);

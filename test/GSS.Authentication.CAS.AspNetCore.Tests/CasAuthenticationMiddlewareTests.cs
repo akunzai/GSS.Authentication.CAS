@@ -26,11 +26,11 @@ public class CasAuthenticationMiddlewareTests
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
 
         // Act
-        using var response = await client.GetAsync("/");
+        using var response = await client.GetAsync("/", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, response.StatusCode);
@@ -39,23 +39,23 @@ public class CasAuthenticationMiddlewareTests
             CookieAuthenticationDefaults.ReturnUrlParameter, "/");
         Assert.Equal(loginUri, response.Headers.Location?.AbsoluteUri);
     }
-    
+
     [Fact]
     public async Task AnonymousRequest_WithCallbackPath_ShouldThrows()
     {
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
 
         // Act
         var exception = await Record.ExceptionAsync(async () =>
         {
             // Act
-            await client.GetAsync("/signin-cas");
+            await client.GetAsync("/signin-cas", TestContext.Current.CancellationToken);
         });
-        
+
 
         // Assert
         Assert.NotNull(exception);
@@ -69,11 +69,12 @@ public class CasAuthenticationMiddlewareTests
         // Arrange
         using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
 
         // Act
-        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath,
+            TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
@@ -91,10 +92,10 @@ public class CasAuthenticationMiddlewareTests
             options.CasServerUrlBase = CasServerUrlBase;
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket,
@@ -104,7 +105,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
+            await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
         });
 
         // Assert
@@ -128,10 +129,10 @@ public class CasAuthenticationMiddlewareTests
             options.CasServerUrlBase = CasServerUrlBase;
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
@@ -140,7 +141,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
+            await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
         });
 
         // Assert
@@ -176,17 +177,17 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
+        using var signInResponse = await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -199,10 +200,10 @@ public class CasAuthenticationMiddlewareTests
         Assert.Equal("/", signInResponse.Headers.Location?.OriginalString);
 
         using var authorizedRequest = signInResponse.GetRequestWithCookies("/");
-        using var authorizedResponse = await client.SendAsync(authorizedRequest);
+        using var authorizedResponse = await client.SendAsync(authorizedRequest, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
-        var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
+        var bodyText = await authorizedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.Equal(principal.GetPrincipalName(), bodyText);
         ticketValidator
             .Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -224,10 +225,10 @@ public class CasAuthenticationMiddlewareTests
             options.CasServerUrlBase = CasServerUrlBase;
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
@@ -236,7 +237,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
+            await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
         });
 
         // Assert
@@ -270,17 +271,17 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
+        using var signInResponse = await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -304,10 +305,10 @@ public class CasAuthenticationMiddlewareTests
             options.Events = new CasEvents { OnCreatingTicket = _ => throw new NotSupportedException("test") };
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
@@ -316,7 +317,7 @@ public class CasAuthenticationMiddlewareTests
         {
             // Act
             using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-            await client.SendAsync(signInRequest);
+            await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
         });
 
         // Assert
@@ -345,18 +346,18 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
 
         // Act
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
+        using var signInResponse = await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
@@ -404,19 +405,19 @@ public class CasAuthenticationMiddlewareTests
             };
         });
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var challengeResponse =
-            await client.GetAsync(CookieAuthenticationDefaults.LoginPath);
+            await client.GetAsync(CookieAuthenticationDefaults.LoginPath, TestContext.Current.CancellationToken);
         var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location?.Query);
         var validateUrl =
             QueryHelpers.AddQueryString(query[Constants.Parameters.Service]!, Constants.Parameters.Ticket, ticket);
         using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
-        using var signInResponse = await client.SendAsync(signInRequest);
+        using var signInResponse = await client.SendAsync(signInRequest, TestContext.Current.CancellationToken);
         var signOutRequest = signInResponse.GetRequestWithCookies(CookieAuthenticationDefaults.LogoutPath);
 
         // Act
-        using var signOutResponse = await client.SendAsync(signOutRequest);
+        using var signOutResponse = await client.SendAsync(signOutRequest, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.Found, signOutResponse.StatusCode);

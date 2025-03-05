@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http;
 using GSS.Authentication.CAS.Validation;
 using RichardSzalay.MockHttp;
 using Xunit;
@@ -25,7 +24,7 @@ public class Cas10ServiceTicketValidationTests
         var validator = new Cas10ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act
-        var principal = await validator.ValidateAsync(ticket, ServiceUrl);
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken);
 
         //Assert
         Assert.NotNull(principal);
@@ -50,7 +49,7 @@ public class Cas10ServiceTicketValidationTests
         var validator = new Cas10ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act
-        var principal = await validator.ValidateAsync(ticket, serviceUrl);
+        var principal = await validator.ValidateAsync(ticket, serviceUrl, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(principal);
@@ -71,7 +70,7 @@ public class Cas10ServiceTicketValidationTests
         var validator = new Cas10ServiceTicketValidator(_options, new HttpClient(mockHttp));
 
         // Act
-        var principal = await validator.ValidateAsync(ticket, ServiceUrl);
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(principal);
@@ -94,7 +93,7 @@ public class Cas10ServiceTicketValidationTests
         // Act & Assert
         await Assert
             .ThrowsAsync<HttpRequestException>(
-                () => validator.ValidateAsync(ticket, ServiceUrl));
+                () => validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken));
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

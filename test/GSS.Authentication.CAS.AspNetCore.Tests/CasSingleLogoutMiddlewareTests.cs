@@ -23,13 +23,13 @@ public class CasSingleLogoutMiddlewareTests
         var cache = new Mock<IDistributedCache>();
         using var host = CreateHost(cache.Object);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var content = new StringContent("TEST");
         content.Headers.ContentType = null;
 
         // Act
-        using var response = await client.PostAsync("/", content);
+        using var response = await client.PostAsync("/", content, TestContext.Current.CancellationToken);
 
         // Assert
         cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -42,7 +42,7 @@ public class CasSingleLogoutMiddlewareTests
         var cache = new Mock<IDistributedCache>();
         using var host = CreateHost(cache.Object);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         using var content = new StringContent(
             JsonSerializer.Serialize(new { logoutRequest = new { ticket = Guid.NewGuid().ToString() } }),
@@ -51,7 +51,7 @@ public class CasSingleLogoutMiddlewareTests
         );
 
         // Act
-        using var response = await client.PostAsync("/", content);
+        using var response = await client.PostAsync("/", content, TestContext.Current.CancellationToken);
 
         // Assert
         cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -68,7 +68,7 @@ public class CasSingleLogoutMiddlewareTests
             .Returns(Task.CompletedTask);
         using var host = CreateHost(cache.Object);
         var server = host.GetTestServer();
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
         using var client = server.CreateClient();
         var ticket = Guid.NewGuid().ToString();
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -80,7 +80,7 @@ public class CasSingleLogoutMiddlewareTests
         });
 
         // Act
-        using var response = await client.PostAsync("/", content);
+        using var response = await client.PostAsync("/", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(_options.CacheKeyFactory(ticket), removedTicket);
@@ -101,7 +101,7 @@ public class CasSingleLogoutMiddlewareTests
             .Build();
 
         // Act & Assert
-        await host.StartAsync();
+        await host.StartAsync(TestContext.Current.CancellationToken);
     }
 
     private IHost CreateHost(IDistributedCache cache)

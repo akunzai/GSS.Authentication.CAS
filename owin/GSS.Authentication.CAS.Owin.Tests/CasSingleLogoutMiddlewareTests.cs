@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin.Testing;
@@ -28,7 +24,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             content.Headers.ContentType = null;
 
             // Act
-            using var response = await server.HttpClient.PostAsync("/", content);
+            using var response = await server.HttpClient.PostAsync("/", content, TestContext.Current.CancellationToken);
 
             // Assert
             cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -47,7 +43,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             );
 
             // Act
-            using var response = await server.HttpClient.PostAsync("/", content);
+            using var response = await server.HttpClient.PostAsync("/", content, TestContext.Current.CancellationToken);
 
             // Assert
             cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -73,7 +69,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             });
 
             // Act
-            using var response = await server.HttpClient.PostAsync("/", content);
+            using var response = await server.HttpClient.PostAsync("/", content, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Equal(_options.CacheKeyFactory(ticket), removedTicket);

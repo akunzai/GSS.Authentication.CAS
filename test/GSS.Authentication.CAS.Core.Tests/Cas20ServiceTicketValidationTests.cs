@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http;
 using System.Security.Authentication;
 using System.Text;
 using GSS.Authentication.CAS.Validation;
@@ -63,7 +62,7 @@ public class Cas20ServiceTicketValidationTests
         // Act & Assert
         await Assert
             .ThrowsAsync<AuthenticationException>(() =>
-                validator.ValidateAsync(ticket, ServiceUrl));
+                validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken));
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }
@@ -83,7 +82,7 @@ public class Cas20ServiceTicketValidationTests
         // Act & Assert
         await Assert
             .ThrowsAsync<HttpRequestException>(
-                () => validator.ValidateAsync(ticket, ServiceUrl));
+                () => validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken));
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

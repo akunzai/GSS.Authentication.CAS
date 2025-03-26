@@ -34,6 +34,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
-    ]
+    ],
+    "overrides": {
+      "@babel/helpers@<7.26.10": ">=7.26.10"
+    }
   }
 }

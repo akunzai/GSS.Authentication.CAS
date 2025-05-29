@@ -23,9 +23,6 @@ docker compose up -d
 
 # run the AspNetCoreSample
 dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
-
-# build the OwinSample
-msbuild ../samples/OwinSample/OwinSample.csproj -verbosity:minimal -restore
 ```
 
 ## URLs

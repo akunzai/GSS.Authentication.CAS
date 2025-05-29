@@ -1,5 +1,5 @@
 # https://github.com/keycloak/keycloak/releases
-ARG KEYCLOAK_VERSION=26.2.4
+ARG KEYCLOAK_VERSION=26.2.5
 ARG KEYCLOAK_CAS_VERSION=26.2.4
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 ARG KEYCLOAK_VERSION
@@ -10,5 +10,3 @@ ARG KEYCLOAK_CAS_VERSION
 ADD --chown=keycloak:keycloak https://github.com/jacekkow/keycloak-protocol-cas/releases/download/${KEYCLOAK_CAS_VERSION}/keycloak-protocol-cas-${KEYCLOAK_CAS_VERSION}.jar /opt/keycloak/providers/keycloak-protocol-cas.jar
 
 WORKDIR /opt/keycloak
-
-RUN /opt/keycloak/bin/kc.sh build

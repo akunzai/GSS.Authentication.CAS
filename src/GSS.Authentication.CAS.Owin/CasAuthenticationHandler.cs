@@ -167,7 +167,7 @@ namespace GSS.Authentication.CAS.Owin
                 throw new InvalidOperationException("Missing ticket parameter from query");
             }
 
-            var service = QueryHelpers.AddQueryString(BuildRedirectUri(properties.RedirectUri ?? "/"), State, state);
+            var service = QueryHelpers.AddQueryString(BuildRedirectUri(Options.CallbackPath.Value), State, state);
             var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
                 .ConfigureAwait(false);
 

@@ -1,21 +1,13 @@
-name: auth-cas_devcontainer
 services:
 
   dotnet:
     build: .
-    image: dotnet-sdk:mono
-    environment:
-      PATH: $PATH:/home/vscode/.dotnet:/home/vscode/.dotnet/tools
+    image: dotnet-sdk
     volumes:
       - type: bind
         source: ${LOCAL_WORKSPACE_FOLDER:-..}
         target: /workspace
         consistency: cached
-      # https://learn.microsoft.com/aspnet/core/security/docker-compose-https#macos-or-linux
-      - type: bind
-        source: ~/.aspnet/https
-        target: /https
-        read_only: true
     command: sleep infinity
 
   keycloak:
@@ -43,7 +35,7 @@ services:
       - type: bind
         source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/import
         target: /opt/keycloak/data/import
-    command: start --optimized --import-realm
+    command: start-dev --import-realm
     ports:
       - 127.0.0.1:8443:8443
     secrets:

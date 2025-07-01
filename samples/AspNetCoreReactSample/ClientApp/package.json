@@ -18,7 +18,7 @@
     "react-router-bootstrap": "^0.26.3",
     "rimraf": "^6.0.1",
     "typescript": "~5.8.3",
-    "typescript-eslint": "^8.34.1",
+    "typescript-eslint": "^8.35.1",
     "web-vitals": "^5.0.3",
     "wouter": "^3.7.1"
   },

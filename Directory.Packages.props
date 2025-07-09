@@ -44,10 +44,10 @@
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.12.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
-    <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
-    <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
-    <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
-    <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.2" />
+    <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.3" />
+    <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.3" />
+    <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.3" />
+    <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.3" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="17.14.1" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />

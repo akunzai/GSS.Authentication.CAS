@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "eamodio.gitlens",
+    "mhutchie.git-graph",
     "ms-dotnettools.csdevkit"
   ]
 }

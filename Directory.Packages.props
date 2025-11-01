@@ -31,7 +31,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.9" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.10" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.9" />
     <PackageVersion Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />

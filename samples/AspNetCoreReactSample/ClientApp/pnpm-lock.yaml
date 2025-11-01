@@ -15,14 +15,14 @@ importers:
         specifier: 5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       react:
-        specifier: 19.1.1
-        version: 19.1.1
+        specifier: 19.2.0
+        version: 19.2.0
       react-dom:
         specifier: 19.1.1
-        version: 19.1.1(react@19.1.1)
+        version: 19.1.1(react@19.2.0)
       react-router-bootstrap:
         specifier: 0.26.3
-        version: 0.26.3(react-router-dom@6.21.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
+        version: 0.26.3(react-router-dom@6.21.0(react-dom@19.1.1(react@19.2.0))(react@19.2.0))(react@19.2.0)
       rimraf:
         specifier: 6.0.1
         version: 6.0.1
@@ -37,7 +37,7 @@ importers:
         version: 5.1.0
       wouter:
         specifier: 3.7.1
-        version: 3.7.1(react@19.1.1)
+        version: 3.7.1(react@19.2.0)
     devDependencies:
       '@eslint/js':
         specifier: 9.36.0
@@ -46,11 +46,11 @@ importers:
         specifier: 24.9.2
         version: 24.9.2
       '@types/react':
-        specifier: 19.1.16
-        version: 19.1.16
+        specifier: 19.2.2
+        version: 19.2.2
       '@types/react-dom':
         specifier: 19.1.9
-        version: 19.1.9(@types/react@19.1.16)
+        version: 19.1.9(@types/react@19.2.2)
       '@vitejs/plugin-react':
         specifier: 5.0.4
         version: 5.0.4(vite@7.1.12(@types/node@24.9.2))
@@ -559,8 +559,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.0.0
 
-  '@types/react@19.1.16':
-    resolution: {integrity: sha512-WBM/nDbEZmDUORKnh5i1bTnAz6vTohUf9b8esSMu+b24+srbaxa04UbJgWx78CVfNXA20sNu0odEIluZDFdCog==}
+  '@types/react@19.2.2':
+    resolution: {integrity: sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA==}
 
   '@typescript-eslint/eslint-plugin@8.46.2':
     resolution: {integrity: sha512-ZGBMToy857/NIPaaCucIUQgqueOiq7HeAKkhlvqVV4lm089zUFW6ikRySx2v+cAhKeUCPuWVHeimyk6Dw1iY3w==}
@@ -1191,8 +1191,8 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react@19.1.1:
-    resolution: {integrity: sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==}
+  react@19.2.0:
+    resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
 
   regexparam@3.0.0:
@@ -1799,11 +1799,11 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/react-dom@19.1.9(@types/react@19.1.16)':
+  '@types/react-dom@19.1.9(@types/react@19.2.2)':
     dependencies:
-      '@types/react': 19.1.16
+      '@types/react': 19.2.2
 
-  '@types/react@19.1.16':
+  '@types/react@19.2.2':
     dependencies:
       csstype: 3.1.3
 
@@ -2432,34 +2432,34 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-dom@19.1.1(react@19.1.1):
+  react-dom@19.1.1(react@19.2.0):
     dependencies:
-      react: 19.1.1
+      react: 19.2.0
       scheduler: 0.26.0
 
   react-is@16.13.1: {}
 
   react-refresh@0.17.0: {}
 
-  react-router-bootstrap@0.26.3(react-router-dom@6.21.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1):
+  react-router-bootstrap@0.26.3(react-router-dom@6.21.0(react-dom@19.1.1(react@19.2.0))(react@19.2.0))(react@19.2.0):
     dependencies:
       prop-types: 15.8.1
-      react: 19.1.1
-      react-router-dom: 6.21.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react: 19.2.0
+      react-router-dom: 6.21.0(react-dom@19.1.1(react@19.2.0))(react@19.2.0)
 
-  react-router-dom@6.21.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  react-router-dom@6.21.0(react-dom@19.1.1(react@19.2.0))(react@19.2.0):
     dependencies:
       '@remix-run/router': 1.14.0
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
-      react-router: 6.21.0(react@19.1.1)
+      react: 19.2.0
+      react-dom: 19.1.1(react@19.2.0)
+      react-router: 6.21.0(react@19.2.0)
 
-  react-router@6.21.0(react@19.1.1):
+  react-router@6.21.0(react@19.2.0):
     dependencies:
       '@remix-run/router': 1.14.0
-      react: 19.1.1
+      react: 19.2.0
 
-  react@19.1.1: {}
+  react@19.2.0: {}
 
   regexparam@3.0.0: {}
 
@@ -2588,9 +2588,9 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  use-sync-external-store@1.2.0(react@19.1.1):
+  use-sync-external-store@1.2.0(react@19.2.0):
     dependencies:
-      react: 19.1.1
+      react: 19.2.0
 
   vite@7.1.12(@types/node@24.9.2):
     dependencies:
@@ -2612,12 +2612,12 @@ snapshots:
 
   word-wrap@1.2.5: {}
 
-  wouter@3.7.1(react@19.1.1):
+  wouter@3.7.1(react@19.2.0):
     dependencies:
       mitt: 3.0.1
-      react: 19.1.1
+      react: 19.2.0
       regexparam: 3.0.0
-      use-sync-external-store: 1.2.0(react@19.1.1)
+      use-sync-external-store: 1.2.0(react@19.2.0)
 
   wrap-ansi@7.0.0:
     dependencies:

@@ -41,3 +41,23 @@ dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
 
 - Username: `test`
 - Password: `test`
+
+## E2E Testing with Playwright
+
+By default, automated video recording and tracing are disabled. To enable them, set the following environment variables before running the tests:
+
+```bash
+# Enable Video Recording
+export PLAYWRIGHT_VIDEO=true
+
+# Enable Trace Recording
+export PLAYWRIGHT_TRACE=true
+
+# Run tests
+dotnet test
+```
+
+The recordings will be saved in the `test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net8.0/recordings/` directory.
+
+- **Videos**: Play `.webm` files with a modern browser or VLC.
+- **Trace**: Upload the `.zip` file to [Playwright Trace Viewer](https://trace.playwright.dev/) for a full step-by-step playback with screenshots and console logs.

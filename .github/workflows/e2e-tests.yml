@@ -1,0 +1,242 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
+      - '.devcontainer/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
+      - '.devcontainer/**'
+  workflow_dispatch:
+    inputs:
+      enable_video:
+        description: 'Enable Playwright video recording'
+        required: false
+        type: boolean
+        default: false
+      enable_trace:
+        description: 'Enable Playwright trace recording'
+        required: false
+        type: boolean
+        default: false
+      sample_to_test:
+        description: 'Sample to test'
+        required: true
+        type: choice
+        options:
+          - All
+          - MVC
+          - Identity
+          - React
+          - Blazor
+          - Basic
+        default: All
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: MVC
+            project: samples/AspNetCoreMvcSample
+            filter: AspNetCoreMvcSampleTests
+            url: "https://localhost:5002"
+          - name: Identity
+            project: samples/AspNetCoreIdentitySample
+            filter: AspNetCoreIdentitySampleTests
+            url: "https://localhost:5004"
+          - name: React
+            project: samples/AspNetCoreReactSample
+            filter: AspNetCoreReactSampleTests
+            url: "https://localhost:5005"
+          - name: Blazor
+            project: samples/BlazorSample
+            filter: BlazorSampleTests
+            url: "https://localhost:5003"
+          - name: Basic
+            project: samples/AspNetCoreSample
+            filter: AspNetCoreSampleTests
+            url: "https://localhost:5001"
+
+    env:
+      PLAYWRIGHT_VIDEO: ${{ github.event.inputs.enable_video }}
+      PLAYWRIGHT_TRACE: ${{ github.event.inputs.enable_trace }}
+      SAMPLE_BASE_URL: ${{ matrix.url }}
+      PROXY_TARGET: ${{ matrix.url }}
+
+    steps:
+      - name: Check if job should run
+        id: check
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || [[ "${{ github.event.inputs.sample_to_test }}" == "All" ]] || [[ "${{ github.event.inputs.sample_to_test }}" == "${{ matrix.name }}" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.check.outputs.run == 'true'
+        uses: actions/checkout@v5
+
+      - name: Set up hosts
+        if: steps.check.outputs.run == 'true'
+        run: |
+          echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
+
+      - name: Generate self-signed certificates
+        if: steps.check.outputs.run == 'true'
+        run: |
+          # Create .secrets directory as referenced in compose.yaml
+          mkdir -p .devcontainer/.secrets
+
+          # Generate self-signed certificate similar to mkcert
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout .devcontainer/.secrets/key.pem \
+            -out .devcontainer/.secrets/cert.pem \
+            -subj "/CN=auth.dev.local" \
+            -addext "subjectAltName=DNS:auth.dev.local,DNS:localhost"
+
+          chmod 644 .devcontainer/.secrets/cert.pem
+          chmod 644 .devcontainer/.secrets/key.pem
+
+          sudo cp .devcontainer/.secrets/cert.pem /usr/local/share/ca-certificates/auth.dev.local.crt
+          sudo update-ca-certificates
+
+      - name: Build Keycloak image with CAS protocol
+        if: steps.check.outputs.run == 'true'
+        run: docker build -t keycloak:cas .devcontainer/keycloak
+
+      - name: Start Keycloak
+        if: steps.check.outputs.run == 'true'
+        run: |
+          cd .devcontainer
+          docker compose -f compose.yaml -f compose.ci.yaml up -d keycloak
+        env:
+          LOCAL_WORKSPACE_FOLDER: ${{ github.workspace }}
+
+      - name: Wait for Keycloak to be ready
+        if: steps.check.outputs.run == 'true'
+        run: |
+          echo "Waiting for Keycloak to be ready..."
+          for i in {1..36}; do
+            if curl -sf -k https://auth.dev.local:8443/realms/demo/.well-known/openid-configuration > /dev/null; then
+              echo "Keycloak is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/36: Keycloak not ready yet, waiting 5s..."
+            sleep 5
+          done
+          echo "Keycloak failed to start"
+          docker compose -f .devcontainer/compose.yaml -f .devcontainer/compose.ci.yaml logs keycloak
+          exit 1
+
+      - name: Set up .NET SDK
+        if: steps.check.outputs.run == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install pnpm
+        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: Set up Node.js
+        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+          cache-dependency-path: 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml'
+
+      - name: Build E2E Tests
+        if: steps.check.outputs.run == 'true'
+        run: dotnet build test/GSS.Authentication.CAS.E2E.Tests
+
+      - name: Install Playwright browsers
+        if: steps.check.outputs.run == 'true'
+        run: pwsh test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/playwright.ps1 install chromium --with-deps
+
+      - name: Trust development certificates
+        if: steps.check.outputs.run == 'true'
+        run: dotnet dev-certs https --trust || true
+
+      - name: Start sample application
+        if: steps.check.outputs.run == 'true'
+        run: |
+          dotnet run --project ${{ matrix.project }} --urls "${{ matrix.url }}" &
+          echo $! > /tmp/sample-app.pid
+
+          echo "Waiting for sample application to start..."
+          for i in {1..30}; do
+            if curl -sf -k ${{ matrix.url }} > /dev/null 2>&1; then
+              echo "Sample application is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Sample application not ready yet, waiting 2s..."
+            sleep 2
+          done
+          echo "Sample application failed to start"
+          exit 1
+
+      - name: Run E2E Tests
+        if: steps.check.outputs.run == 'true'
+        run: dotnet test test/GSS.Authentication.CAS.E2E.Tests --logger "trx;LogFileName=test-results-${{ matrix.name }}.trx" --filter "FullyQualifiedName~${{ matrix.filter }}"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.check.outputs.run == 'true'
+        with:
+          name: e2e-test-results-${{ matrix.name }}
+          path: test/GSS.Authentication.CAS.E2E.Tests/TestResults/*.trx
+
+      - name: Upload recordings (Video)
+        uses: actions/upload-artifact@v4
+        if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_video == 'true'
+        with:
+          name: e2e-recordings-video-${{ matrix.name }}
+          path: test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/recordings/videos/
+
+      - name: Upload recordings (Trace)
+        uses: actions/upload-artifact@v4
+        if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_trace == 'true'
+        with:
+          name: e2e-recordings-trace-${{ matrix.name }}
+          path: test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/recordings/traces/
+
+      - name: Stop sample application
+        if: always() && steps.check.outputs.run == 'true'
+        run: |
+          if [ -f /tmp/sample-app.pid ]; then
+            kill "$(cat /tmp/sample-app.pid)" || true
+          fi
+
+      - name: Show Keycloak logs on failure
+        if: failure() && steps.check.outputs.run == 'true'
+        run: |
+          cd .devcontainer
+          docker compose logs keycloak
+
+      - name: Stop Keycloak
+        if: always() && steps.check.outputs.run == 'true'
+        run: |
+          cd .devcontainer
+          docker compose -f compose.yaml -f compose.ci.yaml down
+        env:
+          LOCAL_WORKSPACE_FOLDER: ${{ github.workspace }}

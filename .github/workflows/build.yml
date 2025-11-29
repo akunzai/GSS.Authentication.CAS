@@ -44,7 +44,7 @@ jobs:
           dotnet build -c Release
       - name: Test
         run: |
-          dotnet test --collect:"XPlat Code Coverage"
+          dotnet test --collect:"XPlat Code Coverage" --filter "FullyQualifiedName!~E2E"
           dotnet tool restore
           dotnet tool run reportgenerator
           [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"

@@ -1,0 +1,29 @@
+# CI-specific compose override
+# Uses volumes instead of secrets for certificate mounting
+# to avoid permission issues in CI environment
+
+services:
+  keycloak:
+    # Override secrets with volumes for CI compatibility
+    secrets: []
+    volumes:
+      - type: volume
+        source: keycloak_data
+        target: /opt/keycloak/data
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/export
+        target: /opt/keycloak/data/export
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/keycloak/import
+        target: /opt/keycloak/data/import
+      # Mount certificates directly instead of using secrets
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/.secrets/cert.pem
+        target: /run/secrets/cert.pem
+        read_only: true
+      - type: bind
+        source: ${LOCAL_WORKSPACE_FOLDER:-..}/.devcontainer/.secrets/key.pem
+        target: /run/secrets/key.pem
+        read_only: true

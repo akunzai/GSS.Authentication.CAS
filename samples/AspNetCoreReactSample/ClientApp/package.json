@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "prestart": "node aspnetcore-https && node aspnetcore-react",
     "start": "vite",
@@ -13,14 +13,14 @@
   "dependencies": {
     "axios": "1.13.2",
     "bootstrap": "5.3.8",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
     "react-router-bootstrap": "0.26.3",
     "rimraf": "6.1.2",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.48.0",
+    "typescript-eslint": "8.48.1",
     "web-vitals": "5.1.0",
-    "wouter": "3.8.0"
+    "wouter": "3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",
@@ -29,7 +29,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
     "eslint": "9.39.1",
-    "vite": "7.2.4"
+    "vite": "7.2.6"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

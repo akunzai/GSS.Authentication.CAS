@@ -1,0 +1,157 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
+      - '.devcontainer/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'samples/**'
+      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
+      - '.devcontainer/**'
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up hosts
+        run: |
+          echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
+
+      - name: Generate self-signed certificates
+        run: |
+          # Create .secrets directory as referenced in compose.yaml
+          mkdir -p .devcontainer/.secrets
+
+          # Generate self-signed certificate similar to mkcert
+          # mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem 'auth.dev.local'
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout .devcontainer/.secrets/key.pem \
+            -out .devcontainer/.secrets/cert.pem \
+            -subj "/CN=auth.dev.local" \
+            -addext "subjectAltName=DNS:auth.dev.local,DNS:localhost"
+
+          # Set permissions so Keycloak container (non-root user) can read them
+          # Docker secrets are mounted with restricted permissions by default
+          chmod 644 .devcontainer/.secrets/cert.pem
+          chmod 644 .devcontainer/.secrets/key.pem
+
+          # Trust the self-signed certificate system-wide (for .NET HttpClient)
+          sudo cp .devcontainer/.secrets/cert.pem /usr/local/share/ca-certificates/auth.dev.local.crt
+          sudo update-ca-certificates
+
+          # Verify certificates were created
+          ls -la .devcontainer/.secrets/
+
+      - name: Build Keycloak image with CAS protocol
+        run: docker build -t keycloak:cas .devcontainer/keycloak
+
+      - name: Start Keycloak
+        run: |
+          cd .devcontainer
+          # Use CI-specific compose override to avoid secrets permission issues
+          docker compose -f compose.yaml -f compose.ci.yaml up -d keycloak
+        env:
+          LOCAL_WORKSPACE_FOLDER: ${{ github.workspace }}
+
+      - name: Wait for Keycloak to be ready
+        run: |
+          echo "Waiting for Keycloak to be ready..."
+          for i in {1..36}; do
+            # Use OpenID configuration endpoint as health check
+            # Note: /health/ready requires --health-enabled=true in Keycloak 26.x
+            if curl -sf -k https://auth.dev.local:8443/realms/demo/.well-known/openid-configuration > /dev/null; then
+              echo "Keycloak is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/36: Keycloak not ready yet, waiting 5s..."
+            sleep 5
+          done
+          echo "Keycloak failed to start"
+          docker compose -f .devcontainer/compose.yaml -f .devcontainer/compose.ci.yaml logs keycloak
+          exit 1
+
+      - name: Verify Keycloak endpoints
+        run: |
+          # Verify Keycloak is accessible
+          curl -sf -k https://auth.dev.local:8443/realms/demo/.well-known/openid-configuration | head -c 500
+          echo ""
+          echo "Keycloak demo realm is accessible"
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build E2E Tests
+        run: dotnet build test/GSS.Authentication.CAS.E2E.Tests -c Release
+
+      - name: Install Playwright browsers
+        run: pwsh test/GSS.Authentication.CAS.E2E.Tests/bin/Release/net10.0/playwright.ps1 install chromium --with-deps
+
+      - name: Trust development certificates
+        run: dotnet dev-certs https --trust || true
+
+      - name: Start sample application
+        run: |
+          # Start AspNetCoreMvcSample in background
+          dotnet run --project samples/AspNetCoreMvcSample -c Release --urls "https://localhost:5002" &
+          echo $! > /tmp/sample-app.pid
+
+          # Wait for the application to start
+          echo "Waiting for sample application to start..."
+          for i in {1..30}; do
+            if curl -sf -k https://localhost:5002/Account/Login > /dev/null 2>&1; then
+              echo "Sample application is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Sample application not ready yet, waiting 2s..."
+            sleep 2
+          done
+          echo "Sample application failed to start"
+          exit 1
+
+      - name: Run E2E Tests
+        run: dotnet test test/GSS.Authentication.CAS.E2E.Tests -c Release --logger "trx;LogFileName=test-results.trx" --filter "FullyQualifiedName~AspNetCoreMvcSampleTests"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: test/GSS.Authentication.CAS.E2E.Tests/TestResults/*.trx
+
+      - name: Stop sample application
+        if: always()
+        run: |
+          if [ -f /tmp/sample-app.pid ]; then
+            kill "$(cat /tmp/sample-app.pid)" || true
+          fi
+
+      - name: Show Keycloak logs on failure
+        if: failure()
+        run: |
+          cd .devcontainer
+          docker compose logs keycloak
+
+      - name: Stop Keycloak
+        if: always()
+        run: |
+          cd .devcontainer
+          docker compose -f compose.yaml -f compose.ci.yaml down
+        env:
+          LOCAL_WORKSPACE_FOLDER: ${{ github.workspace }}

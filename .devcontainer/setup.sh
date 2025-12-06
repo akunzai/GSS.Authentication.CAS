@@ -9,3 +9,12 @@ EOF
 else
 	dotnet dev-certs https --trust
 fi
+
+# Install Playwright browsers for E2E testing
+# Only install if the E2E test project exists
+if [[ -f "/workspace/test/GSS.Authentication.CAS.E2E.Tests/GSS.Authentication.CAS.E2E.Tests.csproj" ]]; then
+    echo "Installing Playwright browsers..."
+    cd /workspace/test/GSS.Authentication.CAS.E2E.Tests || exit
+    dotnet build -c Release
+    pwsh bin/Release/net10.0/playwright.ps1 install chromium --with-deps 2>/dev/null || true
+fi

@@ -7,7 +7,8 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Testing;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Owin;
 using Xunit;
 
@@ -69,15 +70,15 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task SignInChallenge_WithValidTicketAndPrincipal_ShouldResponseWithAuthCookies()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             var ticket = Guid.NewGuid().ToString();
             var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
             ticketValidator
-                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(principal);
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult<ICasPrincipal?>(principal));
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
                 options.Provider = new CasAuthenticationProvider
                 {
@@ -116,18 +117,17 @@ namespace GSS.Authentication.CAS.Owin.Tests
             Assert.Equal(HttpStatusCode.OK, authorizedResponse.StatusCode);
             var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
             Assert.Equal(principal.GetPrincipalName(), bodyText);
-            ticketValidator.Verify(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()),
-                Times.Once);
+            await ticketValidator.Received(1).ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>());
         }
 
         [Fact]
         public async Task SignInChallenge_WithoutTicketInCallbackQuery_ShouldThrows()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
             using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
@@ -151,14 +151,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task SignInChallenge_WithoutValidPrincipal_ShouldThrows()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             var ticket = Guid.NewGuid().ToString();
             ticketValidator
-                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((ICasPrincipal)null!);
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult<ICasPrincipal?>(null));
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
             using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
@@ -182,14 +182,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task SignInChallenge_WithValidatingException_ShouldThrows()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             var ticket = Guid.NewGuid().ToString();
             ticketValidator
-                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Throws(new NotSupportedException("test"));
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .ThrowsAsync(new NotSupportedException("test"));
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
             });
             using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
@@ -214,14 +214,14 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task SignInChallenge_WithValidatingExceptionAndHandledResponse_ShouldRedirectToAccessDeniedPath()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             var ticket = Guid.NewGuid().ToString();
             ticketValidator
-                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Throws(new NotSupportedException("test"));
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .ThrowsAsync(new NotSupportedException("test"));
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
                 options.Provider = new CasAuthenticationProvider
                 {
@@ -251,15 +251,15 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task SignInChallenge_WithTicketCreatingException_ShouldThrows()
         {
             // Arrange
-            var ticketValidator = new Mock<IServiceTicketValidator>();
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
             var ticket = Guid.NewGuid().ToString();
             var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
             ticketValidator
-                .Setup(x => x.ValidateAsync(ticket, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(principal);
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult<ICasPrincipal?>(principal));
             using var server = CreateServer(options =>
             {
-                options.ServiceTicketValidator = ticketValidator.Object;
+                options.ServiceTicketValidator = ticketValidator;
                 options.CasServerUrlBase = CasServerUrlBase;
                 options.Provider = new CasAuthenticationProvider
                 {

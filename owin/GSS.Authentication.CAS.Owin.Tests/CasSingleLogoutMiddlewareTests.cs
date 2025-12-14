@@ -4,7 +4,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin.Testing;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace GSS.Authentication.CAS.Owin.Tests
@@ -18,8 +18,8 @@ namespace GSS.Authentication.CAS.Owin.Tests
         public async Task WithoutLogoutRequest_ShouldNotRemoveTicket()
         {
             // Arrange
-            var cache = new Mock<IDistributedCache>();
-            using var server = CreateServer(cache.Object);
+            var cache = Substitute.For<IDistributedCache>();
+            using var server = CreateServer(cache);
             using var content = new StringContent("TEST");
             content.Headers.ContentType = null;
 
@@ -27,15 +27,15 @@ namespace GSS.Authentication.CAS.Owin.Tests
             using var response = await server.HttpClient.PostAsync("/", content, TestContext.Current.CancellationToken);
 
             // Assert
-            cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            await cache.DidNotReceive().RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         }
 
         [Fact]
         public async Task WithJsonLogoutRequest_ShouldNotRemoveTicket()
         {
             // Arrange
-            var cache = new Mock<IDistributedCache>();
-            using var server = CreateServer(cache.Object);
+            var cache = Substitute.For<IDistributedCache>();
+            using var server = CreateServer(cache);
             var content = new StringContent(
                 JsonSerializer.Serialize(new { logoutRequest = new { ticket = Guid.NewGuid().ToString() } }),
                 Encoding.UTF8,
@@ -46,19 +46,19 @@ namespace GSS.Authentication.CAS.Owin.Tests
             using var response = await server.HttpClient.PostAsync("/", content, TestContext.Current.CancellationToken);
 
             // Assert
-            cache.Verify(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            await cache.DidNotReceive().RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         }
 
         [Fact]
         public async Task WithFormUrlEncodedLogoutRequest_ShouldRemoveTicket()
         {
             // Arrange
-            var cache = new Mock<IDistributedCache>();
-            using var server = CreateServer(cache.Object);
+            var cache = Substitute.For<IDistributedCache>();
+            using var server = CreateServer(cache);
             var removedTicket = string.Empty;
-            cache.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .Callback<string, CancellationToken>((x, _) => removedTicket = x)
-                .Returns(Task.CompletedTask);
+            cache.RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.CompletedTask)
+                .AndDoes(x => removedTicket = x.Arg<string>());
             var ticket = Guid.NewGuid().ToString();
             using var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -73,7 +73,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
 
             // Assert
             Assert.Equal(_options.CacheKeyFactory(ticket), removedTicket);
-            cache.Verify(x => x.RemoveAsync(_options.CacheKeyFactory(ticket), It.IsAny<CancellationToken>()), Times.Once);
+            await cache.Received(1).RemoveAsync(_options.CacheKeyFactory(ticket), Arg.Any<CancellationToken>());
         }
 
         private TestServer CreateServer(IDistributedCache cache)

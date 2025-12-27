@@ -39,6 +39,8 @@ jobs:
         with:
           dotnet-version: |
             10.0.x
+          cache: true
+          cache-dependency-path: '**/Directory.Packages.props'
       - name: Build
         run: |
           cd owin

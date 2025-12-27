@@ -8,6 +8,16 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var configUrls = builder.WebHost.GetSetting(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey) ??
+                 Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? 
+                 builder.Configuration["ASPNETCORE_URLS"];
+var proxyTarget = configUrls?.Split(';').FirstOrDefault(x => x.StartsWith("https://")) ?? 
+                  configUrls?.Split(';').FirstOrDefault();
+
+if (!string.IsNullOrEmpty(proxyTarget))
+{
+    Environment.SetEnvironmentVariable("PROXY_TARGET", proxyTarget);
+}
 builder.Services.AddControllers();
 builder.Services.AddAuthorization(options =>
 {

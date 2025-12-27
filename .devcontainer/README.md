@@ -3,7 +3,7 @@
 ## Requirements
 
 - [Docker Engine](https://docs.docker.com/install/)
-- [Docker Compose V2](https://docs.docker.com/compose/cli-command/)
+- [Docker Compose](https://docs.docker.com/compose/)
 - [mkcert](https://github.com/FiloSottile/mkcert)
 - [Visual Studio Code](https://code.visualstudio.com/)
 - Bash

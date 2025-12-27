@@ -39,6 +39,8 @@ jobs:
         with:
           dotnet-version: |
             10.0.x
+          cache: true
+          cache-dependency-path: '**/Directory.Packages.props'
       - name: Build
         run: |
           cd owin
@@ -64,9 +66,11 @@ jobs:
           fi
       - name: Commit binding redirect changes
         if: ${{ github.event_name == 'pull_request' && steps.check_for_changes.outputs.changes_detected == 'true' }}
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add owin/OwinSample/web.config
           git commit -m "Fix assembly binding redirects"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:$HEAD_REF

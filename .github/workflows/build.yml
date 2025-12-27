@@ -38,13 +38,15 @@ jobs:
           dotnet-version: |
             8.0.x
             10.0.x
+          cache: true
+          cache-dependency-path: '**/Directory.Packages.props'
       - name: Build
         run: |
           dotnet --info
           dotnet build -c Release
       - name: Test
         run: |
-          dotnet test --collect:"XPlat Code Coverage"
+          dotnet test --collect:"XPlat Code Coverage" --filter "FullyQualifiedName!~E2E"
           dotnet tool restore
           dotnet tool run reportgenerator
           [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"

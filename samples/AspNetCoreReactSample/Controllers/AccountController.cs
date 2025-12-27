@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace AspNetCoreReactSample.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
@@ -17,7 +18,6 @@ public class AccountController : ControllerBase
         _options = options.Value;
     }
 
-    [AllowAnonymous]
     [HttpGet("auth-schemes")]
     public IEnumerable<string> GetAuthenticationSchemes()
     {
@@ -26,8 +26,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("profile")]
-    public UserProfile GetUserProfile()
+    public UserProfile? GetUserProfile()
     {
+        if (User.Identity?.IsAuthenticated != true) return null;
         return new UserProfile
         {
             Id =
@@ -37,7 +38,6 @@ public class AccountController : ControllerBase
         };
     }
 
-    [AllowAnonymous]
     [HttpGet("/account/login")]
     public IActionResult Login(string? scheme)
     {
@@ -46,7 +46,6 @@ public class AccountController : ControllerBase
             : Challenge(new AuthenticationProperties { RedirectUri = "/" }, scheme);
     }
 
-    [AllowAnonymous]
     [HttpGet("/account/logout")]
     public async Task Logout(string? redirectUrl)
     {

@@ -8,7 +8,7 @@
       "request": "launch",
       "preLaunchTask": "build",
       // Needs change path when updating target Framework
-      "program": "${workspaceFolder}/samples/AspNetCoreSample/bin/Debug/net9.0/AspNetCoreSample.dll",
+      "program": "${workspaceFolder}/samples/AspNetCoreSample/bin/Debug/net10.0/AspNetCoreSample.dll",
       "args": [],
       "cwd": "${workspaceFolder}/samples/AspNetCoreSample",
       "env": {

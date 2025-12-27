@@ -116,9 +116,20 @@ jobs:
           sudo cp .devcontainer/.secrets/cert.pem /usr/local/share/ca-certificates/auth.dev.local.crt
           sudo update-ca-certificates
 
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.run == 'true'
+        uses: docker/setup-buildx-action@v3
+
       - name: Build Keycloak image with CAS protocol
         if: steps.check.outputs.run == 'true'
-        run: docker build -t keycloak:cas .devcontainer/keycloak
+        uses: docker/build-push-action@v6
+        with:
+          context: .devcontainer/keycloak
+          tags: keycloak:cas
+          push: false
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Start Keycloak
         if: steps.check.outputs.run == 'true'
@@ -149,6 +160,8 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: '**/Directory.Packages.props'
 
       - name: Install pnpm
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
@@ -165,9 +178,30 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml'
 
+      - name: Install dependencies
+        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        run: pnpm install
+        working-directory: samples/AspNetCoreReactSample/ClientApp
+
       - name: Build E2E Tests
         if: steps.check.outputs.run == 'true'
         run: dotnet build test/GSS.Authentication.CAS.E2E.Tests
+
+      - name: Get Playwright version
+        if: steps.check.outputs.run == 'true'
+        id: playwright-version
+        shell: bash
+        run: |
+          VERSION=$(grep -oP '<PackageVersion Include="Microsoft.Playwright" Version="\K[^"]+' Directory.Packages.props)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        if: steps.check.outputs.run == 'true'
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Playwright browsers
         if: steps.check.outputs.run == 'true'

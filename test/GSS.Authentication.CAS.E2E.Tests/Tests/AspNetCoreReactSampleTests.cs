@@ -128,6 +128,27 @@ public class AspNetCoreReactSampleTests(PlaywrightFixture playwright) : SampleTe
     }
 
     [Fact]
+    public async Task AuthenticatedUser_CanAccessHomePage()
+    {
+        var page = await CreatePageAsync();
+
+        await NavigateToLoginPageAsync(page);
+
+        var loggedIn = await LoginWithCasReactAsync(page);
+        Assert.SkipWhen(!loggedIn, "CAS authentication scheme not available");
+
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await NavigateToHomePageAsync(page);
+        await OnPageNavigatedAsync(page);
+
+        await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 }))
+            .ToContainTextAsync("Hello,", new() { Timeout = 15000 });
+        await Assertions.Expect(page.GetByRole(AriaRole.Button, new() { Name = "Logout" }))
+            .ToBeVisibleAsync(new() { Timeout = 15000 });
+    }
+
+    [Fact]
     public async Task Logout_ReturnsToAnonymousState()
     {
         var page = await CreatePageAsync();
@@ -143,6 +164,30 @@ public class AspNetCoreReactSampleTests(PlaywrightFixture playwright) : SampleTe
 
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 }))
             .ToContainTextAsync("Hello, anonymous", new() { Timeout = 30000 });
+    }
+
+    [Fact]
+    public async Task AuthenticatedUser_StaysLoggedIn_AfterNavigation()
+    {
+        var page = await CreatePageAsync();
+
+        await NavigateToLoginPageAsync(page);
+
+        var loggedIn = await LoginWithCasReactAsync(page);
+        Assert.SkipWhen(!loggedIn, "CAS authentication scheme not available");
+
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await NavigateToHomePageAsync(page);
+        await OnPageNavigatedAsync(page);
+        var username = await page.GetByRole(AriaRole.Heading, new() { Level = 1 }).TextContentAsync();
+
+        // Navigate back to home page to verify session persistence
+        await NavigateToHomePageAsync(page);
+        await OnPageNavigatedAsync(page);
+
+        await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 }))
+            .ToContainTextAsync(username ?? string.Empty, new() { Timeout = 15000 });
     }
     /// <summary>
     /// React sample uses Button instead of Link for CAS login.

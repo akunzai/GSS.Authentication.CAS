@@ -1,0 +1,58 @@
+name: Update Keycloak CAS Version
+
+on:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Get latest keycloak-protocol-cas release
+        id: get-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST_VERSION=$(gh api repos/jacekkow/keycloak-protocol-cas/releases/latest --jq '.tag_name')
+          echo "latest_version=${LATEST_VERSION}" >> "$GITHUB_OUTPUT"
+
+          # Get current version from Dockerfile
+          CURRENT_VERSION=$(grep -oP 'ARG KEYCLOAK_CAS_VERSION=\K[0-9.]+' .devcontainer/keycloak/Dockerfile)
+          echo "current_version=${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
+
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs_update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update Dockerfile
+        if: steps.get-release.outputs.needs_update == 'true'
+        env:
+          NEW_VERSION: ${{ steps.get-release.outputs.latest_version }}
+        run: |
+          sed -i "s/ARG KEYCLOAK_VERSION=.*/ARG KEYCLOAK_VERSION=${NEW_VERSION}/" .devcontainer/keycloak/Dockerfile
+          sed -i "s/ARG KEYCLOAK_CAS_VERSION=.*/ARG KEYCLOAK_CAS_VERSION=${NEW_VERSION}/" .devcontainer/keycloak/Dockerfile
+
+      - name: Create Pull Request
+        if: steps.get-release.outputs.needs_update == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore(deps): update Keycloak CAS to ${{ steps.get-release.outputs.latest_version }}'
+          title: 'chore(deps): update Keycloak CAS to ${{ steps.get-release.outputs.latest_version }}'
+          body: |
+            Updates Keycloak and keycloak-protocol-cas to version `${{ steps.get-release.outputs.current_version }}` → `${{ steps.get-release.outputs.latest_version }}`.
+
+            Release: https://github.com/jacekkow/keycloak-protocol-cas/releases/tag/${{ steps.get-release.outputs.latest_version }}
+          branch: update-keycloak-${{ steps.get-release.outputs.latest_version }}
+          delete-branch: true
+          labels: dependencies

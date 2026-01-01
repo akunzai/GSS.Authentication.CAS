@@ -45,7 +45,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.get-release.outputs.needs_update == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: 'chore(deps): update Keycloak CAS to ${{ steps.get-release.outputs.latest_version }}'
           title: 'chore(deps): update Keycloak CAS to ${{ steps.get-release.outputs.latest_version }}'

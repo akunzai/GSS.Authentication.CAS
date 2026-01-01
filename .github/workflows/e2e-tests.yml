@@ -234,21 +234,21 @@ jobs:
         run: dotnet test test/GSS.Authentication.CAS.E2E.Tests --logger "trx;LogFileName=test-results-${{ matrix.name }}.trx" --filter "FullyQualifiedName~${{ matrix.filter }}"
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always() && steps.check.outputs.run == 'true'
         with:
           name: e2e-test-results-${{ matrix.name }}
           path: test/GSS.Authentication.CAS.E2E.Tests/TestResults/*.trx
 
       - name: Upload recordings (Video)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_video == 'true'
         with:
           name: e2e-recordings-video-${{ matrix.name }}
           path: test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/recordings/videos/
 
       - name: Upload recordings (Trace)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_trace == 'true'
         with:
           name: e2e-recordings-trace-${{ matrix.name }}

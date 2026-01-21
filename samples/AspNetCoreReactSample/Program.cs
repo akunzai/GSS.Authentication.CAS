@@ -87,7 +87,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
-app.MapStaticAssets();
+app.MapStaticAssets().AllowAnonymous();
 
 app.UseRouting();
 

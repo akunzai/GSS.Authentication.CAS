@@ -173,7 +173,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapStaticAssets();
+app.MapStaticAssets().AllowAnonymous();
 
 app.UseRouting();
 

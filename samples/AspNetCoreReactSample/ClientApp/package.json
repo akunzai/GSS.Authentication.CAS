@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "prestart": "node aspnetcore-https && node aspnetcore-react",
     "start": "vite",
@@ -18,14 +18,14 @@
     "react-router-bootstrap": "0.26.3",
     "rimraf": "6.1.2",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.52.0",
+    "typescript-eslint": "8.53.1",
     "web-vitals": "5.1.0",
     "wouter": "3.9.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
-    "@types/node": "25.0.3",
-    "@types/react": "19.2.7",
+    "@types/node": "25.0.9",
+    "@types/react": "19.2.9",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.2",
     "eslint": "9.39.2",
@@ -36,7 +36,7 @@
       "esbuild"
     ],
     "overrides": {
-      "react-router": "^6.30.2",
+      "react-router": "^6.30.3",
       "@remix-run/router": "^1.23.2"
     }
   }

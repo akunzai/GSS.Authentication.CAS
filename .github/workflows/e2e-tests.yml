@@ -90,7 +90,7 @@ jobs:
 
       - name: Checkout
         if: steps.check.outputs.run == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up hosts
         if: steps.check.outputs.run == 'true'

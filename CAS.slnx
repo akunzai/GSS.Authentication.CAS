@@ -7,6 +7,11 @@
     <Project Path="samples/AspNetCoreSample/AspNetCoreSample.csproj" />
     <Project Path="samples/BlazorSample/BlazorSample.csproj" />
   </Folder>
+  <Folder Name="/aspire/">
+    <Project Path="aspire/AspireSample/AspireSample.csproj" />
+    <Project Path="aspire/AspireSample.AppHost/AspireSample.AppHost.csproj" />
+    <Project Path="aspire/AspireSample.ServiceDefaults/AspireSample.ServiceDefaults.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".config/dotnet-tools.json" />
     <File Path=".editorconfig" />

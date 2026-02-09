@@ -36,6 +36,7 @@ dotnet add package GSS.Authentication.CAS.AspNetCore
 Currently, CAS protocol from 1.0 to 3.0 was supported.
 Check out these [samples](./samples/) to learn the basics and key features.
 
+- [.NET Aspire](./aspire/)
 - [ASP.NET Core](./samples/AspNetCoreSample/)
 - [ASP.NET Core with React.js](./samples/AspNetCoreReactSample/)
 - [ASP.NET Core Identity](./samples/AspNetCoreIdentitySample/)

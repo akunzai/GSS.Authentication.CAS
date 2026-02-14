@@ -1,0 +1,46 @@
+name: PR Label Check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-label:
+    name: Auto Label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Apply labels
+        uses: actions/labeler@v5
+        with:
+          sync-labels: true
+
+  check:
+    name: Validate Labels
+    needs: auto-label
+    runs-on: ubuntu-latest
+    env:
+      REQUIRED_CATEGORY_LABELS: feature,bug,breaking,maintenance,documentation,enhancement,fix,refactor,dependencies,github_actions,samples,owin,dotnet
+    steps:
+      - name: Check labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Fetch labels directly from the API to ensure we have the latest data
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const labels = pullRequest.labels.map(l => l.name);
+            console.log(`PR Labels found: ${labels.join(', ')}`);
+            const required = process.env.REQUIRED_CATEGORY_LABELS.split(',').map(l => l.trim());
+            const hasLabel = labels.some(l => required.includes(l));
+            if (!hasLabel) {
+              core.setFailed(`PR must have at least one valid category label. Found: [${labels.join(', ')}]. Required one of: ${required.join(', ')}`);
+            }

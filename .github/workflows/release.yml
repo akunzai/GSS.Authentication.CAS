@@ -2,14 +2,34 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
 
-permissions: 
-    contents: write
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
-  publish:
+  release-drafter:
+    name: Release Drafter
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - id: release-drafter
+        uses: release-drafter/release-drafter@v6
+        with:
+          config-name: release.yml
+          # If it's a tag, publish it. Otherwise, just update the draft.
+          publish: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-nuget:
+    name: Publish to NuGet
+    needs: release-drafter
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,18 +46,3 @@ jobs:
           dotnet pack -o packages
       - name: Publish to NuGet.org
         run: dotnet nuget push "packages/*.nupkg" -k ${{ secrets.NUGET_AUTH_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
-  release:
-    needs: publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Pre-release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') && (contains(github.ref,'preview') || contains(github.ref,'beta') || contains(github.ref,'alpha') || contains(github.ref,'rc'))
-        with:
-          prerelease: true
-          generate_release_notes: true
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') && !(contains(github.ref,'preview') || contains(github.ref,'beta') || contains(github.ref,'alpha') || contains(github.ref,'rc'))
-        with:
-          generate_release_notes: true

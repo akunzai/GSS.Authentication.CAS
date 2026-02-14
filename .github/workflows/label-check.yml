@@ -1,0 +1,28 @@
+on:
+  pull_request:
+    types: [labeled, unlabeled, opened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Fetch labels directly from the API to ensure we have the latest data
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const labels = pullRequest.labels.map(l => l.name);
+            console.log(`PR Labels found: ${labels.join(', ')}`);
+            const required = ['feature', 'bug', 'breaking', 'maintenance', 'documentation', 'enhancement', 'fix', 'refactor', 'dependencies', 'github_actions', 'samples', 'owin', 'dotnet'];
+            const hasLabel = labels.some(l => required.includes(l));
+            if (!hasLabel) {
+              core.setFailed(`PR must have at least one valid category label. Found: [${labels.join(', ')}]. Required one of: ${required.join(', ')}`);
+            }

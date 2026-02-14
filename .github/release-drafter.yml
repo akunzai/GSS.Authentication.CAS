@@ -1,0 +1,59 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+      - renovate
+  categories:
+    - title: '⚡️ Breaking Changes'
+      labels:
+        - breaking
+    - title: '🚀 Features'
+      labels:
+        - feature
+        - enhancement
+    - title: '🐛 Bug Fixes'
+      labels:
+        - bug
+        - fix
+    - title: '🔨 Maintenance'
+      labels:
+        - 'maintenance'
+        - 'refactor'
+        - 'dependencies'
+        - 'github_actions'
+        - 'samples'
+        - 'owin'
+        - 'dotnet'
+    - title: '📝 Documentation'
+      labels:
+        - 'documentation'
+    - title: Misc
+      labels:
+        - "*"
+version-resolver:
+  major:
+    labels:
+      - 'breaking'
+  minor:
+    labels:
+      - 'feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'bug'
+      - 'fix'
+      - 'maintenance'
+      - 'refactor'
+      - 'dependencies'
+      - 'github_actions'
+      - 'samples'
+      - 'owin'
+      - 'dotnet'
+  default: patch
+template: |
+  ## Changes
+  $CHANGES

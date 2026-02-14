@@ -1,0 +1,31 @@
+'dotnet':
+  - changed-files:
+    - any-glob-to-any-file: 'src/**/*'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/package.json'
+      - '**/package-lock.json'
+      - '**/pnpm-lock.yaml'
+      - '**/yarn.lock'
+      - '**/Directory.Packages.props'
+
+github_actions:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**/*'
+
+samples:
+  - changed-files:
+    - any-glob-to-any-file: 'samples/**/*'
+
+owin:
+  - changed-files:
+    - any-glob-to-any-file: 'owin/**/*'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '**/*.md'
+      - 'LICENSE'

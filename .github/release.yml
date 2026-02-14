@@ -21,38 +21,38 @@ changelog:
         - fix
     - title: '🔨 Maintenance'
       labels:
-        - 'maintenance'
-        - 'refactor'
-        - 'dependencies'
-        - 'github_actions'
-        - 'samples'
-        - 'owin'
-        - 'dotnet'
+        - maintenance
+        - refactor
+        - dependencies
+        - github_actions
+        - samples
+        - owin
+        - dotnet
     - title: '📝 Documentation'
       labels:
-        - 'documentation'
+        - documentation
     - title: Misc
       labels:
-        - "*"
+        - '*'
 version-resolver:
   major:
     labels:
-      - 'breaking'
+      - breaking
   minor:
     labels:
-      - 'feature'
-      - 'enhancement'
+      - feature
+      - enhancement
   patch:
     labels:
-      - 'bug'
-      - 'fix'
-      - 'maintenance'
-      - 'refactor'
-      - 'dependencies'
-      - 'github_actions'
-      - 'samples'
-      - 'owin'
-      - 'dotnet'
+      - bug
+      - fix
+      - maintenance
+      - refactor
+      - dependencies
+      - github_actions
+      - samples
+      - owin
+      - dotnet
   default: patch
 template: |
   ## Changes

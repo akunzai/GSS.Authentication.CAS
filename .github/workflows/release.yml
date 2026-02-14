@@ -1,33 +1,26 @@
+name: Release
+
 on:
   push:
     branches:
       - main
     tags:
       - "v*"
-  pull_request:
-    types: [opened, reopened, synchronize]
 
 permissions:
   contents: write
-  pull-requests: write
-  # Explicitly add read to avoid potential issues as requested
-  # pull-requests: read (Note: write usually implies read, but we keep it safe)
+  pull-requests: read
 
 jobs:
   release-drafter:
     name: Release Drafter
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Auto Labeler
-        if: github.event_name == 'pull_request'
-        uses: actions/labeler@v5
-        with:
-          sync-labels: true
       - id: release-drafter
         uses: release-drafter/release-drafter@v6
         with:
+          config-name: release.yml
           # If it's a tag, publish it. Otherwise, just update the draft.
           publish: ${{ startsWith(github.ref, 'refs/tags/v') }}
         env:

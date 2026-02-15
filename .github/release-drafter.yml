@@ -1,44 +1,42 @@
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
-changelog:
-  exclude:
+exclude-labels:
+  - ignore-for-release
+exclude-contributors:
+  - dependabot
+  - renovate
+categories:
+  - title: '⚡️ Breaking Changes'
     labels:
-      - ignore-for-release
-    authors:
-      - dependabot
-      - renovate
-  categories:
-    - title: '⚡️ Breaking Changes'
-      labels:
-        - breaking
-    - title: '🚀 Features'
-      labels:
-        - feature
-        - enhancement
-    - title: '🐛 Bug Fixes'
-      labels:
-        - bug
-        - fix
-    - title: '🔨 Maintenance'
-      labels:
-        - chore
-        - refactor
-    - title: '📦 Dependencies'
-      labels:
-        - dependencies
-    - title: '⚙️ CI/CD'
-      labels:
-        - github_actions
-    - title: '🧪 Samples'
-      labels:
-        - samples
-        - owin
-    - title: '📝 Documentation'
-      labels:
-        - documentation
-    - title: Misc
-      labels:
-        - '*'
+      - breaking
+  - title: '🚀 Features'
+    labels:
+      - feature
+      - enhancement
+  - title: '🐛 Bug Fixes'
+    labels:
+      - bug
+      - fix
+  - title: '🔨 Maintenance'
+    labels:
+      - chore
+      - refactor
+  - title: '📦 Dependencies'
+    labels:
+      - dependencies
+  - title: '⚙️ CI/CD'
+    labels:
+      - github_actions
+  - title: '🧪 Samples'
+    labels:
+      - samples
+      - owin
+  - title: '📝 Documentation'
+    labels:
+      - documentation
+  - title: Misc
+    labels:
+      - '*'
 prerelease-identifier: rc
 version-resolver:
   major:

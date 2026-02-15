@@ -28,7 +28,7 @@
       "serverReadyAction": {
         "action": "openExternally",
         "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-      },
+      }
     },
     {
       "name": ".NET Core Attach",

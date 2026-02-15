@@ -25,9 +25,12 @@ dependencies:
       - '**/Directory.Packages.props'
 
 github_actions:
+  - head-branch:
+    - '^ci/.+'
   - changed-files:
     - any-glob-to-any-file:
       - '.github/workflows/**/*'
+      - '.github/*.yml'
 
 samples:
   - all:

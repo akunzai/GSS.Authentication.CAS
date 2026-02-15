@@ -53,6 +53,6 @@ jobs:
             Updates Keycloak and keycloak-protocol-cas to version `${{ steps.get-release.outputs.current_version }}` → `${{ steps.get-release.outputs.latest_version }}`.
 
             Release: https://github.com/jacekkow/keycloak-protocol-cas/releases/tag/${{ steps.get-release.outputs.latest_version }}
-          branch: update-keycloak-${{ steps.get-release.outputs.latest_version }}
+          branch: keycloak-protocol-cas/${{ steps.get-release.outputs.latest_version }}
           delete-branch: true
           labels: dependencies

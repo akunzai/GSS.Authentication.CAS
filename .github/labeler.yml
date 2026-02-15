@@ -1,0 +1,48 @@
+feature:
+  - head-branch:
+    - '^feature/.+'
+    - '^feat/.+'
+
+bug:
+  - head-branch:
+    - '^bugfix/.+'
+    - '^bug/.+'
+    - '^fix/.+'
+    - '^hotfix/.+'
+
+refactor:
+  - head-branch:
+    - '^refactor/.+'
+
+dependencies:
+  - head-branch:
+    - '^dependabot/.+'
+    - '^keycloak/.+'
+    - '^keycloak-protocol-cas/.+'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.config/dotnet-tools.json'
+      - '**/Directory.Packages.props'
+
+github_actions:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**/*'
+
+samples:
+  - all:
+    - changed-files:
+      - any-glob-to-any-file:
+        - 'samples/**/*'
+        - 'owin/**/*'
+    - head-branch:
+      - '^(?!dependabot/).+'
+
+documentation:
+  - head-branch:
+    - '^docs?/.+'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '*.md'
+      - 'LICENSE'

@@ -1,11 +1,6 @@
 name: Build React Sample Client
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'samples/AspNetCoreReactSample/ClientApp/**'
   pull_request:
     branches:
       - main

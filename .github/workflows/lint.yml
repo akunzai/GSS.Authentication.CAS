@@ -1,14 +1,6 @@
 name: Lint
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**.md'
-      - '**.sh'
-      - '**/Dockerfile'
-      - '.github/workflows/*.yml'
   pull_request:
     branches:
       - main

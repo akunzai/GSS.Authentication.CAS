@@ -1,16 +1,6 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.config/**'
-      - '*.sln'
-      - '*.slnx'
-      - 'src/**'
-      - 'test/**'
-      - 'Directory.*.props'
   pull_request:
     branches:
       - main

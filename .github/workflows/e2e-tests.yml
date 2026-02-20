@@ -1,13 +1,6 @@
 name: E2E Tests
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'samples/**'
-      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
-      - '.devcontainer/**'
   pull_request:
     branches:
       - main

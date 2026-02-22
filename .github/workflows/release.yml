@@ -20,6 +20,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Delete existing draft releases
+        run: |
+          gh release list --json tagName,isDraft \
+            --jq '.[] | select(.isDraft) | .tagName' | \
+            xargs -r -I{} gh release delete {} -y
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: release-drafter
         uses: release-drafter/release-drafter@v6
         with:

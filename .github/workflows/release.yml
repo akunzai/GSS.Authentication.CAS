@@ -27,6 +27,7 @@ jobs:
             xargs -r -I{} gh release delete {} -y
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
       - id: release-drafter
         uses: release-drafter/release-drafter@v6
         with:

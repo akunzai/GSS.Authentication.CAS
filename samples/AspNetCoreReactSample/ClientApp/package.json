@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@types/node": "25.3.3",
+    "@types/node": "25.3.5",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.4",
@@ -37,8 +37,9 @@
     ],
     "overrides": {
       "ajv": "^6.14.0",
-      "minimatch": "^10.2.2",
+      "minimatch": "^10.2.4",
       "react-router": "^6.30.3",
+      "rollup": "^4.59.0",
       "@remix-run/router": "^1.23.2"
     },
     "peerDependencyRules": {

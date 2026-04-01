@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
       - name: Set up .NET SDK

@@ -48,7 +48,7 @@ jobs:
           dotnet test --collect:"XPlat Code Coverage"
           dotnet tool restore
           dotnet tool run reportgenerator
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check for changes in web.config

@@ -119,7 +119,7 @@ jobs:
 
       - name: Build Keycloak image with CAS protocol
         if: steps.check.outputs.run == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .devcontainer/keycloak
           tags: keycloak:cas

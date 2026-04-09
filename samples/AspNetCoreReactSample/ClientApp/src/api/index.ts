@@ -1,2 +1,2 @@
-export * from './axiosSetup';
+export * from './fetchClient';
 export * from './UserManager';

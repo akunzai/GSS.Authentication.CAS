@@ -1,31 +1,18 @@
 import { User } from '../types';
-import { axiosFactory } from '.';
+import { fetchJson } from './fetchClient';
 
 export class UserManager {
-  constructor(
-    private axiosInstance = axiosFactory()
-  ) {}
-
   public async isAuthenticated() {
     const user = await this.getUser();
     return !!user;
   }
 
   public async getUser(): Promise<User | null> {
-    const response = await this.axiosInstance.get<User>(
-      '/api/account/profile'
-    );
-    if (response.status === 200 && response.data){
-      return response.data;
-    }
-    return null;
+    return await fetchJson<User>('/api/account/profile');
   }
 
   public async getAuthenticationSchemes(): Promise<string[]> {
-    const response = await this.axiosInstance.get<string[]>(
-      '/api/account/auth-schemes'
-    );
-    return response.data;
+    return await fetchJson<string[]>('/api/account/auth-schemes');
   }
 
   public async signIn(scheme: string): Promise<void> {

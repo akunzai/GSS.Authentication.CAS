@@ -1,0 +1,10 @@
+onlyBuiltDependencies:
+  - esbuild
+
+overrides:
+  react-router: "^6.30.3"
+  "@remix-run/router": "^1.23.2"
+
+peerDependencyRules:
+  allowedVersions:
+    eslint: "10"

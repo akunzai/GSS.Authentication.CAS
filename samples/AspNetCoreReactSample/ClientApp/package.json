@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@11.0.9",
+  "packageManager": "pnpm@11.1.3",
   "scripts": {
     "prestart": "node aspnetcore-https && node aspnetcore-react",
     "start": "vite",

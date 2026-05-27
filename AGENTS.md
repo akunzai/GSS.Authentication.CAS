@@ -6,7 +6,6 @@ This file provides guidance to AI agents when working with code in this reposito
 
 - This root **AGENTS.md** contains only essential baseline knowledge. Domain-specific or advanced topics should be placed in `AGENTS.md` files within relevant subdirectories (e.g., `src/AGENTS.md`, `test/AGENTS.md`, `samples/AGENTS.md`). For cross-cutting topics without a corresponding subdirectory, place documentation under `docs/`.
 - When solving problems reveals valuable knowledge, record it back to the most relevant `AGENTS.md` or documentation file.
-- **CLAUDE.md** is a symlink to this file — avoid modifying CLAUDE.md directly.
 - All documentation and code should be written in English.
 
 ## Project Overview
@@ -91,3 +90,10 @@ Uses Central Package Management (CPM) — all NuGet versions are defined in `Dir
 
 1. Merge PRs to `main` — draft release auto-updated by release-drafter
 2. Push a `v*` tag — triggers NuGet publish via `dotnet pack -o packages` and GitHub release
+
+## Claude Code Compatibility
+
+> [!NOTE]
+> This repository maintains compatibility with Claude Code. The file `CLAUDE.md` is a symbolic link pointing to `AGENTS.md`. 
+> All commands, style guides, and workflows defined in `AGENTS.md` apply to both Antigravity (and other agentic assistants) and Claude Code.
+> **DO NOT** delete the `CLAUDE.md` symbolic link or edit it independently; all guidelines must be updated directly in `AGENTS.md`.

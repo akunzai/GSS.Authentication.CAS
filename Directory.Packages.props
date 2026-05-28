@@ -42,13 +42,13 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.18.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
     <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.3" />
     <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="4.2.3" />
     <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.3" />
     <PackageVersion Include="Microsoft.Owin.Testing" Version="4.2.3" />
-    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.5.1" />
+    <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="18.6.0" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
@@ -60,8 +60,8 @@
     <PackageVersion Include="Sustainsys.Saml2.Owin" Version="2.11.0" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageVersion Include="Microsoft.Playwright" Version="1.59.0" />
-    <PackageVersion Include="Microsoft.Playwright.Xunit" Version="1.59.0" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.60.0" />
+    <PackageVersion Include="Microsoft.Playwright.Xunit" Version="1.60.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>

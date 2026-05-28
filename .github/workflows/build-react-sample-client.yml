@@ -19,18 +19,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 10
-          run_install: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: 'pnpm'
-          cache-dependency-path: 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml'
+
+      - name: Prepare pnpm and get store path
+        id: pnpm-cache
+        shell: bash
+        working-directory: samples/AspNetCoreReactSample/ClientApp
+        run: |
+          corepack enable
+          corepack prepare
+          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install

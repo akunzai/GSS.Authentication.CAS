@@ -1,6 +1,7 @@
 minimumReleaseAgeExclude:
   - vite@8.0.16
   - react-dom@19.2.7
+  - react@19.2.7
 
 onlyBuiltDependencies:
   - esbuild

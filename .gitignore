@@ -9,6 +9,8 @@ log.txt
 .run/*.run.xml
 # Claude Code
 .claude/
+# Agent daily memory logs (gitignored per memory skill spec)
+.memories/
 
 # development containers
 /.devcontainer/keycloak/export/

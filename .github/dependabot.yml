@@ -11,6 +11,14 @@ updates:
       interval: monthly
     cooldown:
       default-days: 3
+    groups:
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+          - '@vitejs/plugin-react'
   - package-ecosystem: nuget
     directory: /
     schedule:

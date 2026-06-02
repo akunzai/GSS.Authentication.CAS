@@ -9,6 +9,8 @@ updates:
     directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 3
   - package-ecosystem: nuget
     directory: /
     schedule:

@@ -86,6 +86,13 @@ Enforced via `.editorconfig`:
 
 Uses Central Package Management (CPM) — all NuGet versions are defined in `Directory.Packages.props` at the root. Do not add `Version` attributes in individual `.csproj` files.
 
+Legacy TFM versioning: `Directory.Packages.props` uses conditional groups — `netstandard2.0` / `net462` targets pin `Microsoft.Extensions.*` to the 8.0.x line; modern TFMs use the 10.x line.
+
+## OWIN Ecosystem Status
+
+> [!WARNING]
+> The OWIN ecosystem is **permanently frozen**. `Microsoft.Owin.*` is pinned at 4.2.3 with no future security or feature updates. `Sustainsys.Saml2.AspNetCore2` 2.11.0 is also at its final release. Do not expect upstream fixes for OWIN-related packages.
+
 ## Release Process
 
 1. Merge PRs to `main` — draft release auto-updated by release-drafter

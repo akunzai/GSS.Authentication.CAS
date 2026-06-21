@@ -44,8 +44,8 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(eslint@10.5.0)
       '@types/node':
-        specifier: 25.9.1
-        version: 25.9.1
+        specifier: 25.9.3
+        version: 25.9.3
       '@types/react':
         specifier: 19.2.17
         version: 19.2.17
@@ -54,13 +54,13 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       '@vitejs/plugin-react':
         specifier: 6.0.2
-        version: 6.0.2(vite@8.0.16(@types/node@25.9.1))
+        version: 6.0.2(vite@8.0.16(@types/node@25.9.3))
       eslint:
         specifier: 10.5.0
         version: 10.5.0
       vite:
         specifier: 8.0.16
-        version: 8.0.16(@types/node@25.9.1)
+        version: 8.0.16(@types/node@25.9.3)
 
 packages:
 
@@ -258,8 +258,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@25.9.1':
-    resolution: {integrity: sha512-xfrlY7UD5rMJk3ZVJP8BNzS28J36YJg+xp+LPXV1TdWxr8uMH5A860QNxYDGQe/ylDSgjxE52Q9VnO7p75tJxg==}
+  '@types/node@25.9.3':
+    resolution: {integrity: sha512-603BddQMv3pUcr4U2dhujk83N2tTDVr/34wII2B6bJy6g+8WD6yUb11jszNs0gdi4PesVWl7ABt8nYMVpnLUcg==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -997,7 +997,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@25.9.1':
+  '@types/node@25.9.3':
     dependencies:
       undici-types: 7.24.6
 
@@ -1100,10 +1100,10 @@ snapshots:
       '@typescript-eslint/types': 8.61.1
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@6.0.2(vite@8.0.16(@types/node@25.9.1))':
+  '@vitejs/plugin-react@6.0.2(vite@8.0.16(@types/node@25.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.0.16(@types/node@25.9.1)
+      vite: 8.0.16(@types/node@25.9.3)
 
   acorn-jsx@5.3.2(acorn@8.17.0):
     dependencies:
@@ -1508,7 +1508,7 @@ snapshots:
     dependencies:
       react: 19.2.7
 
-  vite@8.0.16(@types/node@25.9.1):
+  vite@8.0.16(@types/node@25.9.3):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -1516,7 +1516,7 @@ snapshots:
       rolldown: 1.0.3
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 25.9.1
+      '@types/node': 25.9.3
       fsevents: 2.3.3
 
   web-vitals@5.3.0: {}

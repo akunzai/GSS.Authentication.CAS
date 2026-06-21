@@ -4,11 +4,11 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
   - package-ecosystem: npm
     directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:
-      interval: monthly
+      interval: weekly
     cooldown:
       default-days: 3
     groups:
@@ -22,4 +22,4 @@ updates:
   - package-ecosystem: nuget
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly

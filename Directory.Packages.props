@@ -10,7 +10,7 @@
     <MicrosoftOwinVersion>4.2.3</MicrosoftOwinVersion>
     <SustainsysSaml2Version>2.11.0</SustainsysSaml2Version>
     <PlaywrightVersion>1.60.0</PlaywrightVersion>
-    <MicrosoftTestSdkVersion>18.6.0</MicrosoftTestSdkVersion>
+    <MicrosoftTestSdkVersion>18.7.0</MicrosoftTestSdkVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or $(TargetFramework.StartsWith('net4')) ">
     <PackageVersion Include="Microsoft.AspNetCore.WebUtilities" Version="2.3.11" />

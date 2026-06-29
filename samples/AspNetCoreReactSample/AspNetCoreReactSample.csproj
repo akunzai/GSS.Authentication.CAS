@@ -8,7 +8,7 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
-    <SpaProxyLaunchCommand>pnpm start</SpaProxyLaunchCommand>
+    <SpaProxyLaunchCommand>aube start</SpaProxyLaunchCommand>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -45,14 +45,14 @@
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
-    <Message Importance="high" Text="Restoring dependencies using 'pnpm'. This may take several minutes..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="pnpm install" />
+    <Message Importance="high" Text="Restoring dependencies using 'aube'. This may take several minutes..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="aube install" />
   </Target>
 
   <Target Name="PublishClientAssets" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="pnpm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="pnpm build" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="aube install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="aube build" />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>

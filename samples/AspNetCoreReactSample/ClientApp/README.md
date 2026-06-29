@@ -3,19 +3,17 @@
 ## Requirement
 
 - [Node.js](https://nodejs.org)
+- [aube](https://aube.jdx.dev) (recommended via [mise](https://mise.jdx.dev): `mise install`)
 
 ## [Getting Started](https://create-react-app.dev/docs/getting-started)
 
 ```sh
-# activate the pnpm package manager
-corepack enable
-
 # install npm packages
-pnpm install
+aube install
 
 # watch and serve a dev server at https://localhost:3000/
-pnpm start
+aube start
 
 # build the project in production mode. The build artifacts will be stored in the `dist/` directory
-pnpm build
+aube build
 ```

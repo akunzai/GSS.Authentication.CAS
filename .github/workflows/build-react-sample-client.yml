@@ -16,38 +16,35 @@ permissions: read-all
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: samples/AspNetCoreReactSample/ClientApp
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Set up mise (provisions aube + node from mise.toml)
+        uses: jdx/mise-action@v4
         with:
-          node-version: 24
+          install_args: aube node
+          cache: true
 
-      - name: Prepare pnpm and get store path
-        id: pnpm-cache
-        shell: bash
-        working-directory: samples/AspNetCoreReactSample/ClientApp
-        run: |
-          corepack enable
-          corepack prepare
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Get aube store path
+        id: aube-store
+        run: echo "path=$(aube store path)" >> "$GITHUB_OUTPUT"
 
-      - name: Setup pnpm cache
+      - name: Cache aube store
         uses: actions/cache@v6
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          path: ${{ steps.aube-store.outputs.path }}
+          key: ${{ runner.os }}-aube-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-aube-store-
 
       - name: Install dependencies
-        run: pnpm install
-        working-directory: samples/AspNetCoreReactSample/ClientApp
+        run: aube ci
 
       - name: Build
         run: |
-          pnpm lint
-          pnpm build
-        working-directory: samples/AspNetCoreReactSample/ClientApp
+          aube lint
+          aube build

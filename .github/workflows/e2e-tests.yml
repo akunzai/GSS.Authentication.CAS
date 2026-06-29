@@ -160,34 +160,30 @@ jobs:
           cache: true
           cache-dependency-path: '**/Directory.Packages.props'
 
-      - name: Set up Node.js
+      - name: Set up mise (provisions aube + node from mise.toml)
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
-        uses: actions/setup-node@v6
+        uses: jdx/mise-action@v4
         with:
-          node-version: 24
+          install_args: aube node
+          cache: true
 
-      - name: Prepare pnpm and get store path
+      - name: Get aube store path
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
-        id: pnpm-cache
-        shell: bash
-        working-directory: samples/AspNetCoreReactSample/ClientApp
-        run: |
-          corepack enable
-          corepack prepare
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        id: aube-store
+        run: echo "path=$(aube store path)" >> "$GITHUB_OUTPUT"
 
-      - name: Setup pnpm cache
+      - name: Cache aube store
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
         uses: actions/cache@v6
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          path: ${{ steps.aube-store.outputs.path }}
+          key: ${{ runner.os }}-aube-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-aube-store-
 
       - name: Install dependencies
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
-        run: pnpm install
+        run: aube ci
         working-directory: samples/AspNetCoreReactSample/ClientApp
 
       - name: Build E2E Tests

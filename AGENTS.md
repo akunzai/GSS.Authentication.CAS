@@ -40,10 +40,17 @@ dotnet test --filter "FullyQualifiedName~Cas20ServiceTicketValidatorTests.Valida
 cd owin && msbuild -noLogo -verbosity:minimal -restore
 
 # React sample client (in samples/AspNetCoreReactSample/ClientApp)
-pnpm lint && pnpm build
+aube lint && aube build
 ```
 
 E2E tests require a running Keycloak instance with the CAS protocol extension. See `.devcontainer/` for the Docker Compose setup.
+
+## Toolchain
+
+Developer tool versions are pinned in `mise.toml` (see [mise](https://mise.jdx.dev)) — run `mise install` to provision them:
+
+- **.NET SDK** — `global.json` pins the 10.x SDK (builds every TFM, including net8.0/netstandard2.0/netcoreapp3.1). net8.0 is installed runtime-only to *run* net8 tests/samples. net462/net48 (OWIN) are out of mise's scope (Windows + MSBuild).
+- **Node.js + [aube](https://aube.jdx.dev)** — the React sample client uses `aube` (not pnpm) for package management; it reads/writes the existing `pnpm-lock.yaml` in place. Use `aube ci` for frozen-lockfile installs.
 
 ## Architecture
 

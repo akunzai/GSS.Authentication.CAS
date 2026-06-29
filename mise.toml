@@ -1,0 +1,14 @@
+# https://mise.jdx.dev/
+# Pins the developer toolchain so local, devcontainer, and CI environments match.
+#
+# Notes:
+# - The .NET 10 SDK builds every target framework in this repo
+#   (net10.0/net8.0/netstandard2.0/netcoreapp3.1). Only ONE SDK is needed to build.
+# - net8.0 just needs its ASP.NET Core runtime to *run* the net8 tests and samples,
+#   so it is installed runtime-only (leaner than a full net8 SDK). The major-only
+#   "8" resolves to the latest 8.0.x patch at install time.
+# - net462/net48 (OWIN) require Windows + MSBuild and are out of mise's scope.
+[tools]
+dotnet = ["10", { version = "8", runtime = "aspnetcore" }]
+node = "lts"
+aube = "1.25.1"

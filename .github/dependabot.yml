@@ -23,3 +23,36 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      aspnetcore:
+        patterns:
+          - Microsoft.AspNetCore.*
+      entityframeworkcore:
+        patterns:
+          - Microsoft.EntityFrameworkCore.*
+      extensions:
+        patterns:
+          - Microsoft.Extensions.*
+      owin:
+        patterns:
+          - Microsoft.Owin.*
+      saml2:
+        patterns:
+          - Sustainsys.Saml2.*
+      playwright:
+        patterns:
+          - Microsoft.Playwright*
+      test-sdk:
+        patterns:
+          - Microsoft.NET.Test.Sdk
+          - Microsoft.TestPlatform.ObjectModel
+      xunit:
+        patterns:
+          - xunit.*
+      system:
+        patterns:
+          - System.Security.Cryptography.Xml
+          - System.Text.Encodings.Web
+          - System.Text.Json

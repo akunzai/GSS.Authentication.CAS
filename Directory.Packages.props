@@ -4,7 +4,7 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <!-- Package Version Variables -->
     <MicrosoftAspNetCoreVersion>10.0.9</MicrosoftAspNetCoreVersion>
-    <MicrosoftExtensionsVersion>10.0.9</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>10.0.10</MicrosoftExtensionsVersion>
     <EntityFrameworkCoreVersion>10.0.9</EntityFrameworkCoreVersion>
     <SystemPackagesVersion>10.0.9</SystemPackagesVersion>
     <MicrosoftOwinVersion>4.2.3</MicrosoftOwinVersion>

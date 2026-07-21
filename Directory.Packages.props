@@ -6,7 +6,7 @@
     <MicrosoftAspNetCoreVersion>10.0.9</MicrosoftAspNetCoreVersion>
     <MicrosoftExtensionsVersion>10.0.10</MicrosoftExtensionsVersion>
     <EntityFrameworkCoreVersion>10.0.9</EntityFrameworkCoreVersion>
-    <SystemPackagesVersion>10.0.9</SystemPackagesVersion>
+    <SystemPackagesVersion>10.0.10</SystemPackagesVersion>
     <MicrosoftOwinVersion>4.2.3</MicrosoftOwinVersion>
     <SustainsysSaml2Version>2.11.0</SustainsysSaml2Version>
     <PlaywrightVersion>1.61.0</PlaywrightVersion>

@@ -162,7 +162,7 @@ jobs:
 
       - name: Set up mise (provisions aube + node from mise.toml)
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v4.2.3
         with:
           install_args: aube node
           cache: true

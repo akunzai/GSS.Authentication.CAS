@@ -5,6 +5,16 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Workflows intentionally use floating major tags. Ignore the expanded
+    # version tags Dependabot resolves within those majors, while still
+    # surfacing a future major action upgrade.
+    ignore:
+      - dependency-name: reviewdog/action-hadolint
+        versions:
+          - 1.x
+      - dependency-name: jdx/mise-action
+        versions:
+          - 4.x
   - package-ecosystem: npm
     directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:
@@ -12,13 +22,13 @@ updates:
     cooldown:
       default-days: 3
     groups:
-      react:
+      typescript:
         patterns:
-          - react
-          - react-dom
-          - '@types/react'
-          - '@types/react-dom'
-          - '@vitejs/plugin-react'
+          - typescript
+          - typescript-eslint
+      frontend:
+        patterns:
+          - '*'
   - package-ecosystem: nuget
     directory: /
     schedule:

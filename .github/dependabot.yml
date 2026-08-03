@@ -5,16 +5,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # Workflows intentionally use floating major tags. Ignore the expanded
-    # version tags Dependabot resolves within those majors, while still
-    # surfacing a future major action upgrade.
+    # Floating major tags already track latest minor/patch at runtime.
+    # Only surface major action upgrades.
     ignore:
-      - dependency-name: reviewdog/action-hadolint
-        versions:
-          - 1.x
-      - dependency-name: jdx/mise-action
-        versions:
-          - 4.x
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-minor
+          - version-update:semver-patch
   - package-ecosystem: npm
     directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:

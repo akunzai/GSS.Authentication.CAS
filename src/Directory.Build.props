@@ -16,7 +16,7 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
-    <Version>5.7.0</Version>
+    <Version>5.8.0-rc.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release' ">

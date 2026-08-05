@@ -1,57 +1,67 @@
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
-exclude-labels:
-  - ignore-for-release
 exclude-contributors:
   - dependabot
   - renovate
 categories:
   - title: '⚡️ Breaking Changes'
-    labels:
-      - breaking
+    when:
+      label: breaking
   - title: '🚀 Features'
-    labels:
-      - feature
-      - enhancement
+    when:
+      labels:
+        - feature
+        - enhancement
   - title: '🐛 Bug Fixes'
-    labels:
-      - bug
-      - fix
+    when:
+      labels:
+        - bug
+        - fix
   - title: '🔨 Maintenance'
-    labels:
-      - chore
-      - refactor
+    when:
+      labels:
+        - chore
+        - refactor
   - title: '📦 Dependencies'
-    labels:
-      - dependencies
+    when:
+      label: dependencies
   - title: '⚙️ CI/CD'
-    labels:
-      - github_actions
+    when:
+      label: github_actions
   - title: '🧪 Samples'
-    labels:
-      - samples
-      - owin
+    when:
+      labels:
+        - samples
+        - owin
   - title: '📝 Documentation'
-    labels:
-      - documentation
+    when:
+      label: documentation
   - title: Misc
-    labels:
-      - '*'
+    when:
+      label: '*'
+  - type: pre-exclude
+    when:
+      label: ignore-for-release
+  - type: version-resolver
+    semver-increment: major
+    when:
+      label: breaking
+  - type: version-resolver
+    semver-increment: minor
+    when:
+      labels:
+        - feature
+        - enhancement
+  - type: version-resolver
+    semver-increment: patch
+    when:
+      labels:
+        - bug
+        - fix
+        - refactor
+  - type: version-resolver
+    semver-increment: patch
 prerelease-identifier: rc
-version-resolver:
-  major:
-    labels:
-      - breaking
-  minor:
-    labels:
-      - feature
-      - enhancement
-  patch:
-    labels:
-      - bug
-      - fix
-      - refactor
-  default: patch
 template: |
   ## Changes
   $CHANGES

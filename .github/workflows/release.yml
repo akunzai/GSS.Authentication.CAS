@@ -62,6 +62,10 @@ jobs:
     name: Publish to NuGet
     needs: publish-release
     if: startsWith(github.ref, 'refs/tags/v')
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -76,5 +80,10 @@ jobs:
         run: |
           dotnet --info
           dotnet pack -o packages
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: akunzai
       - name: Publish to NuGet.org
-        run: dotnet nuget push "packages/*.nupkg" -k ${{ secrets.NUGET_AUTH_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "packages/*.nupkg" -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate

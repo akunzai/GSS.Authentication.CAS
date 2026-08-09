@@ -11,3 +11,5 @@ ARG KEYCLOAK_CAS_VERSION
 ADD --chown=keycloak:keycloak https://github.com/jacekkow/keycloak-protocol-cas/releases/download/${KEYCLOAK_CAS_VERSION}/keycloak-protocol-cas-${KEYCLOAK_CAS_VERSION}.jar /opt/keycloak/providers/keycloak-protocol-cas.jar
 
 WORKDIR /opt/keycloak
+
+RUN /opt/keycloak/bin/kc.sh build --health-enabled=true

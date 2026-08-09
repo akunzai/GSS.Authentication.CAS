@@ -1,0 +1,43 @@
+# Warm GHA BuildKit caches for e2e custom images on main so new PRs can
+# cache-from on their first run (PR jobs may restore caches from the default branch).
+# Scopes must match .github/workflows/e2e-tests.yml (keycloak).
+name: E2E Image Cache
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.devcontainer/keycloak/**'
+      - '.devcontainer/Dockerfile'
+      - '.github/workflows/e2e-image-cache.yml'
+      - '.github/workflows/e2e-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  warm-keycloak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    name: Warm Keycloak cache
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # No load/push — only export type=gha layers for PR e2e cache-from.
+      - name: Build Keycloak image (cache export)
+        uses: docker/build-push-action@v7
+        with:
+          context: .devcontainer/keycloak
+          cache-from: type=gha,scope=keycloak
+          cache-to: type=gha,mode=max,scope=keycloak

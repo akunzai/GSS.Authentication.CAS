@@ -37,7 +37,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
+  # buildx type=gha cache-to needs write on private repos; harmless on public
+  actions: write
 
 jobs:
   build:
@@ -117,6 +120,15 @@ jobs:
         if: steps.check.outputs.run == 'true'
         uses: docker/setup-buildx-action@v4
 
+      # type=gha only persists reliably via docker/build-push-action (or bake-action).
+      # Scopes match .github/workflows/e2e-image-cache.yml (main warms caches for
+      # first-run PRs; PR jobs can restore from the default branch).
+      - name: Pull service images
+        if: steps.check.outputs.run == 'true'
+        working-directory: .devcontainer
+        # Tags come from compose.yaml (SSOT); only Hub services — not keycloak.
+        run: docker compose pull redis
+
       - name: Build Keycloak image with CAS protocol
         if: steps.check.outputs.run == 'true'
         uses: docker/build-push-action@v7
@@ -125,8 +137,8 @@ jobs:
           tags: keycloak:cas
           push: false
           load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=keycloak
+          cache-to: type=gha,scope=keycloak,mode=max
 
       - name: Start Keycloak
         if: steps.check.outputs.run == 'true'

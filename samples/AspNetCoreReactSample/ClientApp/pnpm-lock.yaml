@@ -35,8 +35,8 @@ importers:
         specifier: 8.66.0
         version: 8.66.0(eslint@10.8.0)(typescript@6.0.3)
       web-vitals:
-        specifier: 6.0.1
-        version: 6.0.1
+        specifier: 6.1.0
+        version: 6.1.0
       wouter:
         specifier: 3.10.0
         version: 3.10.0(react@19.2.8)
@@ -837,8 +837,8 @@ packages:
       yaml:
         optional: true
 
-  web-vitals@6.0.1:
-    resolution: {integrity: sha512-iF3+kno3Anlqi5fPVTQk9gYLfsCiL8P69Hof+AmZyVVx00E3e/BiGVvu+EsOy6jvTLqTKuiaRloPyw0JtdKbSw==}
+  web-vitals@6.1.0:
+    resolution: {integrity: sha512-ZNoJ/MbU6aaR2WjKrFVUvy5WQx+G96YvXQFSsmKTz3A/0VlAFywjUcxl00hc/S6wef2stfgQ4yWYIJCWCNudkA==}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -1525,7 +1525,7 @@ snapshots:
       '@types/node': 26.1.2
       fsevents: 2.3.3
 
-  web-vitals@6.0.1: {}
+  web-vitals@6.1.0: {}
 
   which@2.0.2:
     dependencies:

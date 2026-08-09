@@ -47,8 +47,8 @@ services:
           - auth.dev.local
 
   redis:
-    # https://hub.docker.com/_/redis
-    image: redis
+    # https://hub.docker.com/_/redis — pin major tag for reproducible CI pulls / cache hits
+    image: redis:8-alpine
     volumes:
       - type: volume
         source: redis_data

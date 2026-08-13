@@ -58,15 +58,17 @@ Open in VS Code with the [Dev Containers](https://marketplace.visualstudio.com/i
    dotnet test --filter "FullyQualifiedName!~E2E"
    ```
 
-4. **Apply a label** to your PR (required for release-drafter to categorize it):
+4. **Apply one primary label** to your PR (required; release-drafter puts each PR in the first matching group):
 
    | Label                      | When to use              |
    | -------------------------- | ------------------------ |
    | `breaking`                 | Breaking API change      |
    | `feature` / `enhancement`  | New functionality        |
    | `bug` / `fix`              | Bug fix                  |
-   | `chore` / `refactor`       | Internal cleanup         |
    | `dependencies`             | Dependency updates       |
+   | `github_actions`           | CI / workflow changes    |
+   | `chore` / `refactor`       | Internal cleanup         |
+   | `samples`                  | Sample apps only         |
    | `documentation`            | Docs only                |
    | `ignore-for-release`       | Not noteworthy for users |
 

@@ -318,6 +318,179 @@ namespace GSS.Authentication.CAS.Owin.Tests
             Assert.Equal("/Account/ExternalLoginFailure", signInResponse.Headers.Location.OriginalString);
         }
 
+        [Fact]
+        public async Task SignInChallenge_WithoutCorrelationCookie_ShouldThrows()
+        {
+            // Arrange
+            using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase);
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var callbackUrl = query[Constants.Parameters.Service].ToString();
+            var exception = await Record.ExceptionAsync(async () =>
+            {
+                // Act
+                await server.HttpClient.GetAsync(callbackUrl, TestContext.Current.CancellationToken);
+            });
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("An error was encountered while handling the remote login.", exception.Message);
+            Assert.Equal("Invalid return state, unable to redirect.", exception.InnerException!.Message);
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithSaveTokens_ShouldStoreServiceTicket()
+        {
+            // Arrange
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
+            var ticket = Guid.NewGuid().ToString();
+            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+            ticketValidator
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult<ICasPrincipal?>(principal));
+            string? savedTicket = null;
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator;
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.SaveTokens = true;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnCreatingTicket = context =>
+                    {
+                        savedTicket = context.Properties.GetServiceTicket();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl =
+                QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
+
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            using var signInResponse = await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+            Assert.Equal(ticket, savedTicket);
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithoutRedirectUri_ShouldReturnToCurrentPath()
+        {
+            // Arrange
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
+            var ticket = Guid.NewGuid().ToString();
+            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+            ticketValidator
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult<ICasPrincipal?>(principal));
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator;
+                options.CasServerUrlBase = CasServerUrlBase;
+            });
+            using var challengeResponse = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl =
+                QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
+
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            using var signInResponse = await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, signInResponse.StatusCode);
+            Assert.Equal("http://localhost/challenge", signInResponse.Headers.Location.OriginalString);
+        }
+
+        [Fact]
+        public async Task SingleSignOut_ShouldRedirectToCasServer()
+        {
+            // Arrange
+            using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase);
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/cas-signout", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var callbackUrl = QueryHelpers.AddQueryString("http://localhost/signout-callback-cas", "state", string.Empty);
+            var expectedUrlPrefix =
+                QueryHelpers.AddQueryString(CasServerUrlBase + Constants.Paths.Logout, "service", callbackUrl);
+            Assert.StartsWith(expectedUrlPrefix, response.Headers.Location.AbsoluteUri);
+        }
+
+        [Fact]
+        public async Task SingleSignOutCallback_WithState_ShouldRedirectToSignedOutRedirectUri()
+        {
+            // Arrange
+            const string signedOutRedirectUri = "https://app.example.org/logged-out";
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.SignedOutRedirectUri = signedOutRedirectUri;
+            });
+            using var signOutResponse = await server.HttpClient.GetAsync("/cas-signout", TestContext.Current.CancellationToken);
+            var logoutQuery = QueryHelpers.ParseQuery(signOutResponse.Headers.Location.Query);
+            var callbackUrl = logoutQuery[Constants.Parameters.Service].ToString();
+
+            // Act
+            using var callbackResponse = await server.HttpClient.GetAsync(callbackUrl, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, callbackResponse.StatusCode);
+            Assert.Equal(signedOutRedirectUri, callbackResponse.Headers.Location.AbsoluteUri);
+        }
+
+        [Fact]
+        public async Task SingleSignOutCallback_WithoutState_ShouldRedirectToSignedOutRedirectUri()
+        {
+            // Arrange
+            const string signedOutRedirectUri = "/logged-out";
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.SignedOutRedirectUri = signedOutRedirectUri;
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/signout-callback-cas", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            Assert.Equal(signedOutRedirectUri, response.Headers.Location.OriginalString);
+        }
+
+        [Fact]
+        public async Task SingleSignOut_WhenRedirectHandled_ShouldSkipCasLogout()
+        {
+            // Arrange
+            const string customLogoutPath = "/custom-signout";
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnRedirectToIdentityProviderForSignOut = context =>
+                    {
+                        context.Response.Redirect(customLogoutPath);
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/cas-signout", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            Assert.Equal(customLogoutPath, response.Headers.Location.OriginalString);
+        }
+
         private static TestServer CreateServer(Action<CasAuthenticationOptions> configureOptions)
         {
             var options = new CasAuthenticationOptions();
@@ -340,6 +513,18 @@ namespace GSS.Authentication.CAS.Owin.Tests
                     {
                         context.Authentication.Challenge(new AuthenticationProperties { RedirectUri = "/" },
                             CasDefaults.AuthenticationType);
+                        return;
+                    }
+
+                    if (request.Path.Value == "/challenge")
+                    {
+                        context.Authentication.Challenge(CasDefaults.AuthenticationType);
+                        return;
+                    }
+
+                    if (request.Path.Value == "/cas-signout")
+                    {
+                        context.Authentication.SignOut(CasDefaults.AuthenticationType);
                         return;
                     }
 

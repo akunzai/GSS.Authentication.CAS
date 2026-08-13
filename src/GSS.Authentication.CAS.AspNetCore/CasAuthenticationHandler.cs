@@ -94,7 +94,7 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
                     Options.StateDataFormat.Protect(properties))));
         var redirectContext = new CasRedirectContext(Context, Scheme, Options, properties, redirectUri);
 
-        await Events.RedirectToAuthorizationEndpoint(redirectContext).ConfigureAwait(false);
+        await Events.RedirectToIdentityProviderForSignOut(redirectContext).ConfigureAwait(false);
         if (redirectContext.Handled)
         {
             return;

@@ -43,7 +43,7 @@ namespace GSS.Authentication.CAS.Owin
         {
             var query = Request.Query;
             var state = query[State];
-            var properties = Options.StateDataFormat.Unprotect(state);
+            var properties = string.IsNullOrEmpty(state) ? null : Options.StateDataFormat.Unprotect(state);
             Response.Redirect(!string.IsNullOrEmpty(properties?.RedirectUri)
                 ? properties!.RedirectUri
                 : Options.SignedOutRedirectUri);

@@ -14,6 +14,10 @@ refactor:
   - head-branch:
     - '^refactor/.+'
 
+chore:
+  - head-branch:
+    - '^chore/.+'
+
 dependencies:
   - head-branch:
     - '^dependabot/.+'
@@ -24,28 +28,27 @@ dependencies:
       - '.config/dotnet-tools.json'
       - '**/Directory.Packages.props'
 
+# Workflows and ci/* branches only — not every file under .github/
 github_actions:
   - head-branch:
     - '^ci/.+'
   - changed-files:
     - any-glob-to-any-file:
       - '.github/workflows/**/*'
-      - '.github/*.yml'
 
+# Sample apps only — owin/ is the OWIN library, not a sample
 samples:
   - all:
     - changed-files:
       - any-glob-to-any-file:
         - 'samples/**/*'
-        - 'owin/**/*'
     - head-branch:
       - '^(?!dependabot/).+'
 
+# Dedicated docs tree / docs? branches — not every *.md touch
 documentation:
   - head-branch:
     - '^docs?/.+'
   - changed-files:
     - any-glob-to-any-file:
       - 'docs/**/*'
-      - '*.md'
-      - 'LICENSE'

@@ -3,56 +3,70 @@ tag-template: 'v$RESOLVED_VERSION'
 exclude-contributors:
   - dependabot
   - renovate
+# Changelog categories are exclusive and ordered by precedence.
+# Type labels (breaking → chore) win over area labels (samples, docs).
 categories:
   - title: '⚡️ Breaking Changes'
+    exclusive: true
     when:
       label: breaking
   - title: '🚀 Features'
+    exclusive: true
     when:
       labels:
         - feature
         - enhancement
   - title: '🐛 Bug Fixes'
+    exclusive: true
     when:
       labels:
         - bug
         - fix
+  - title: '📦 Dependencies'
+    exclusive: true
+    when:
+      label: dependencies
+  - title: '⚙️ CI/CD'
+    exclusive: true
+    when:
+      label: github_actions
   - title: '🔨 Maintenance'
+    exclusive: true
     when:
       labels:
         - chore
         - refactor
-  - title: '📦 Dependencies'
-    when:
-      label: dependencies
-  - title: '⚙️ CI/CD'
-    when:
-      label: github_actions
   - title: '🧪 Samples'
+    exclusive: true
     when:
       labels:
         - samples
         - owin
   - title: '📝 Documentation'
+    exclusive: true
     when:
       label: documentation
   - title: Misc
+    exclusive: true
     when:
       label: '*'
   - type: pre-exclude
     when:
       label: ignore-for-release
   - type: version-resolver
+    exclusive: true
     semver-increment: major
     when:
       label: breaking
   - type: version-resolver
+    exclusive: true
     semver-increment: minor
     when:
       labels:
         - feature
         - enhancement
   - type: version-resolver
+    exclusive: true
     semver-increment: patch
     when:
       labels:

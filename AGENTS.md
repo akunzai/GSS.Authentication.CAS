@@ -13,7 +13,7 @@ dotnet test --collect:"XPlat Code Coverage" --filter "FullyQualifiedName!~E2E"
 dotnet tool restore && dotnet tool run reportgenerator
 dotnet test --filter "FullyQualifiedName~Cas20ServiceTicketValidatorTests.ValidateAsync"
 cd owin && msbuild -noLogo -verbosity:minimal -restore   # Windows + MSBuild only
-# samples/AspNetCoreReactSample/ClientApp
+# samples/AspNetCoreReactSample/ClientApp (oxlint + oxfmt)
 aube lint && aube build
 ```
 

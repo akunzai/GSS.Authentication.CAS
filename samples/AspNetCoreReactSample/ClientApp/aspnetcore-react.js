@@ -12,13 +12,11 @@ const baseFolder =
 const certificateArg = process.argv
   .map((arg) => arg.match(/--name=(?<value>.+)/i))
   .filter(Boolean)[0];
-const certificateName = certificateArg
-  ? certificateArg.groups.value
-  : process.env.npm_package_name;
+const certificateName = certificateArg ? certificateArg.groups.value : process.env.npm_package_name;
 
 if (!certificateName) {
   console.error(
-    'Invalid certificate name. Run this script in the context of an npm/yarn script or pass --name=<<app>> explicitly.'
+    'Invalid certificate name. Run this script in the context of an npm/yarn script or pass --name=<<app>> explicitly.',
   );
   process.exit(-1);
 }
@@ -30,7 +28,7 @@ if (!existsSync('.env.development.local')) {
   writeFileSync(
     '.env.development.local',
     `SSL_CRT_FILE=${certFilePath}
-SSL_KEY_FILE=${keyFilePath}`
+SSL_KEY_FILE=${keyFilePath}`,
   );
 } else {
   let lines = readFileSync('.env.development.local').toString().split('\n');
@@ -46,15 +44,9 @@ SSL_KEY_FILE=${keyFilePath}`
     }
   }
   if (!hasCert) {
-    appendFileSync(
-      '.env.development.local',
-      `\nSSL_CRT_FILE=${certFilePath}`
-    );
+    appendFileSync('.env.development.local', `\nSSL_CRT_FILE=${certFilePath}`);
   }
   if (!hasCertKey) {
-    appendFileSync(
-      '.env.development.local',
-      `\nSSL_KEY_FILE=${keyFilePath}`
-    );
+    appendFileSync('.env.development.local', `\nSSL_KEY_FILE=${keyFilePath}`);
   }
 }

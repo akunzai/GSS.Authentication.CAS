@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "mhutchie.git-graph",
-    "ms-dotnettools.csdevkit"
+    "ms-dotnettools.csdevkit",
+    "oxc.oxc-vscode"
   ]
 }

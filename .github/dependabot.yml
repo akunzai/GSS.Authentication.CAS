@@ -22,7 +22,6 @@ updates:
       typescript:
         patterns:
           - typescript
-          - typescript-eslint
       frontend:
         patterns:
           - '*'

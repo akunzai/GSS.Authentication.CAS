@@ -10,7 +10,7 @@ export const defaultOptions: FetchOptions = {
 
 export async function fetchJson<T>(
   url: string,
-  options: FetchOptions = defaultOptions
+  options: FetchOptions = defaultOptions,
 ): Promise<T> {
   const headers = new Headers(defaultOptions.headers);
 

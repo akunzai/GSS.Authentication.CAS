@@ -16,4 +16,10 @@ aube start
 
 # build the project in production mode. The build artifacts will be stored in the `dist/` directory
 aube build
+
+# lint (oxlint) and check formatting (oxfmt)
+aube lint
+
+# write oxfmt changes
+aube format
 ```

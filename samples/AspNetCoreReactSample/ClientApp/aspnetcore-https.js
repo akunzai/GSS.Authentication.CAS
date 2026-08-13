@@ -17,7 +17,7 @@ const certificateName = certificateArg
 
 if (!certificateName) {
   console.error(
-    'Invalid certificate name. Run this script in the context of an npm/yarn script or pass --name=<<app>> explicitly.'
+    'Invalid certificate name. Run this script in the context of an npm/yarn script or pass --name=<<app>> explicitly.',
   );
   process.exit(-1);
 }
@@ -32,15 +32,7 @@ if (!existsSync(baseFolder)) {
 if (!existsSync(certFilePath) || !existsSync(keyFilePath)) {
   spawn(
     'dotnet',
-    [
-      'dev-certs',
-      'https',
-      '--export-path',
-      certFilePath,
-      '--format',
-      'Pem',
-      '--no-password',
-    ],
-    { stdio: 'inherit' }
+    ['dev-certs', 'https', '--export-path', certFilePath, '--format', 'Pem', '--no-password'],
+    { stdio: 'inherit' },
   ).on('exit', (code) => process.exit(code));
 }

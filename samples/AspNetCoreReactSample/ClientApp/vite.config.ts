@@ -12,23 +12,23 @@ export default defineConfig(({ mode }) => {
   const httpsOptions =
     env.HTTPS && certFilePath && keyFilePath && existsSync(certFilePath) && existsSync(keyFilePath)
       ? {
-        cert: readFileSync(certFilePath),
-        key: readFileSync(keyFilePath),
-      }
+          cert: readFileSync(certFilePath),
+          key: readFileSync(keyFilePath),
+        }
       : undefined;
   const proxyTarget = env.PROXY_TARGET
     ? env.PROXY_TARGET
     : env.ASPNETCORE_URLS
-      ? env.ASPNETCORE_URLS.split(';').find(url => url.startsWith('https')) ??
-      env.ASPNETCORE_URLS.split(';').find(url => url.startsWith('http')) ??
-      env.ASPNETCORE_URLS.split(';')[0]
+      ? (env.ASPNETCORE_URLS.split(';').find((url) => url.startsWith('https')) ??
+        env.ASPNETCORE_URLS.split(';').find((url) => url.startsWith('http')) ??
+        env.ASPNETCORE_URLS.split(';')[0])
       : env.ASPNETCORE_HTTPS_PORT
         ? `https://127.0.0.1:${env.ASPNETCORE_HTTPS_PORT}`
         : 'http://127.0.0.1:5000';
   // https://github.com/http-party/node-http-proxy#options
   const proxyOptions = {
     target: proxyTarget,
-    secure: false
+    secure: false,
   };
   return {
     plugins: [react()],
@@ -39,8 +39,8 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': proxyOptions,
         '/account': proxyOptions,
-        '^/sign(in|out)-.+': proxyOptions
-      }
+        '^/sign(in|out)-.+': proxyOptions,
+      },
     },
   };
 });

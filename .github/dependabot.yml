@@ -53,6 +53,7 @@ updates:
       test-sdk:
         patterns:
           - Microsoft.NET.Test.Sdk
+          - Microsoft.Testing.*
           - Microsoft.TestPlatform.ObjectModel
       xunit:
         patterns:

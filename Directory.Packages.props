@@ -57,6 +57,8 @@
     <PackageVersion Include="Microsoft.Owin.Security.Cookies" Version="$(MicrosoftOwinVersion)" />
     <PackageVersion Include="Microsoft.Owin.Security.OpenIdConnect" Version="$(MicrosoftOwinVersion)" />
     <PackageVersion Include="Microsoft.Owin.Testing" Version="$(MicrosoftOwinVersion)" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.10.0" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.3.3" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="$(MicrosoftTestSdkVersion)" />
     <PackageVersion Include="NSubstitute" Version="6.1.0" />
     <PackageVersion Include="MSBuild.Microsoft.VisualStudio.Web.targets" Version="14.0.0.3" />

@@ -40,10 +40,12 @@ jobs:
           dotnet build -c Release
       - name: Test
         run: |
-          dotnet test --collect:"XPlat Code Coverage" --filter "FullyQualifiedName!~E2E"
+          dotnet test --coverage --coverage-output-format cobertura --filter "FullyQualifiedName!~E2E" --ignore-exit-code 8
           dotnet tool restore
           dotnet tool run reportgenerator
           [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"
       - uses: codecov/codecov-action@v7
+        with:
+          flags: core
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

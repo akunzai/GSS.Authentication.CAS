@@ -246,7 +246,7 @@ jobs:
 
       - name: Run E2E Tests
         if: steps.check.outputs.run == 'true'
-        run: dotnet test test/GSS.Authentication.CAS.E2E.Tests --logger "trx;LogFileName=test-results-${{ matrix.name }}.trx" --filter "FullyQualifiedName~${{ matrix.filter }}"
+        run: dotnet test test/GSS.Authentication.CAS.E2E.Tests --report-trx --report-trx-filename "test-results-${{ matrix.name }}.trx" --results-directory test/GSS.Authentication.CAS.E2E.Tests/TestResults --filter "FullyQualifiedName~${{ matrix.filter }}" --ignore-exit-code 8
 
       - name: Upload test results
         uses: actions/upload-artifact@v7

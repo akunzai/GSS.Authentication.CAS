@@ -6,8 +6,10 @@ CAS 1.0/2.0/3.0 authentication middleware for ASP.NET Core and OWIN/Katana. NuGe
 
 ```shell
 dotnet build
-dotnet test --filter "FullyQualifiedName!~E2E"
-dotnet test --filter "FullyQualifiedName~Cas20ServiceTicketValidatorTests.ValidateAsync"
+dotnet test --filter "FullyQualifiedName!~E2E" --ignore-exit-code 8
+dotnet test --coverage --coverage-output-format cobertura --filter "FullyQualifiedName!~E2E" --ignore-exit-code 8
+dotnet tool restore && dotnet tool run reportgenerator
+dotnet test --filter "Cas20ServiceTicketValidationTests" --ignore-exit-code 8
 cd owin && msbuild -noLogo -verbosity:minimal -restore   # Windows + MSBuild only
 aube lint && aube build                                   # samples/AspNetCoreReactSample/ClientApp
 ```

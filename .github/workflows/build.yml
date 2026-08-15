@@ -45,5 +45,7 @@ jobs:
           dotnet tool run reportgenerator
           [[ -f "./coverage/Summary.txt" ]] && cat "./coverage/Summary.txt"
       - uses: codecov/codecov-action@v7
+        with:
+          flags: core
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

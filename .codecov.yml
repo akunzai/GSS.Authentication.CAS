@@ -1,0 +1,10 @@
+codecov:
+  notify:
+    after_n_builds: 2
+
+comment:
+  after_n_builds: 2
+
+flag_management:
+  default_rules:
+    carryforward: true

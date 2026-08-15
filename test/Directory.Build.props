@@ -7,6 +7,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
   </PropertyGroup>
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">

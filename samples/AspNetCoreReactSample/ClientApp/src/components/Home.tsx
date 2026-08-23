@@ -1,21 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { UserManager } from '../api';
 import { User } from '../types';
 
 export function Home(): React.JSX.Element {
   const userManager = useMemo(() => new UserManager(), []);
-  const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  const fetchUser = useCallback(async () => {
-    setUser(await userManager.getUser());
-    setAuthenticated(await userManager.isAuthenticated());
+  useEffect(() => {
+    void userManager.getUser().then((nextUser) => {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setUser(nextUser);
+    });
   }, [userManager]);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  const authenticated = !!user;
 
   if (!authenticated) {
     return (

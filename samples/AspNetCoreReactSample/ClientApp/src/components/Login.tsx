@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UserManager } from '../api';
 
 export function Login(): React.JSX.Element {
   const userManager = useMemo(() => new UserManager(), []);
   const [schemes, setSchemes] = useState<string[]>([]);
 
-  const fetchSchemes = useCallback(async () => {
-    setSchemes(await userManager.getAuthenticationSchemes());
-  }, [userManager]);
-
   useEffect(() => {
-    fetchSchemes();
-  }, [fetchSchemes]);
+    void userManager.getAuthenticationSchemes().then((nextSchemes) => {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setSchemes(nextSchemes);
+    });
+  }, [userManager]);
 
   return (
     <>

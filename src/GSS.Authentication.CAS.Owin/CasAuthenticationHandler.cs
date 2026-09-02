@@ -281,6 +281,12 @@ namespace GSS.Authentication.CAS.Owin
 
             if (challenge != null)
             {
+                if (Options.Renew && Options.Gateway)
+                {
+                    throw new InvalidOperationException(
+                        $"'{nameof(Options.Renew)}' and '{nameof(Options.Gateway)}' cannot both be set, per the CAS protocol.");
+                }
+
                 var requestPrefix = Request.Scheme + Uri.SchemeDelimiter + Request.Host;
 
                 var state = challenge.Properties;
@@ -298,6 +304,29 @@ namespace GSS.Authentication.CAS.Owin
                 var authorizationEndpoint = QueryHelpers.AddQueryString(
                     $"{Options.CasServerUrlBase.TrimEnd('/')}{Constants.Paths.Login}",
                     Constants.Parameters.Service, returnTo);
+
+                if (Options.Renew)
+                {
+                    authorizationEndpoint =
+                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Renew, "true");
+                }
+                else if (Options.Gateway)
+                {
+                    authorizationEndpoint =
+                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Gateway, "true");
+                }
+
+                if (!string.IsNullOrEmpty(Options.Method))
+                {
+                    authorizationEndpoint =
+                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Method, Options.Method);
+                }
+
+                if (!string.IsNullOrEmpty(Options.Locale))
+                {
+                    authorizationEndpoint =
+                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Locale, Options.Locale);
+                }
 
                 var redirectContext = new CasRedirectContext(Context, null) { RedirectUri = authorizationEndpoint };
                 if (Options.Provider is CasAuthenticationProvider provider)

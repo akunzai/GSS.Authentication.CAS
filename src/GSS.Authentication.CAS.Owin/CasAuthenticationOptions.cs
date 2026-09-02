@@ -113,6 +113,32 @@ namespace GSS.Authentication.CAS.Owin
         public IProxyGrantingTicketStore ProxyGrantingTicketStore { get; set; } = new InMemoryProxyGrantingTicketStore();
 
         /// <summary>
+        /// Forces the user to re-authenticate with primary credentials, even if a valid SSO session already exists.
+        /// Mutually exclusive with <see cref="Gateway"/>. See CAS Protocol Specification §2.1.1.
+        /// </summary>
+        public bool Renew { get; set; }
+
+        /// <summary>
+        /// Attempts a transparent/silent authentication: CAS will not prompt for credentials, redirecting straight
+        /// back without a <c>ticket</c> if there's no existing SSO session. Mutually exclusive with <see cref="Renew"/>.
+        /// See CAS Protocol Specification §2.1.1.
+        /// </summary>
+        public bool Gateway { get; set; }
+
+        /// <summary>
+        /// The CAS 3.0 <c>method</c> parameter, controlling how CAS delivers the response to <c>service</c>
+        /// (e.g. <c>"POST"</c>, <c>"HEADER"</c>; the default, unset, is a <c>GET</c> redirect).
+        /// See CAS Protocol Specification §2.1.1.
+        /// </summary>
+        public string? Method { get; set; }
+
+        /// <summary>
+        /// A hint for the locale CAS should render its login page in. Not part of the core CAS protocol, but widely
+        /// supported by CAS server implementations.
+        /// </summary>
+        public string? Locale { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="IServiceTicketValidator"/> used to validate service ticket.
         /// Default is <see cref="Cas30ServiceTicketValidator"/>.
         /// </summary>

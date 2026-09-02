@@ -103,6 +103,58 @@ public class CasAuthenticationMiddlewareTests
     }
 
     [Fact]
+    public async Task SignInChallenge_WithRenewGatewayMethodLocale_ShouldAppendQueryParameters()
+    {
+        // Arrange
+        using var host = CreateHost(options =>
+        {
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Renew = true;
+            options.Method = "POST";
+            options.Locale = "zh_TW";
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        using var client = server.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath,
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var query = QueryHelpers.ParseQuery(response.Headers.Location?.Query);
+        Assert.Equal("true", query[Constants.Parameters.Renew]);
+        Assert.Equal("POST", query[Constants.Parameters.Method]);
+        Assert.Equal("zh_TW", query[Constants.Parameters.Locale]);
+        Assert.False(query.ContainsKey(Constants.Parameters.Gateway));
+    }
+
+    [Fact]
+    public async Task SignInChallenge_WithGateway_ShouldAppendGatewayQueryParameter()
+    {
+        // Arrange
+        using var host = CreateHost(options =>
+        {
+            options.CasServerUrlBase = CasServerUrlBase;
+            options.Gateway = true;
+        });
+        var server = host.GetTestServer();
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        using var client = server.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath,
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var query = QueryHelpers.ParseQuery(response.Headers.Location?.Query);
+        Assert.Equal("true", query[Constants.Parameters.Gateway]);
+        Assert.False(query.ContainsKey(Constants.Parameters.Renew));
+    }
+
+    [Fact]
     public async Task SignInChallenge_WithoutTicketInCallbackQuery_ShouldThrows()
     {
         // Arrange

@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace GSS.Authentication.CAS.AspNetCore;
 
-public static class TicketStoreWrapperExtensions
+/// <summary>
+/// Stores and reads the CAS service ticket on <see cref="AuthenticationProperties"/>, which is how
+/// <see cref="DistributedCacheTicketStore"/> keys its entries so Single Sign-Out can find them.
+/// </summary>
+public static class ServiceTicketPropertiesExtensions
 {
     private const string ServiceTicketKey = "service_ticket";
 

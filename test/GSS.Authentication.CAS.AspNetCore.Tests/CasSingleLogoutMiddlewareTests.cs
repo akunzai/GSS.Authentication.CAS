@@ -88,6 +88,39 @@ public class CasSingleLogoutMiddlewareTests
     }
 
     [Fact]
+    public async Task WithUntrustedRequest_ShouldNotRemoveTicket()
+    {
+        // Arrange
+        var cache = Substitute.For<IDistributedCache>();
+        var host = new HostBuilder()
+            .ConfigureWebHostDefaults(builder =>
+            {
+                builder.UseTestServer();
+                builder.Configure(app => app.UseCasSingleLogout(
+                    new DistributedCacheTicketStore(cache, Options.Create(_options)),
+                    new CasSingleLogoutOptions { IsTrustedRequest = _ => false }));
+            })
+            .Build();
+        var server = host.GetTestServer();
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        using var client = server.CreateClient();
+        var ticket = Guid.NewGuid().ToString();
+        using var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["logoutRequest"] =
+                $@"<samlp:LogoutRequest xmlns:samlp=""urn:oasis:names:tc:SAML:2.0:protocol"" ID=""{Guid.NewGuid()}"" Version=""2.0"" IssueInstant=""{DateTime.UtcNow:o}"">
+    <saml:NameID xmlns:saml=""urn:oasis:names:tc:SAML:2.0:assertion"">@NOT_USED@</saml:NameID>
+    <samlp:SessionIndex>{ticket}</samlp:SessionIndex></samlp:LogoutRequest>"
+        });
+
+        // Act
+        using var response = await client.PostAsync("/", content, TestContext.Current.CancellationToken);
+
+        // Assert
+        await cache.DidNotReceive().RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task RetrievedTicketStoreFromDI_ShouldNotThrows()
     {
         // Arrange

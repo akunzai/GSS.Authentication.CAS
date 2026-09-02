@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -135,6 +136,16 @@ public class CasSingleLogoutMiddlewareTests
 
         // Act & Assert
         await host.StartAsync(TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public void SetNullIsTrustedRequest_ShouldThrowsArgumentNullException()
+    {
+        // Arrange
+        var options = new CasSingleLogoutOptions();
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => options.IsTrustedRequest = null!);
     }
 
     private IHost CreateHost(IDistributedCache cache)

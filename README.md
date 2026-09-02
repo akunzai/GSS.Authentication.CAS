@@ -33,15 +33,33 @@ dotnet add package GSS.Authentication.CAS.AspNetCore
 
 ## Usage
 
-Currently, CAS protocol from 1.0 to 3.0 was supported.
-Check out these [samples](./samples/) to learn the basics and key features.
+The documentation below covers the API; these runnable samples put it together end to end.
 
-- [ASP.NET Core](./samples/AspNetCoreSample/)
-- [ASP.NET Core with React.js](./samples/AspNetCoreReactSample/)
-- [ASP.NET Core Identity](./samples/AspNetCoreIdentitySample/)
-- [ASP.NET Core Blazor](./samples/BlazorSample/)
-- [ASP.NET Core MVC](./samples/AspNetCoreMvcSample/)
-- [OWIN](./samples/OwinSample/)
+- [ASP.NET Core][sample-aspnetcore]
+- [ASP.NET Core with React.js][sample-react]
+- [ASP.NET Core Identity][sample-identity]
+- [ASP.NET Core Blazor][sample-blazor]
+- [ASP.NET Core MVC][sample-mvc]
+- [OWIN][sample-owin]
+
+## Documentation
+
+- [Configuration][doc-configuration] — registration, CAS 1.0/2.0/3.0 protocol versions, JSON validation
+  responses, claims mapping, and the `renew`/`gateway`/`method`/`locale` login parameters
+- [Sign-out and Single Sign-Out][doc-slo] — the CAS `/logout` redirect, back-channel session invalidation via
+  a ticket store, and restricting which requests are trusted
+- [Proxy tickets][doc-proxy] — PGT/PGTIOU, the `pgtUrl` callback, and `/proxy` + `/proxyValidate`
+
+<!-- Absolute URLs: this file ships as the NuGet package readme, where relative links do not resolve. -->
+[sample-aspnetcore]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/samples/AspNetCoreSample
+[sample-react]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/samples/AspNetCoreReactSample
+[sample-identity]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/samples/AspNetCoreIdentitySample
+[sample-blazor]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/samples/BlazorSample
+[sample-mvc]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/samples/AspNetCoreMvcSample
+[sample-owin]: https://github.com/akunzai/GSS.Authentication.CAS/tree/main/owin/OwinSample
+[doc-configuration]: https://github.com/akunzai/GSS.Authentication.CAS/blob/main/docs/configuration.md
+[doc-slo]: https://github.com/akunzai/GSS.Authentication.CAS/blob/main/docs/single-sign-out.md
+[doc-proxy]: https://github.com/akunzai/GSS.Authentication.CAS/blob/main/docs/proxy-tickets.md
 
 ## FAQ
 

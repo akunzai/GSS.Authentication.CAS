@@ -8,6 +8,8 @@ namespace GSS.Authentication.CAS.Owin
     /// </summary>
     public class CasSingleLogoutOptions
     {
+        private Func<IOwinContext, bool> _isTrustedRequest = _ => true;
+
         /// <summary>
         /// Called for every incoming request before it's treated as a genuine CAS back-channel logout
         /// notification. Return <see langword="false"/> to ignore the request without removing anything from
@@ -30,6 +32,11 @@ namespace GSS.Authentication.CAS.Owin
         /// </code>
         /// </para>
         /// </remarks>
-        public Func<IOwinContext, bool> IsTrustedRequest { get; set; } = _ => true;
+        /// <exception cref="ArgumentNullException">The value is <see langword="null"/>.</exception>
+        public Func<IOwinContext, bool> IsTrustedRequest
+        {
+            get => _isTrustedRequest;
+            set => _isTrustedRequest = value ?? throw new ArgumentNullException(nameof(value));
+        }
     }
 }

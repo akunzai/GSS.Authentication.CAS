@@ -131,53 +131,89 @@ namespace GSS.Authentication.CAS.Validation
         private ICasPrincipal? BuildPrincipalFromJson(string responseBody)
         {
             using var doc = JsonDocument.Parse(responseBody);
-            if (!doc.RootElement.TryGetProperty(JsonServiceResponse, out var serviceResponse))
+            if (!TryGetProperty(doc.RootElement, JsonServiceResponse, out var serviceResponse))
                 return null;
 
-            if (serviceResponse.TryGetProperty(JsonAuthenticationFailure, out var failureElement))
+            if (TryGetProperty(serviceResponse, JsonAuthenticationFailure, out var failureElement))
             {
-                var description = failureElement.TryGetProperty(JsonFailureDescription, out var descriptionElement)
-                    ? descriptionElement.GetString()
-                    : failureElement.TryGetProperty(JsonFailureCode, out var codeElement)
-                        ? codeElement.GetString()
-                        : null;
-                throw new AuthenticationException(description ?? "Ticket validation failed");
+                // The failure is normally an object carrying code/description, but treat a bare scalar as the
+                // description rather than losing it.
+                var description = TryGetProperty(failureElement, JsonFailureDescription, out var descriptionElement)
+                    ? GetAttributeValue(descriptionElement)
+                    : TryGetProperty(failureElement, JsonFailureCode, out var codeElement)
+                        ? GetAttributeValue(codeElement)
+                        : failureElement.ValueKind == JsonValueKind.Object
+                            ? null
+                            : GetAttributeValue(failureElement);
+                throw new AuthenticationException(string.IsNullOrWhiteSpace(description)
+                    ? "Ticket validation failed"
+                    : description);
             }
 
-            if (!serviceResponse.TryGetProperty(JsonAuthenticationSuccess, out var successElement))
+            if (!TryGetProperty(serviceResponse, JsonAuthenticationSuccess, out var successElement))
                 return null;
 
-            var principalName = successElement.TryGetProperty(JsonUser, out var userElement)
-                ? userElement.GetString()
+            var principalName = TryGetProperty(successElement, JsonUser, out var userElement)
+                ? GetAttributeValue(userElement)
                 : null;
             if (string.IsNullOrWhiteSpace(principalName))
                 return null;
 
             var attributes = new Dictionary<string, StringValues>();
-            if (successElement.TryGetProperty(JsonAttributes, out var attributesElement))
+            // A CAS server may omit attributes entirely, or send null/an array/a scalar where an object is
+            // expected; only an object carries name/value pairs worth reading.
+            if (TryGetProperty(successElement, JsonAttributes, out var attributesElement) &&
+                attributesElement.ValueKind == JsonValueKind.Object)
             {
                 foreach (var attribute in attributesElement.EnumerateObject())
                 {
                     var values = attribute.Value.ValueKind == JsonValueKind.Array
-                        ? attribute.Value.EnumerateArray().Select(v => v.GetString() ?? string.Empty).ToArray()
-                        : [attribute.Value.GetString() ?? string.Empty];
+                        ? attribute.Value.EnumerateArray().Select(GetAttributeValue).ToArray()
+                        : [GetAttributeValue(attribute.Value)];
                     attributes[attribute.Name] = new StringValues(values);
                 }
             }
 
-            var proxyGrantingTicketIou = successElement.TryGetProperty(JsonProxyGrantingTicket, out var pgtElement)
-                ? pgtElement.GetString()
+            var proxyGrantingTicketIou = TryGetProperty(successElement, JsonProxyGrantingTicket, out var pgtElement)
+                ? GetAttributeValue(pgtElement)
                 : null;
             List<string>? proxies = null;
-            if (successElement.TryGetProperty(JsonProxies, out var proxiesElement) &&
+            if (TryGetProperty(successElement, JsonProxies, out var proxiesElement) &&
                 proxiesElement.ValueKind == JsonValueKind.Array)
             {
-                proxies = proxiesElement.EnumerateArray().Select(p => p.GetString() ?? string.Empty).ToList();
+                proxies = proxiesElement.EnumerateArray().Select(GetAttributeValue).ToList();
             }
 
             // IsNullOrWhiteSpace isn't annotated [NotNullWhen(false)] on the netstandard2.0 reference assembly.
             var assertion = new Assertion(principalName!, attributes, proxyGrantingTicketIou, proxies);
             return new CasPrincipal(assertion, Options.AuthenticationType);
+        }
+
+        /// <summary>
+        /// <see cref="JsonElement.TryGetProperty(string, out JsonElement)"/> throws when the element isn't an
+        /// object, which a malformed or unexpected CAS response can easily produce.
+        /// </summary>
+        private static bool TryGetProperty(JsonElement element, string propertyName, out JsonElement value)
+        {
+            if (element.ValueKind == JsonValueKind.Object)
+                return element.TryGetProperty(propertyName, out value);
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Reads a JSON value as text. <see cref="JsonElement.GetString"/> throws on anything but a string or
+        /// null, and CAS servers do release non-string attributes (e.g. Apereo CAS sends
+        /// <c>"isFromNewLogin":[true]</c>), so fall back to the raw JSON text for those.
+        /// </summary>
+        private static string GetAttributeValue(JsonElement element)
+        {
+            return element.ValueKind switch
+            {
+                JsonValueKind.String => element.GetString() ?? string.Empty,
+                JsonValueKind.Null or JsonValueKind.Undefined => string.Empty,
+                _ => element.GetRawText()
+            };
         }
     }
 }

@@ -8,6 +8,8 @@ namespace GSS.Authentication.CAS.AspNetCore;
 /// </summary>
 public class CasSingleLogoutOptions
 {
+    private Func<HttpContext, bool> _isTrustedRequest = _ => true;
+
     /// <summary>
     /// Called for every incoming request before it's treated as a genuine CAS back-channel logout notification.
     /// Return <see langword="false"/> to ignore the request without removing anything from the ticket store.
@@ -25,5 +27,10 @@ public class CasSingleLogoutOptions
     /// </code>
     /// </para>
     /// </remarks>
-    public Func<HttpContext, bool> IsTrustedRequest { get; set; } = _ => true;
+    /// <exception cref="ArgumentNullException">The value is <see langword="null"/>.</exception>
+    public Func<HttpContext, bool> IsTrustedRequest
+    {
+        get => _isTrustedRequest;
+        set => _isTrustedRequest = value ?? throw new ArgumentNullException(nameof(value));
+    }
 }

@@ -30,7 +30,7 @@ dotnet build
 dotnet test --filter "FullyQualifiedName!~E2E"
 
 # With code coverage report
-dotnet test --collect:"XPlat Code Coverage" --filter "FullyQualifiedName!~E2E"
+dotnet test --coverage --coverage-output-format cobertura --filter "FullyQualifiedName!~E2E"
 dotnet tool restore && dotnet tool run reportgenerator
 
 # E2E tests (requires Keycloak — see .devcontainer/)

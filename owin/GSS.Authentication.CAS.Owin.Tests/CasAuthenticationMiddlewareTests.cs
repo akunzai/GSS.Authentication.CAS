@@ -527,7 +527,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
         }
 
         [Fact]
-        public async Task SignInChallenge_WithRenewGatewayMethodLocale_ShouldAppendQueryParameters()
+        public async Task SignInChallenge_WithRenewMethodLocale_ShouldAppendQueryParametersWithoutGateway()
         {
             // Arrange
             using var server = CreateServer(options =>
@@ -548,6 +548,48 @@ namespace GSS.Authentication.CAS.Owin.Tests
             Assert.Equal("POST", query[Constants.Parameters.Method]);
             Assert.Equal("zh_TW", query[Constants.Parameters.Locale]);
             Assert.False(query.ContainsKey(Constants.Parameters.Gateway));
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithWhitespaceMethodAndLocale_ShouldNotAppendQueryParameters()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Method = " ";
+                options.Locale = "\t";
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
+            Assert.False(query.ContainsKey(Constants.Parameters.Method));
+            Assert.False(query.ContainsKey(Constants.Parameters.Locale));
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithPaddedMethodAndLocale_ShouldAppendTrimmedQueryParameters()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Method = " POST ";
+                options.Locale = " zh_TW ";
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
+            Assert.Equal("POST", query[Constants.Parameters.Method]);
+            Assert.Equal("zh_TW", query[Constants.Parameters.Locale]);
         }
 
         [Fact]

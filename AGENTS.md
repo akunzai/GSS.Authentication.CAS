@@ -2,6 +2,10 @@
 
 CAS 1.0/2.0/3.0 authentication middleware for ASP.NET Core and OWIN/Katana. NuGet: `GSS.Authentication.CAS.{Core,AspNetCore,Owin}`.
 
+## Language
+
+All repo-facing content — code comments, commit messages, PR/issue titles and bodies, docs — MUST be written in English, regardless of the conversation language used to produce it.
+
 ## Commands
 
 ```shell
@@ -29,6 +33,8 @@ Pinned in `@mise.toml`:
   - `@test/GSS.Authentication.CAS.Core.Tests/Cas20ServiceTicketValidationTests.cs`
   - `@test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`
 - Conventions: Central Package Management (CPM) in `@Directory.Packages.props` (never `Version=` in `.csproj`).
+- Agent skills config: issues on GitHub (`@docs/agents/issue-tracker.md`), triage labels (`@docs/agents/triage-labels.md`), domain docs layout (`@docs/agents/domain.md`).
+- Gotchas: `@docs/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
 
 ## Constraints
 

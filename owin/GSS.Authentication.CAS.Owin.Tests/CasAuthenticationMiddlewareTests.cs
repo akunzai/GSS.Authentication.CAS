@@ -407,6 +407,78 @@ namespace GSS.Authentication.CAS.Owin.Tests
         }
 
         [Fact]
+        public async Task SignInChallenge_WithCustomProvider_ShouldAppendCustomQueryParameter()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnRedirectToIdentityProviderForSignIn = context =>
+                    {
+                        context.RedirectUri =
+                            QueryHelpers.AddQueryString(context.RedirectUri, "login_hint", "user@example.org");
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
+            Assert.Equal("user@example.org", query["login_hint"]);
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WhenRedirectHandled_ShouldSkipDefaultRedirect()
+        {
+            // Arrange
+            const string customLoginPath = "/custom-login";
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Provider = new CasAuthenticationProvider
+                {
+                    OnRedirectToIdentityProviderForSignIn = context =>
+                    {
+                        context.Response.Redirect(customLoginPath);
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            Assert.Equal(customLoginPath, response.Headers.Location.OriginalString);
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithPlainProvider_ShouldRedirectToCasLoginEndpointUnchanged()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Provider = Substitute.For<ICasAuthenticationProvider>();
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            Assert.StartsWith(CasServerUrlBase + Constants.Paths.Login, response.Headers.Location.AbsoluteUri);
+        }
+
+        [Fact]
         public async Task SingleSignOut_ShouldRedirectToCasServer()
         {
             // Arrange

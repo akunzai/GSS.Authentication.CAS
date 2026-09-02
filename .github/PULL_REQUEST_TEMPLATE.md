@@ -18,6 +18,6 @@
 
 - [ ] I have applied an appropriate **PR label** (required for release notes)
 - [ ] `dotnet build -c Release` passes with no warnings
-- [ ] `dotnet test --filter "FullyQualifiedName!~E2E"` passes
+- [ ] `dotnet test` passes
 - [ ] Added or updated tests for behavior changes
 - [ ] Public API changes include XML documentation comments

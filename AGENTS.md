@@ -10,19 +10,20 @@ All repo-facing content — code comments, commit messages, PR/issue titles and 
 
 ```shell
 dotnet build
-dotnet test --filter "FullyQualifiedName!~E2E" --ignore-exit-code 8
-dotnet test --coverage --coverage-output-format cobertura --filter "FullyQualifiedName!~E2E" --ignore-exit-code 8
+dotnet test --ignore-exit-code 8
+dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
 dotnet tool restore && dotnet tool run reportgenerator
 dotnet test --filter "Cas20ServiceTicketValidationTests" --ignore-exit-code 8
 cd owin && msbuild -noLogo -verbosity:minimal -restore   # Windows + MSBuild only
 aube lint && aube build                                   # samples/AspNetCoreReactSample/ClientApp
+cd e2e && aube install && aube exec -- playwright test    # requires Keycloak + samples running, see .devcontainer/
 ```
 
 ## Toolchain
 
 Pinned in `@mise.toml`:
 - **.NET**: `@global.json` SDK 10.x builds all TFMs; net8.0 is runtime-only for tests/samples.
-- **Node**: React sample uses [aube](https://aube.jdx.dev) (`aube ci` for frozen install).
+- **Node**: React sample and `e2e/` use [aube](https://aube.jdx.dev) (`aube ci` for frozen install).
 
 ## Pointers
 
@@ -35,6 +36,7 @@ Pinned in `@mise.toml`:
   - `@test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`
 - Conventions: Central Package Management (CPM) in `@Directory.Packages.props` (never `Version=` in `.csproj`).
 - User docs: `@docs/configuration.md`, `@docs/single-sign-out.md`, `@docs/proxy-tickets.md`
+- E2E tests (Playwright Test, Node/aube): `@e2e/playwright.config.ts` (one project per sample app), `@e2e/support/`
 - Agent skills config: issues on GitHub (`@docs/agents/issue-tracker.md`), triage labels (`@docs/agents/triage-labels.md`), domain docs layout (`@docs/agents/domain.md`).
 - Gotchas: `@docs/agents/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
 

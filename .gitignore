@@ -302,6 +302,11 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# Playwright Test (e2e/)
+/e2e/test-results/
+/e2e/playwright-report/
+/e2e/blob-report/
+
 # Visual Studio 6 build log
 *.plg
 

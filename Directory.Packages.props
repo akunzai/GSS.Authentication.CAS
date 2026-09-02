@@ -9,7 +9,6 @@
     <SystemPackagesVersion>10.0.10</SystemPackagesVersion>
     <MicrosoftOwinVersion>4.2.3</MicrosoftOwinVersion>
     <SustainsysSaml2Version>2.11.0</SustainsysSaml2Version>
-    <PlaywrightVersion>1.62.0</PlaywrightVersion>
     <MicrosoftTestSdkVersion>18.9.0</MicrosoftTestSdkVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or $(TargetFramework.StartsWith('net4')) ">
@@ -69,8 +68,6 @@
     <PackageVersion Include="StackExchange.Redis" Version="3.1.31" />
     <PackageVersion Include="Sustainsys.Saml2.AspNetCore2" Version="$(SustainsysSaml2Version)" />
     <PackageVersion Include="Sustainsys.Saml2.Owin" Version="$(SustainsysSaml2Version)" />
-    <PackageVersion Include="Microsoft.Playwright" Version="$(PlaywrightVersion)" />
-    <PackageVersion Include="Microsoft.Playwright.Xunit" Version="$(PlaywrightVersion)" />
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
     <PackageVersion Include="xunit.v3" Version="4.0.0" />

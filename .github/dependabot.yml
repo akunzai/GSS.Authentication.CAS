@@ -25,6 +25,19 @@ updates:
       frontend:
         patterns:
           - '*'
+  - package-ecosystem: npm
+    directory: /e2e
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      typescript:
+        patterns:
+          - typescript
+      playwright:
+        patterns:
+          - '@playwright/*'
   - package-ecosystem: nuget
     directory: /
     schedule:
@@ -52,9 +65,6 @@ updates:
       saml2:
         patterns:
           - Sustainsys.Saml2.*
-      playwright:
-        patterns:
-          - Microsoft.Playwright*
       test-sdk:
         patterns:
           - Microsoft.NET.Test.Sdk

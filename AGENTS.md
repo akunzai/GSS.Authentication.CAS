@@ -34,6 +34,7 @@ Pinned in `@mise.toml`:
   - `@test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`
 - Conventions: Central Package Management (CPM) in `@Directory.Packages.props` (never `Version=` in `.csproj`).
 - Agent skills config: issues on GitHub (`@docs/agents/issue-tracker.md`), triage labels (`@docs/agents/triage-labels.md`), domain docs layout (`@docs/agents/domain.md`).
+- Gotchas: `@docs/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
 
 ## Constraints
 

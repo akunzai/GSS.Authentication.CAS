@@ -58,7 +58,31 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             return await HandleSignOutCallbackAsync();
         }
 
+        if (Options.ProxyCallbackPath.HasValue && Options.ProxyCallbackPath == Request.Path)
+        {
+            return await HandleProxyCallbackAsync().ConfigureAwait(false);
+        }
+
         return await base.HandleRequestAsync();
+    }
+
+    /// <summary>
+    /// Receives the Proxy Granting Ticket (<c>pgtId</c>/<c>pgtIou</c>) CAS delivers to the <c>pgtUrl</c> callback.
+    /// See CAS Protocol Specification §2.5.4/§3.3/§3.4.
+    /// </summary>
+    private async Task<bool> HandleProxyCallbackAsync()
+    {
+        var proxyGrantingTicketId = Request.Query[Constants.Parameters.ProxyGrantingTicketId];
+        var proxyGrantingTicketIou = Request.Query[Constants.Parameters.ProxyGrantingTicketIou];
+        if (!string.IsNullOrEmpty(proxyGrantingTicketId) && !string.IsNullOrEmpty(proxyGrantingTicketIou))
+        {
+            await Options.ProxyGrantingTicketStore
+                .StoreAsync(proxyGrantingTicketIou!, proxyGrantingTicketId!, Context.RequestAborted)
+                .ConfigureAwait(false);
+        }
+
+        Response.StatusCode = 200;
+        return true;
     }
 
     /// <summary>
@@ -174,8 +198,19 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
         }
 
         var callbackUri = BuildRedirectUri($"{Options.CallbackPath}?{State}={Uri.EscapeDataString(state!)}");
+        var proxyCallbackUrl = Options.ProxyCallbackPath.HasValue
+            ? BuildRedirectUri(Options.ProxyCallbackPath)
+            : null;
+        if (proxyCallbackUrl != null && !proxyCallbackUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            Logger.LogWarning(
+                "ProxyCallbackPath is configured but the resulting URL '{ProxyCallbackUrl}' is not HTTPS; CAS requires pgtUrl to be HTTPS and will not issue a Proxy Granting Ticket to it.",
+                proxyCallbackUrl);
+        }
+
         var principal = await Options.ServiceTicketValidator
-            .ValidateAsync(serviceTicket!, callbackUri, Context.RequestAborted).ConfigureAwait(false);
+            .ValidateAsync(serviceTicket!, callbackUri, Context.RequestAborted, proxyCallbackUrl)
+            .ConfigureAwait(false);
 
         if (principal == null)
         {

@@ -7,6 +7,7 @@ using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
+using GSS.Authentication.CAS.Proxy;
 
 namespace GSS.Authentication.CAS.Owin
 {
@@ -36,7 +37,32 @@ namespace GSS.Authentication.CAS.Owin
                 return await InvokeReturnPathAsync().ConfigureAwait(false);
             }
 
+            if (Options.ProxyCallbackPath.HasValue && Options.ProxyCallbackPath == Request.Path)
+            {
+                return await HandleProxyCallbackAsync().ConfigureAwait(false);
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Receives the Proxy Granting Ticket (<c>pgtId</c>/<c>pgtIou</c>) CAS delivers to the <c>pgtUrl</c> callback.
+        /// See CAS Protocol Specification §2.5.4/§3.3/§3.4.
+        /// </summary>
+        private async Task<bool> HandleProxyCallbackAsync()
+        {
+            var query = Request.Query;
+            var proxyGrantingTicketId = query[Constants.Parameters.ProxyGrantingTicketId];
+            var proxyGrantingTicketIou = query[Constants.Parameters.ProxyGrantingTicketIou];
+            if (!string.IsNullOrEmpty(proxyGrantingTicketId) && !string.IsNullOrEmpty(proxyGrantingTicketIou))
+            {
+                await Options.ProxyGrantingTicketStore
+                    .StoreAsync(proxyGrantingTicketIou, proxyGrantingTicketId, Request.CallCancelled)
+                    .ConfigureAwait(false);
+            }
+
+            Response.StatusCode = 200;
+            return true;
         }
 
         private Task<bool> HandleSignOutCallbackAsync()
@@ -168,7 +194,17 @@ namespace GSS.Authentication.CAS.Owin
             }
 
             var service = QueryHelpers.AddQueryString(BuildRedirectUri(Options.CallbackPath.Value), State, state);
-            var principal = await Options.ServiceTicketValidator.ValidateAsync(ticket, service, Request.CallCancelled)
+            var proxyCallbackUrl = Options.ProxyCallbackPath.HasValue
+                ? BuildRedirectUri(Options.ProxyCallbackPath.Value)
+                : null;
+            if (proxyCallbackUrl != null && !proxyCallbackUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.WriteWarning(
+                    $"ProxyCallbackPath is configured but the resulting URL '{proxyCallbackUrl}' is not HTTPS; CAS requires pgtUrl to be HTTPS and will not issue a Proxy Granting Ticket to it.");
+            }
+
+            var principal = await Options.ServiceTicketValidator
+                .ValidateAsync(ticket, service, Request.CallCancelled, proxyCallbackUrl)
                 .ConfigureAwait(false);
 
             if (principal == null)

@@ -24,23 +24,20 @@ namespace GSS.Authentication.CAS.Validation
         public virtual async Task<ICasPrincipal?> ValidateAsync(
             string ticket,
             string service,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            string? proxyCallbackUrl = null)
         {
             if (string.IsNullOrEmpty(ticket))
                 throw new ArgumentNullException(nameof(ticket));
             if (string.IsNullOrEmpty(service))
                 throw new ArgumentNullException(nameof(service));
-            var baseUri = new Uri(Options.CasServerUrlBase +
-#if NETCOREAPP3_1_OR_GREATER
-            (Options.CasServerUrlBase.EndsWith('/') 
-#else
-            (Options.CasServerUrlBase.EndsWith("/")
-#endif
-                                      ? string.Empty : "/"));
-            var validateUri = new Uri(baseUri, _suffix);
+            var validateUri = new Uri(Options.GetBaseUri(), _suffix);
             var requestUri =
-                new Uri(
-                    $"{validateUri.AbsoluteUri}?ticket={Uri.EscapeDataString(ticket)}&service={Uri.EscapeDataString(service)}");
+                $"{validateUri.AbsoluteUri}?ticket={Uri.EscapeDataString(ticket)}&service={Uri.EscapeDataString(service)}";
+            if (!string.IsNullOrEmpty(proxyCallbackUrl))
+            {
+                requestUri += $"&pgtUrl={Uri.EscapeDataString(proxyCallbackUrl)}";
+            }
             var response = await _httpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {

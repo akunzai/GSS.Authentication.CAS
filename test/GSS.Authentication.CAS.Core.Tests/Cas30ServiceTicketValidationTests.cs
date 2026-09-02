@@ -53,6 +53,32 @@ public class Cas30ServiceTicketValidationTests
     }
 
     [Fact]
+    public async Task ValidateServiceTicketWithSuccessJsonResponse_ShouldReturnPrincipal()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(new StringContent(
+                """
+                {"serviceResponse":{"authenticationSuccess":{"user":"username","attributes":{"firstname":["John"]}}}}
+                """, Encoding.UTF8, "application/json"));
+        var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(principal);
+        Assert.Equal("username", principal.Assertion.PrincipalName);
+        Assert.Equal("John", principal.Assertion.Attributes["firstname"]);
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
     public async Task ValidateServiceTicketWithUnsupportedCasServer_ShouldThrowsHttpRequestException()
     {
         // Arrange

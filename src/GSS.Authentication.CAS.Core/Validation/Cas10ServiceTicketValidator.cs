@@ -13,7 +13,7 @@ namespace GSS.Authentication.CAS.Validation
         {
         }
 
-        protected override ICasPrincipal? BuildPrincipal(string responseBody)
+        protected override ICasPrincipal? BuildPrincipal(string responseBody, string? contentType)
         {
             var responseParts = responseBody.Split('\n');
             if (responseParts.Length < 2 || responseParts[0] != "yes")

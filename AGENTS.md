@@ -24,7 +24,7 @@ Pinned in `@mise.toml`:
 - **.NET**: `@global.json` SDK 10.x builds all TFMs; net8.0 is runtime-only for tests/samples.
 - **Node**: React sample uses [aube](https://aube.jdx.dev) (`aube ci` for frozen install).
 
-## Architecture & Pointers
+## Pointers
 
 - Solutions: `CAS.slnx` (main), `owin/Owin.sln` (Windows-only)
 - Ticket validation: `@src/GSS.Authentication.CAS.Core/Validation/IServiceTicketValidator.cs`
@@ -34,8 +34,9 @@ Pinned in `@mise.toml`:
   - `@test/GSS.Authentication.CAS.Core.Tests/Cas20ServiceTicketValidationTests.cs`
   - `@test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`
 - Conventions: Central Package Management (CPM) in `@Directory.Packages.props` (never `Version=` in `.csproj`).
+- User docs: `@docs/configuration.md`, `@docs/single-sign-out.md`, `@docs/proxy-tickets.md`
 - Agent skills config: issues on GitHub (`@docs/agents/issue-tracker.md`), triage labels (`@docs/agents/triage-labels.md`), domain docs layout (`@docs/agents/domain.md`).
-- Gotchas: `@docs/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
+- Gotchas: `@docs/agents/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
 
 ## Constraints
 
@@ -47,7 +48,7 @@ Pinned in `@mise.toml`:
 ## Self-Reflection
 
 - **Candidate**: Distill a non-obvious gotcha into ≤ 2 context-tagged bullets. Propose it before writing.
-- **Promote**: On confirmation, write it to a dedicated file — merge an existing topic doc, else `docs/<topic>.md`, else `docs/lessons-learned.md`. Add or update one `@path` line under Pointers.
+- **Promote**: On confirmation, write it to a dedicated file — merge an existing topic doc, else `docs/agents/lessons-learned.md`. Add or update one `@path` line under Pointers. `docs/*.md` is user-facing documentation; agent-facing notes live under `docs/agents/`.
 - **Prune**: Drop entries once stale (obsolete version, now enforced, duplicated, or a transcript) — not by a fixed count.
 
 ## Claude Code Compatibility

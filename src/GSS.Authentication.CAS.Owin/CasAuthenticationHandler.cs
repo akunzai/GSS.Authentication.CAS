@@ -234,11 +234,11 @@ namespace GSS.Authentication.CAS.Owin
         /// Handles SignIn
         /// </summary>
         /// <returns></returns>
-        protected override Task ApplyResponseChallengeAsync()
+        protected override async Task ApplyResponseChallengeAsync()
         {
             if (Response.StatusCode != 401)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             var challenge = Helper.LookupChallenge(Options.AuthenticationType, Options.AuthenticationMode);
@@ -262,10 +262,18 @@ namespace GSS.Authentication.CAS.Owin
                 var authorizationEndpoint =
                     $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";
 
-                Response.Redirect(authorizationEndpoint);
-            }
+                var redirectContext = new CasRedirectContext(Context, null) { RedirectUri = authorizationEndpoint };
+                if (Options.Provider is CasAuthenticationProvider provider)
+                {
+                    await provider.RedirectToIdentityProviderForSignIn(redirectContext).ConfigureAwait(false);
+                    if (redirectContext.Handled)
+                    {
+                        return;
+                    }
+                }
 
-            return Task.CompletedTask;
+                Response.Redirect(redirectContext.RedirectUri);
+            }
         }
 
         private string BuildRedirectUri(string path)

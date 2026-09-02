@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Claims;
+using GSS.Authentication.CAS.Proxy;
 using GSS.Authentication.CAS.Security;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.WebUtilities;
@@ -118,6 +119,57 @@ namespace GSS.Authentication.CAS.Owin.Tests
             var bodyText = await authorizedResponse.Content.ReadAsStringAsync();
             Assert.Equal(principal.GetPrincipalName(), bodyText);
             await ticketValidator.Received(1).ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task ProxyCallback_WithPgtIdAndPgtIou_ShouldStoreInProxyGrantingTicketStore()
+        {
+            // Arrange
+            var store = new InMemoryProxyGrantingTicketStore();
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.ProxyCallbackPath = new Microsoft.Owin.PathString("/proxyCallback");
+                options.ProxyGrantingTicketStore = store;
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/proxyCallback?pgtId=PGT-1-abc&pgtIou=PGTIOU-1-abc",
+                TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("PGT-1-abc", await store.GetAsync("PGTIOU-1-abc", TestContext.Current.CancellationToken));
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithProxyCallbackPathConfigured_ShouldRequestProxyGrantingTicket()
+        {
+            // Arrange
+            var ticketValidator = Substitute.For<IServiceTicketValidator>();
+            var ticket = Guid.NewGuid().ToString();
+            var principal = new CasPrincipal(new Assertion(Guid.NewGuid().ToString()), CasDefaults.AuthenticationType);
+            ticketValidator
+                .ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<string>())
+                .Returns(Task.FromResult<ICasPrincipal?>(principal));
+            using var server = CreateServer(options =>
+            {
+                options.ServiceTicketValidator = ticketValidator;
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.ProxyCallbackPath = new Microsoft.Owin.PathString("/proxyCallback");
+            });
+            using var challengeResponse = await server.HttpClient.GetAsync(CookieAuthenticationDefaults.LoginPath.Value, TestContext.Current.CancellationToken);
+            var query = QueryHelpers.ParseQuery(challengeResponse.Headers.Location.Query);
+            var validateUrl =
+                QueryHelpers.AddQueryString(query[Constants.Parameters.Service], Constants.Parameters.Ticket, ticket);
+
+            // Act
+            using var signInRequest = challengeResponse.GetRequestWithCookies(validateUrl);
+            await server.HttpClient.SendAsync(signInRequest, TestContext.Current.CancellationToken);
+
+            // Assert
+            await ticketValidator.Received(1).ValidateAsync(ticket, Arg.Any<string>(), Arg.Any<CancellationToken>(),
+                Arg.Is<string>(url => url != null && url.EndsWith("/proxyCallback", StringComparison.Ordinal)));
         }
 
         [Fact]

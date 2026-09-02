@@ -18,6 +18,7 @@ public class Cas30ServiceTicketValidationTests
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
+        var proxyGrantingTicketIou = $"PGTIOU-{Guid.NewGuid()}";
         var requestUrl =
             $"{_options.CasServerUrlBase}/p3/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
         var mockHttp = new MockHttpMessageHandler();
@@ -33,7 +34,7 @@ public class Cas30ServiceTicketValidationTests
             <cas:affiliation>staff</cas:affiliation>
             <cas:affiliation>faculty</cas:affiliation>
         </cas:attributes>
-        <cas:proxyGrantingTicket>{Guid.NewGuid()}</cas:proxyGrantingTicket>
+        <cas:proxyGrantingTicket>{proxyGrantingTicketIou}</cas:proxyGrantingTicket>
     </cas:authenticationSuccess>
 </cas:serviceResponse>", Encoding.UTF8, "application/xml"));
         var validator = new Cas30ServiceTicketValidator(_options, new HttpClient(mockHttp));
@@ -46,6 +47,7 @@ public class Cas30ServiceTicketValidationTests
         Assert.NotNull(principal.Assertion);
         Assert.Equal(principal.GetPrincipalName(), principal.Assertion.PrincipalName);
         Assert.NotEmpty(principal.Assertion.Attributes);
+        Assert.Equal(proxyGrantingTicketIou, principal.Assertion.ProxyGrantingTicketIou);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

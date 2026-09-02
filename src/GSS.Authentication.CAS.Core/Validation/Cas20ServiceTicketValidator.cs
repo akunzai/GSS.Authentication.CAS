@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Xml.Linq;
@@ -15,6 +16,9 @@ namespace GSS.Authentication.CAS.Validation
         private static readonly XName _authenticationSuccess = _namespace + "authenticationSuccess";
         private static readonly XName _authenticationFailure = _namespace + "authenticationFailure";
         private static readonly XName _user = _namespace + "user";
+        private static readonly XName _proxyGrantingTicket = _namespace + "proxyGrantingTicket";
+        private static readonly XName _proxies = _namespace + "proxies";
+        private static readonly XName _proxy = _namespace + "proxy";
 
         public Cas20ServiceTicketValidator(
             ICasOptions options,
@@ -89,7 +93,10 @@ namespace GSS.Authentication.CAS.Validation
                 }
             }
 
-            var assertion = new Assertion(principalName, attributes);
+            var proxyGrantingTicketIou = successElement.Element(_proxyGrantingTicket)?.Value;
+            var proxies = successElement.Element(_proxies)?.Elements(_proxy).Select(e => e.Value).ToList();
+
+            var assertion = new Assertion(principalName, attributes, proxyGrantingTicketIou, proxies);
             return new CasPrincipal(assertion, Options.AuthenticationType);
         }
     }

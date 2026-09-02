@@ -18,6 +18,7 @@ public class Cas20ServiceTicketValidationTests
     {
         // Arrange
         var ticket = Guid.NewGuid().ToString();
+        var proxyGrantingTicketIou = $"PGTIOU-{Guid.NewGuid()}";
         var requestUrl =
             $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
         var mockHttp = new MockHttpMessageHandler();
@@ -26,7 +27,7 @@ public class Cas20ServiceTicketValidationTests
             .Respond(new StringContent(@$"<cas:serviceResponse xmlns:cas=""http://www.yale.edu/tp/cas"">
     <cas:authenticationSuccess>
         <cas:user>username</cas:user>
-        <cas:proxyGrantingTicket>{Guid.NewGuid()}</cas:proxyGrantingTicket>
+        <cas:proxyGrantingTicket>{proxyGrantingTicketIou}</cas:proxyGrantingTicket>
     </cas:authenticationSuccess>
 </cas:serviceResponse>", Encoding.UTF8, "application/xml"));
         var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
@@ -39,6 +40,34 @@ public class Cas20ServiceTicketValidationTests
         Assert.NotNull(principal.Assertion);
         Assert.Equal(principal.GetPrincipalName(), principal.Assertion.PrincipalName);
         Assert.Empty(principal.Assertion.Attributes);
+        Assert.Equal(proxyGrantingTicketIou, principal.Assertion.ProxyGrantingTicketIou);
+        Assert.Empty(principal.Assertion.Proxies);
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
+    public async Task ValidateServiceTicketWithProxyCallbackUrl_ShouldAppendPgtUrlParameter()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        const string proxyCallbackUrl = "https://dev.example.test/proxyCallback";
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}&pgtUrl={Uri.EscapeDataString(proxyCallbackUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(new StringContent(@"<cas:serviceResponse xmlns:cas=""http://www.yale.edu/tp/cas"">
+    <cas:authenticationSuccess>
+        <cas:user>username</cas:user>
+    </cas:authenticationSuccess>
+</cas:serviceResponse>", Encoding.UTF8, "application/xml"));
+        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, CancellationToken.None, proxyCallbackUrl);
+
+        // Assert
+        Assert.NotNull(principal);
         mockHttp.VerifyNoOutstandingRequest();
         mockHttp.VerifyNoOutstandingExpectation();
     }

@@ -1,4 +1,5 @@
 using System;
+using GSS.Authentication.CAS.Proxy;
 using GSS.Authentication.CAS.Validation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -37,6 +38,21 @@ public class CasAuthenticationOptions : RemoteAuthenticationOptions, ICasOptions
     /// </summary>
     /// <remarks>This URI can be out of the application's domain. By default it points to the root.</remarks>
     public string SignedOutRedirectUri { get; set; } = "/";
+
+    /// <summary>
+    /// The request path within the application's base path where CAS will deliver a Proxy Granting Ticket
+    /// (<c>pgtId</c>/<c>pgtIou</c>) after successfully validating a service ticket for which a <c>pgtUrl</c> was
+    /// requested. Must be reachable over HTTPS by the CAS server. Leave unset (the default) to not request PGTs.
+    /// See CAS Protocol Specification §2.5.4/§3.3/§3.4.
+    /// </summary>
+    public PathString ProxyCallbackPath { get; set; }
+
+    /// <summary>
+    /// Correlates the PGTIOU returned in the validation response with the real Proxy Granting Ticket delivered to
+    /// <see cref="ProxyCallbackPath"/>. Defaults to an in-memory, single-process store; provide a distributed
+    /// implementation for multi-instance deployments.
+    /// </summary>
+    public IProxyGrantingTicketStore ProxyGrantingTicketStore { get; set; } = new InMemoryProxyGrantingTicketStore();
 
     public new CasEvents Events
     {

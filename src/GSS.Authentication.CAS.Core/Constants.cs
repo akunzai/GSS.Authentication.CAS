@@ -7,6 +7,10 @@ namespace GSS.Authentication.CAS
             public const string Service = "service";
 
             public const string Ticket = "ticket";
+
+            public const string ProxyGrantingTicketId = "pgtId";
+
+            public const string ProxyGrantingTicketIou = "pgtIou";
         }
 
         public static class Paths

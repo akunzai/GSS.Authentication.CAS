@@ -13,6 +13,7 @@ Thank you for your interest in contributing! This guide covers how to report iss
 ### Prerequisites
 
 - [.NET SDK 8.0+](https://dot.net) (10.0 recommended)
+- [mise](https://mise.jdx.dev) (pins Node + [aube](https://aube.jdx.dev), for the `e2e/` suite)
 - [Docker](https://www.docker.com/) (for E2E tests with Keycloak)
 
 ### Clone & Build
@@ -27,14 +28,17 @@ dotnet build
 
 ```shell
 # Unit + integration tests (no external dependencies)
-dotnet test --filter "FullyQualifiedName!~E2E"
+dotnet test
 
 # With code coverage report
-dotnet test --coverage --coverage-output-format cobertura --filter "FullyQualifiedName!~E2E"
+dotnet test --coverage --coverage-output-format cobertura
 dotnet tool restore && dotnet tool run reportgenerator
 
 # E2E tests (requires Keycloak — see .devcontainer/)
-dotnet test --filter "FullyQualifiedName~E2E"
+cd e2e
+aube install
+aube exec -- playwright install --with-deps chromium
+aube exec -- playwright test
 ```
 
 ### Dev Container (recommended)
@@ -55,7 +59,7 @@ Open in VS Code with the [Dev Containers](https://marketplace.visualstudio.com/i
 
    ```shell
    dotnet build -c Release
-   dotnet test --filter "FullyQualifiedName!~E2E"
+   dotnet test
    ```
 
 4. **Apply one primary label** to your PR (required; release-drafter puts each PR in the first matching group):

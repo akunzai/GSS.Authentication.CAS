@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'samples/**'
-      - 'test/GSS.Authentication.CAS.E2E.Tests/**'
+      - 'e2e/**'
       - '.devcontainer/**'
   workflow_dispatch:
     inputs:
@@ -52,23 +52,23 @@ jobs:
         include:
           - name: MVC
             project: samples/AspNetCoreMvcSample
-            filter: AspNetCoreMvcSampleTests
+            playwright_project: mvc
             url: "https://localhost:5002"
           - name: Identity
             project: samples/AspNetCoreIdentitySample
-            filter: AspNetCoreIdentitySampleTests
+            playwright_project: identity
             url: "https://localhost:5004"
           - name: React
             project: samples/AspNetCoreReactSample
-            filter: AspNetCoreReactSampleTests
+            playwright_project: react
             url: "https://localhost:5005"
           - name: Blazor
             project: samples/BlazorSample
-            filter: BlazorSampleTests
+            playwright_project: blazor
             url: "https://localhost:5003"
           - name: Basic
             project: samples/AspNetCoreSample
-            filter: AspNetCoreSampleTests
+            playwright_project: basic
             url: "https://localhost:5001"
 
     env:
@@ -173,42 +173,35 @@ jobs:
           cache-dependency-path: '**/Directory.Packages.props'
 
       - name: Set up mise (provisions aube + node from mise.toml)
-        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        if: steps.check.outputs.run == 'true'
         uses: jdx/mise-action@v4
         with:
           install_args: aube node
           cache: true
 
       - name: Get aube store path
-        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        if: steps.check.outputs.run == 'true'
         id: aube-store
         run: echo "path=$(aube store path)" >> "$GITHUB_OUTPUT"
 
       - name: Cache aube store
-        if: steps.check.outputs.run == 'true' && matrix.name == 'React'
+        if: steps.check.outputs.run == 'true'
         uses: actions/cache@v6
         with:
           path: ${{ steps.aube-store.outputs.path }}
-          key: ${{ runner.os }}-aube-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-aube-store-${{ hashFiles('e2e/pnpm-lock.yaml', 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-aube-store-
 
-      - name: Install dependencies
+      - name: Install e2e dependencies
+        if: steps.check.outputs.run == 'true'
+        run: aube ci
+        working-directory: e2e
+
+      - name: Install React ClientApp dependencies
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
         run: aube ci
         working-directory: samples/AspNetCoreReactSample/ClientApp
-
-      - name: Build E2E Tests
-        if: steps.check.outputs.run == 'true'
-        run: dotnet build test/GSS.Authentication.CAS.E2E.Tests
-
-      - name: Get Playwright version
-        if: steps.check.outputs.run == 'true'
-        id: playwright-version
-        shell: bash
-        run: |
-          VERSION=$(grep -oP '<PackageVersion Include="Microsoft.Playwright" Version="\K[^"]+' Directory.Packages.props)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
         if: steps.check.outputs.run == 'true'
@@ -216,11 +209,12 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e/pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers
         if: steps.check.outputs.run == 'true'
-        run: pwsh test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/playwright.ps1 install chromium --with-deps
+        run: aube exec -- playwright install --with-deps chromium
+        working-directory: e2e
 
       - name: Trust development certificates
         if: steps.check.outputs.run == 'true'
@@ -246,28 +240,16 @@ jobs:
 
       - name: Run E2E Tests
         if: steps.check.outputs.run == 'true'
-        run: dotnet test test/GSS.Authentication.CAS.E2E.Tests --report-trx --report-trx-filename "test-results-${{ matrix.name }}.trx" --results-directory test/GSS.Authentication.CAS.E2E.Tests/TestResults --filter "FullyQualifiedName~${{ matrix.filter }}" --ignore-exit-code 8
+        run: aube exec -- playwright test --project=${{ matrix.playwright_project }}
+        working-directory: e2e
 
-      - name: Upload test results
+      - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: always() && steps.check.outputs.run == 'true'
         with:
-          name: e2e-test-results-${{ matrix.name }}
-          path: test/GSS.Authentication.CAS.E2E.Tests/TestResults/*.trx
-
-      - name: Upload recordings (Video)
-        uses: actions/upload-artifact@v7
-        if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_video == 'true'
-        with:
-          name: e2e-recordings-video-${{ matrix.name }}
-          path: test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/recordings/videos/
-
-      - name: Upload recordings (Trace)
-        uses: actions/upload-artifact@v7
-        if: always() && steps.check.outputs.run == 'true' && github.event.inputs.enable_trace == 'true'
-        with:
-          name: e2e-recordings-trace-${{ matrix.name }}
-          path: test/GSS.Authentication.CAS.E2E.Tests/bin/Debug/net10.0/recordings/traces/
+          name: e2e-playwright-report-${{ matrix.name }}
+          path: e2e/playwright-report/
+          retention-days: 14
 
       - name: Stop sample application
         if: always() && steps.check.outputs.run == 'true'

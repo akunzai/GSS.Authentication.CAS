@@ -73,6 +73,82 @@ public class Cas20ServiceTicketValidationTests
     }
 
     [Fact]
+    public async Task ValidateServiceTicketWithSuccessJsonResponse_ShouldReturnPrincipal()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(new StringContent(
+                """
+                {"serviceResponse":{"authenticationSuccess":{"user":"username","attributes":{"firstname":["John"],"affiliation":["staff","faculty"]}}}}
+                """, Encoding.UTF8, "application/json"));
+        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(principal);
+        Assert.Equal("username", principal.Assertion.PrincipalName);
+        Assert.Equal("John", principal.Assertion.Attributes["firstname"]);
+        Assert.Equal(["staff", "faculty"], principal.Assertion.Attributes["affiliation"].ToArray());
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
+    public async Task ValidateServiceTicketWithSuccessJsonResponse_ShouldReturnProxyGrantingTicketIouAndProxies()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(new StringContent(
+                """
+                {"serviceResponse":{"authenticationSuccess":{"user":"username","proxyGrantingTicket":"PGTIOU-1-abc","proxies":["https://proxy1.example.org/pgtUrl"]}}}
+                """, Encoding.UTF8, "application/json"));
+        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act
+        var principal = await validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(principal);
+        Assert.Equal("PGTIOU-1-abc", principal.Assertion.ProxyGrantingTicketIou);
+        Assert.Equal(["https://proxy1.example.org/pgtUrl"], principal.Assertion.Proxies);
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
+    public async Task ValidateServiceTicketWithFailJsonResponse_ShouldThrowsAuthenticationException()
+    {
+        // Arrange
+        var ticket = Guid.NewGuid().ToString();
+        var requestUrl =
+            $"{_options.CasServerUrlBase}/serviceValidate?ticket={ticket}&service={Uri.EscapeDataString(ServiceUrl)}";
+        var mockHttp = new MockHttpMessageHandler();
+        mockHttp.Expect(HttpMethod.Get, requestUrl)
+            .Respond(new StringContent(
+                """
+                {"serviceResponse":{"authenticationFailure":{"code":"INVALID_TICKET","description":"Ticket not recognized"}}}
+                """, Encoding.UTF8, "application/json"));
+        var validator = new Cas20ServiceTicketValidator(_options, new HttpClient(mockHttp));
+
+        // Act & Assert
+        await Assert
+            .ThrowsAsync<AuthenticationException>(() =>
+                validator.ValidateAsync(ticket, ServiceUrl, TestContext.Current.CancellationToken));
+        mockHttp.VerifyNoOutstandingRequest();
+        mockHttp.VerifyNoOutstandingExpectation();
+    }
+
+    [Fact]
     public async Task ValidateServiceTicketWithFailXmlResponse_ShouldThrowsAuthenticationException()
     {
         // Arrange

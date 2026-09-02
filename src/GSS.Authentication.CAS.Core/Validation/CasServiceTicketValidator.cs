@@ -46,9 +46,19 @@ namespace GSS.Authentication.CAS.Validation
             }
 
             var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return BuildPrincipal(responseBody);
+            return BuildPrincipal(responseBody, response.Content.Headers.ContentType?.MediaType);
         }
 
-        protected abstract ICasPrincipal? BuildPrincipal(string responseBody);
+        /// <summary>
+        /// Parses the validation response into a principal, or <see langword="null"/> if the response indicates
+        /// the ticket didn't resolve to an authenticated user.
+        /// </summary>
+        /// <param name="responseBody">The raw response body from the CAS server.</param>
+        /// <param name="contentType">
+        /// The response's media type (e.g. <c>application/xml</c>, <c>application/json</c>), used by validators
+        /// that support the CAS 3.0 <c>format</c> parameter to pick the right parser for whatever the server
+        /// actually returned.
+        /// </param>
+        protected abstract ICasPrincipal? BuildPrincipal(string responseBody, string? contentType);
     }
 }

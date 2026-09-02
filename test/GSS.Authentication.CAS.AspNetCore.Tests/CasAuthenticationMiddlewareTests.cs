@@ -83,6 +83,25 @@ public class CasAuthenticationMiddlewareTests
     }
 
     [Fact]
+    public async Task SignInChallenge_WithTrailingSlashInCasServerUrlBase_ShouldNotProduceDoubleSlash()
+    {
+        // Arrange
+        using var host = CreateHost(options => options.CasServerUrlBase = CasServerUrlBase + "/");
+        var server = host.GetTestServer();
+        await host.StartAsync(TestContext.Current.CancellationToken);
+        using var client = server.CreateClient();
+
+        // Act
+        using var response = await client.GetAsync(CookieAuthenticationDefaults.LoginPath,
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.StartsWith(CasServerUrlBase + Constants.Paths.Login + "?",
+            response.Headers.Location?.AbsoluteUri ?? string.Empty);
+    }
+
+    [Fact]
     public async Task SignInChallenge_WithoutTicketInCallbackQuery_ShouldThrows()
     {
         // Arrange

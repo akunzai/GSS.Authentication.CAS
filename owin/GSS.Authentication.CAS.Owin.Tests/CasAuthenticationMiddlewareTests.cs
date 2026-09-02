@@ -461,6 +461,20 @@ namespace GSS.Authentication.CAS.Owin.Tests
         }
 
         [Fact]
+        public async Task SignInChallenge_WithTrailingSlashInCasServerUrlBase_ShouldNotProduceDoubleSlash()
+        {
+            // Arrange
+            using var server = CreateServer(options => options.CasServerUrlBase = CasServerUrlBase + "/");
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            Assert.StartsWith(CasServerUrlBase + Constants.Paths.Login + "?", response.Headers.Location.AbsoluteUri);
+        }
+
+        [Fact]
         public async Task SignInChallenge_WithPlainProvider_ShouldRedirectToCasLoginEndpointUnchanged()
         {
             // Arrange

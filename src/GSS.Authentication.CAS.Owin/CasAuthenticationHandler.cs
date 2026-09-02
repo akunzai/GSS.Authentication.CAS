@@ -259,8 +259,9 @@ namespace GSS.Authentication.CAS.Owin
                 var returnTo = QueryHelpers.AddQueryString(BuildRedirectUri(Options.CallbackPath.Value), State,
                     Options.StateDataFormat.Protect(state));
 
-                var authorizationEndpoint =
-                    $"{Options.CasServerUrlBase}/login?service={Uri.EscapeDataString(returnTo)}";
+                var authorizationEndpoint = QueryHelpers.AddQueryString(
+                    $"{Options.CasServerUrlBase.TrimEnd('/')}{Constants.Paths.Login}",
+                    Constants.Parameters.Service, returnTo);
 
                 var redirectContext = new CasRedirectContext(Context, null) { RedirectUri = authorizationEndpoint };
                 if (Options.Provider is CasAuthenticationProvider provider)

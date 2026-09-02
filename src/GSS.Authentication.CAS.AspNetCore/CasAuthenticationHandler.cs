@@ -138,8 +138,9 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             callbackUri = QueryHelpers.AddQueryString(callbackUri, State, state);
         }
 
-        var redirectUri = Options.CasServerUrlBase + Constants.Paths.Login +
-                          $"?{Constants.Parameters.Service}={Uri.EscapeDataString(callbackUri)}";
+        var redirectUri = QueryHelpers.AddQueryString(
+            $"{Options.CasServerUrlBase.TrimEnd('/')}{Constants.Paths.Login}",
+            Constants.Parameters.Service, callbackUri);
 
         var redirectContext = new RedirectContext<CasAuthenticationOptions>(
             Context, Scheme, Options,

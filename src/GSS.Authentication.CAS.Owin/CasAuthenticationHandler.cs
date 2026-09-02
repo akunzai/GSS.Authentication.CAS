@@ -316,26 +316,23 @@ namespace GSS.Authentication.CAS.Owin
                         QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Gateway, "true");
                 }
 
-                if (!string.IsNullOrEmpty(Options.Method))
+                if (!string.IsNullOrWhiteSpace(Options.Method))
                 {
-                    authorizationEndpoint =
-                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Method, Options.Method);
+                    authorizationEndpoint = QueryHelpers.AddQueryString(authorizationEndpoint,
+                        Constants.Parameters.Method, Options.Method!.Trim());
                 }
 
-                if (!string.IsNullOrEmpty(Options.Locale))
+                if (!string.IsNullOrWhiteSpace(Options.Locale))
                 {
-                    authorizationEndpoint =
-                        QueryHelpers.AddQueryString(authorizationEndpoint, Constants.Parameters.Locale, Options.Locale);
+                    authorizationEndpoint = QueryHelpers.AddQueryString(authorizationEndpoint,
+                        Constants.Parameters.Locale, Options.Locale!.Trim());
                 }
 
                 var redirectContext = new CasRedirectContext(Context, null) { RedirectUri = authorizationEndpoint };
-                if (Options.Provider is CasAuthenticationProvider provider)
+                await Options.Provider.RedirectToIdentityProviderForSignIn(redirectContext).ConfigureAwait(false);
+                if (redirectContext.Handled)
                 {
-                    await provider.RedirectToIdentityProviderForSignIn(redirectContext).ConfigureAwait(false);
-                    if (redirectContext.Handled)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 Response.Redirect(redirectContext.RedirectUri);

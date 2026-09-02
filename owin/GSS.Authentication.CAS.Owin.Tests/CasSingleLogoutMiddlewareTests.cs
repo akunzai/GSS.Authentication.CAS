@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -99,6 +100,16 @@ namespace GSS.Authentication.CAS.Owin.Tests
 
             // Assert
             await cache.DidNotReceive().RemoveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public void SetNullIsTrustedRequest_ShouldThrowsArgumentNullException()
+        {
+            // Arrange
+            var options = new CasSingleLogoutOptions();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => options.IsTrustedRequest = null!);
         }
 
         private TestServer CreateServer(IDistributedCache cache)

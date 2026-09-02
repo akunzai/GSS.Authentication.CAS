@@ -175,14 +175,14 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Gateway, "true");
         }
 
-        if (!string.IsNullOrEmpty(Options.Method))
+        if (!string.IsNullOrWhiteSpace(Options.Method))
         {
-            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Method, Options.Method);
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Method, Options.Method!.Trim());
         }
 
-        if (!string.IsNullOrEmpty(Options.Locale))
+        if (!string.IsNullOrWhiteSpace(Options.Locale))
         {
-            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Locale, Options.Locale);
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Locale, Options.Locale!.Trim());
         }
 
         var redirectContext = new RedirectContext<CasAuthenticationOptions>(

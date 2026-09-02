@@ -29,6 +29,11 @@ namespace GSS.Authentication.CAS.Owin
         Task RedirectToIdentityProviderForSignOut(CasRedirectContext context);
 
         /// <summary>
+        /// Invoked before redirecting to the identity provider to sign in.
+        /// </summary>
+        Task RedirectToIdentityProviderForSignIn(CasRedirectContext context);
+
+        /// <summary>
         /// Invoked when there is a remote failure.
         /// </summary>
         /// <param name="context"></param>

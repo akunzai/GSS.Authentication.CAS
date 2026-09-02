@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using GSS.Authentication.CAS;
@@ -39,6 +40,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.CasServerUrlBase = builder.Configuration["CAS:ServerUrlBase"]!;
         // required for CasSingleLogoutMiddleware
         options.SaveTokens = singleLogout || builder.Configuration.GetValue("CAS:SaveTokens", false);
+        // CAS /login parameters; Renew and Gateway are mutually exclusive
+        options.Renew = builder.Configuration.GetValue("CAS:Renew", false);
+        options.Gateway = builder.Configuration.GetValue("CAS:Gateway", false);
+        options.Method = builder.Configuration["CAS:Method"];
+        options.Locale = builder.Configuration["CAS:Locale"];
+        // Request a Proxy Granting Ticket during ticket validation. The resulting URL must be reachable by the
+        // CAS server over HTTPS, and ProxyGrantingTicketStore defaults to a single-process in-memory store --
+        // swap in a distributed implementation when running more than one instance.
+        var proxyCallbackPath = builder.Configuration["CAS:ProxyCallbackPath"];
+        if (!string.IsNullOrWhiteSpace(proxyCallbackPath))
+        {
+            options.ProxyCallbackPath = proxyCallbackPath;
+        }
+
         options.Events.OnCreatingTicket = context =>
         {
             if (context.Identity == null)
@@ -179,7 +194,19 @@ app.UseRouting();
 
 if (singleLogout)
 {
-    app.UseCasSingleLogout();
+    // The CAS back-channel logout carries no signature of its own, so optionally only trust notifications
+    // coming from the addresses the configured CAS server resolves to.
+    var singleLogoutOptions = new CasSingleLogoutOptions();
+    if (builder.Configuration.GetValue("CAS:TrustCasServerOnly", false))
+    {
+        var trustedAddresses = await Dns.GetHostAddressesAsync(
+            new Uri(builder.Configuration["CAS:ServerUrlBase"]!).Host);
+        singleLogoutOptions.IsTrustedRequest = context => context.Connection.RemoteIpAddress != null
+                                                          && trustedAddresses.Contains(
+                                                              context.Connection.RemoteIpAddress);
+    }
+
+    app.UseCasSingleLogout(options: singleLogoutOptions);
 }
 
 app.UseAuthentication();

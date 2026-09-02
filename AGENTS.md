@@ -28,7 +28,8 @@ Pinned in `@mise.toml`:
 
 - Solutions: `CAS.slnx` (main), `owin/Owin.sln` (Windows-only)
 - Ticket validation: `@src/GSS.Authentication.CAS.Core/Validation/IServiceTicketValidator.cs`
-- AspNetCore handler & SLO: `@src/GSS.Authentication.CAS.AspNetCore/CasAuthenticationHandler.cs`, `DistributedCacheTicketStore.cs`
+- Proxy tickets (PGT/PGTIOU, `/proxy`): `@src/GSS.Authentication.CAS.Core/Proxy/`
+- AspNetCore handler & SLO: `@src/GSS.Authentication.CAS.AspNetCore/CasAuthenticationHandler.cs`, `DistributedCacheTicketStore.cs`, `CasSingleLogoutOptions.cs`
 - Gold-standard tests:
   - `@test/GSS.Authentication.CAS.Core.Tests/Cas20ServiceTicketValidationTests.cs`
   - `@test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`

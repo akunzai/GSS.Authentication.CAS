@@ -166,6 +166,25 @@ public class CasAuthenticationHandler : RemoteAuthenticationHandler<CasAuthentic
             $"{Options.CasServerUrlBase.TrimEnd('/')}{Constants.Paths.Login}",
             Constants.Parameters.Service, callbackUri);
 
+        if (Options.Renew)
+        {
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Renew, "true");
+        }
+        else if (Options.Gateway)
+        {
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Gateway, "true");
+        }
+
+        if (!string.IsNullOrEmpty(Options.Method))
+        {
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Method, Options.Method);
+        }
+
+        if (!string.IsNullOrEmpty(Options.Locale))
+        {
+            redirectUri = QueryHelpers.AddQueryString(redirectUri, Constants.Parameters.Locale, Options.Locale);
+        }
+
         var redirectContext = new RedirectContext<CasAuthenticationOptions>(
             Context, Scheme, Options,
             properties, redirectUri);

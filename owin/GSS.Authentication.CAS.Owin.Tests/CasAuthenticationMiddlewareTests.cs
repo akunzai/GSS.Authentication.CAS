@@ -527,6 +527,71 @@ namespace GSS.Authentication.CAS.Owin.Tests
         }
 
         [Fact]
+        public async Task SignInChallenge_WithRenewGatewayMethodLocale_ShouldAppendQueryParameters()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Renew = true;
+                options.Method = "POST";
+                options.Locale = "zh_TW";
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
+            Assert.Equal("true", query[Constants.Parameters.Renew]);
+            Assert.Equal("POST", query[Constants.Parameters.Method]);
+            Assert.Equal("zh_TW", query[Constants.Parameters.Locale]);
+            Assert.False(query.ContainsKey(Constants.Parameters.Gateway));
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithGateway_ShouldAppendGatewayQueryParameter()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Gateway = true;
+            });
+
+            // Act
+            using var response = await server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
+            var query = QueryHelpers.ParseQuery(response.Headers.Location.Query);
+            Assert.Equal("true", query[Constants.Parameters.Gateway]);
+            Assert.False(query.ContainsKey(Constants.Parameters.Renew));
+        }
+
+        [Fact]
+        public async Task SignInChallenge_WithRenewAndGateway_ShouldThrows()
+        {
+            // Arrange
+            using var server = CreateServer(options =>
+            {
+                options.CasServerUrlBase = CasServerUrlBase;
+                options.Renew = true;
+                options.Gateway = true;
+            });
+
+            // Act
+            var exception = await Record.ExceptionAsync(() =>
+                server.HttpClient.GetAsync("/challenge", TestContext.Current.CancellationToken));
+
+            // Assert
+            // Katana's OWIN pipeline may or may not wrap this exception before it reaches HttpClient, so only
+            // assert that setting both Renew and Gateway fails the request rather than pinning the exact message.
+            Assert.NotNull(exception);
+        }
+
+        [Fact]
         public async Task SignInChallenge_WithPlainProvider_ShouldRedirectToCasLoginEndpointUnchanged()
         {
             // Arrange

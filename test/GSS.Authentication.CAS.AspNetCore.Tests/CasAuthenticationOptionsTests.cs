@@ -154,6 +154,23 @@ public class CasAuthenticationOptionsTests
     }
 
     [Fact]
+    public void Validate_ShouldThrowArgumentException_WhenRenewAndGatewayAreBothSet()
+    {
+        // Arrange
+        var options = new CasAuthenticationOptions
+        {
+            CasServerUrlBase = "https://cas.example.com/cas",
+            Renew = true,
+            Gateway = true
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => options.Validate());
+        Assert.Contains("Renew", exception.Message);
+        Assert.Contains("Gateway", exception.Message);
+    }
+
+    [Fact]
     public void Validate_ShouldNotThrow_WhenCasServerUrlBaseIsValid()
     {
         // Arrange

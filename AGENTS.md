@@ -50,7 +50,7 @@ Pinned in `@mise.toml`:
 ## Self-Reflection
 
 - **Candidate**: Distill a non-obvious gotcha into ≤ 2 context-tagged bullets. Propose it before writing.
-- **Promote**: On confirmation, write it to a dedicated file — merge an existing topic doc, else `docs/agents/lessons-learned.md`. Add or update one `@path` line under Pointers. `docs/*.md` is user-facing documentation; agent-facing notes live under `docs/agents/`.
+- **Promote**: On confirmation, put it where whoever would break it must already pass — enforce it (assert/type/test) when the fix is in hand, else a comment at that site, else an agent-facing doc (`docs/agents/<topic>.md`, else `docs/agents/lessons-learned.md`) with one `@path` line under Pointers. Never both.
 - **Prune**: Drop entries once stale (obsolete version, now enforced, duplicated, or a transcript) — not by a fixed count.
 
 ## Claude Code Compatibility

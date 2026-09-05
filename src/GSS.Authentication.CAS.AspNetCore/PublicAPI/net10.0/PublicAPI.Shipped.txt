@@ -1,0 +1,91 @@
+#nullable enable
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.CasAuthenticationHandler(Microsoft.Extensions.Options.IOptionsMonitor<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>! options, Microsoft.Extensions.Logging.ILoggerFactory! logger, System.Text.Encodings.Web.UrlEncoder! encoder) -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.Events.get -> GSS.Authentication.CAS.AspNetCore.CasEvents!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.Events.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.SignOutAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties? properties) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.AuthenticationType.get -> string!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.CasAuthenticationOptions() -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.CasServerUrlBase.get -> string!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.CasServerUrlBase.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Events.get -> GSS.Authentication.CAS.AspNetCore.CasEvents!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Events.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Gateway.get -> bool
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Gateway.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Locale.get -> string?
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Locale.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Method.get -> string?
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Method.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ProxyCallbackPath.get -> Microsoft.AspNetCore.Http.PathString
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ProxyCallbackPath.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ProxyGrantingTicketStore.get -> GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ProxyGrantingTicketStore.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Renew.get -> bool
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Renew.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ServiceTicketValidator.get -> GSS.Authentication.CAS.Validation.IServiceTicketValidator!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.ServiceTicketValidator.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.SignedOutCallbackPath.get -> Microsoft.AspNetCore.Http.PathString
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.SignedOutCallbackPath.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.SignedOutRedirectUri.get -> string!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.SignedOutRedirectUri.set -> void
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.StateDataFormat.get -> Microsoft.AspNetCore.Authentication.ISecureDataFormat<Microsoft.AspNetCore.Authentication.AuthenticationProperties!>!
+GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.StateDataFormat.set -> void
+GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext
+GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext.Assertion.get -> GSS.Authentication.CAS.Security.Assertion!
+GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext.Backchannel.get -> System.Net.Http.HttpClient!
+GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext.CasCreatingTicketContext(System.Security.Claims.ClaimsPrincipal! principal, Microsoft.AspNetCore.Authentication.AuthenticationProperties! properties, Microsoft.AspNetCore.Http.HttpContext! context, Microsoft.AspNetCore.Authentication.AuthenticationScheme! scheme, GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions! options, System.Net.Http.HttpClient! backchannel, GSS.Authentication.CAS.Security.Assertion! assertion) -> void
+GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext.Identity.get -> System.Security.Claims.ClaimsIdentity?
+GSS.Authentication.CAS.AspNetCore.CasEvents
+GSS.Authentication.CAS.AspNetCore.CasEvents.CasEvents() -> void
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnCreatingTicket.get -> System.Func<GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnCreatingTicket.set -> void
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnRedirectToAuthorizationEndpoint.get -> System.Func<Microsoft.AspNetCore.Authentication.RedirectContext<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnRedirectToAuthorizationEndpoint.set -> void
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnRedirectToIdentityProviderForSignOut.get -> System.Func<GSS.Authentication.CAS.AspNetCore.CasRedirectContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.AspNetCore.CasEvents.OnRedirectToIdentityProviderForSignOut.set -> void
+GSS.Authentication.CAS.AspNetCore.CasExtensions
+GSS.Authentication.CAS.AspNetCore.CasRedirectContext
+GSS.Authentication.CAS.AspNetCore.CasRedirectContext.CasRedirectContext(Microsoft.AspNetCore.Http.HttpContext! context, Microsoft.AspNetCore.Authentication.AuthenticationScheme! scheme, GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions! options, Microsoft.AspNetCore.Authentication.AuthenticationProperties! properties, string! redirectUri) -> void
+GSS.Authentication.CAS.AspNetCore.CasRedirectContext.Handled.get -> bool
+GSS.Authentication.CAS.AspNetCore.CasRedirectContext.HandleResponse() -> void
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutExtensions
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware.CasSingleLogoutMiddleware(Microsoft.AspNetCore.Http.RequestDelegate! next, Microsoft.AspNetCore.Authentication.Cookies.ITicketStore! store, Microsoft.Extensions.Logging.ILogger<GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware!>! logger, Microsoft.Extensions.Options.IOptions<GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions!>? options = null) -> void
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions.CasSingleLogoutOptions() -> void
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions.IsTrustedRequest.get -> System.Func<Microsoft.AspNetCore.Http.HttpContext!, bool>!
+GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions.IsTrustedRequest.set -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore.DistributedCacheTicketStore(Microsoft.Extensions.Caching.Distributed.IDistributedCache! cache, Microsoft.Extensions.Options.IOptions<GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions!>! options) -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore.RemoveAsync(string! key) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore.RenewAsync(string! key, Microsoft.AspNetCore.Authentication.AuthenticationTicket! ticket) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore.RetrieveAsync(string! key) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Authentication.AuthenticationTicket?>!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStore.StoreAsync(Microsoft.AspNetCore.Authentication.AuthenticationTicket! ticket) -> System.Threading.Tasks.Task<string!>!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.CacheEntryOptions.get -> Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.CacheEntryOptions.set -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.CacheKeyFactory.get -> System.Func<string!, string!>!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.CacheKeyFactory.set -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.DistributedCacheTicketStoreOptions() -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.SerializerOptions.get -> System.Text.Json.JsonSerializerOptions?
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.SerializerOptions.set -> void
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.TicketIdFactory.get -> System.Func<Microsoft.AspNetCore.Authentication.AuthenticationTicket!, string!>!
+GSS.Authentication.CAS.AspNetCore.DistributedCacheTicketStoreOptions.TicketIdFactory.set -> void
+GSS.Authentication.CAS.AspNetCore.ServiceTicketPropertiesExtensions
+override GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.CreateEventsAsync() -> System.Threading.Tasks.Task<object!>!
+override GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.HandleChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties! properties) -> System.Threading.Tasks.Task!
+override GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.HandleRemoteAuthenticateAsync() -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Authentication.HandleRequestResult!>!
+override GSS.Authentication.CAS.AspNetCore.CasAuthenticationHandler.HandleRequestAsync() -> System.Threading.Tasks.Task<bool>!
+override GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions.Validate() -> void
+static GSS.Authentication.CAS.AspNetCore.CasExtensions.AddCAS(this Microsoft.AspNetCore.Authentication.AuthenticationBuilder! builder) -> Microsoft.AspNetCore.Authentication.AuthenticationBuilder!
+static GSS.Authentication.CAS.AspNetCore.CasExtensions.AddCAS(this Microsoft.AspNetCore.Authentication.AuthenticationBuilder! builder, string! authenticationScheme, string! displayName, System.Action<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>? configureOptions) -> Microsoft.AspNetCore.Authentication.AuthenticationBuilder!
+static GSS.Authentication.CAS.AspNetCore.CasExtensions.AddCAS(this Microsoft.AspNetCore.Authentication.AuthenticationBuilder! builder, string! authenticationScheme, System.Action<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>? configureOptions) -> Microsoft.AspNetCore.Authentication.AuthenticationBuilder!
+static GSS.Authentication.CAS.AspNetCore.CasExtensions.AddCAS(this Microsoft.AspNetCore.Authentication.AuthenticationBuilder! builder, System.Action<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>? configureOptions) -> Microsoft.AspNetCore.Authentication.AuthenticationBuilder!
+static GSS.Authentication.CAS.AspNetCore.CasSingleLogoutExtensions.UseCasSingleLogout(this Microsoft.AspNetCore.Builder.IApplicationBuilder! app, Microsoft.AspNetCore.Authentication.Cookies.ITicketStore? store = null, GSS.Authentication.CAS.AspNetCore.CasSingleLogoutOptions? options = null) -> Microsoft.AspNetCore.Builder.IApplicationBuilder!
+static GSS.Authentication.CAS.AspNetCore.ServiceTicketPropertiesExtensions.GetServiceTicket(this Microsoft.AspNetCore.Authentication.AuthenticationProperties! properties) -> string?
+static GSS.Authentication.CAS.AspNetCore.ServiceTicketPropertiesExtensions.SetServiceTicket(this Microsoft.AspNetCore.Authentication.AuthenticationProperties! properties, string! ticket) -> void
+virtual GSS.Authentication.CAS.AspNetCore.CasEvents.CreatingTicket(GSS.Authentication.CAS.AspNetCore.CasCreatingTicketContext! context) -> System.Threading.Tasks.Task!
+virtual GSS.Authentication.CAS.AspNetCore.CasEvents.RedirectToAuthorizationEndpoint(Microsoft.AspNetCore.Authentication.RedirectContext<GSS.Authentication.CAS.AspNetCore.CasAuthenticationOptions!>! context) -> System.Threading.Tasks.Task!
+virtual GSS.Authentication.CAS.AspNetCore.CasEvents.RedirectToIdentityProviderForSignOut(GSS.Authentication.CAS.AspNetCore.CasRedirectContext! context) -> System.Threading.Tasks.Task!

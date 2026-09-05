@@ -1,0 +1,81 @@
+#nullable enable
+abstract GSS.Authentication.CAS.Validation.CasServiceTicketValidator.BuildPrincipal(string! responseBody, string? contentType) -> GSS.Authentication.CAS.Security.ICasPrincipal?
+const GSS.Authentication.CAS.CasDefaults.AuthenticationType = "CAS" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Gateway = "gateway" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Locale = "locale" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Method = "method" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.ProxyGrantingTicketId = "pgtId" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.ProxyGrantingTicketIou = "pgtIou" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Renew = "renew" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Service = "service" -> string!
+const GSS.Authentication.CAS.Constants.Parameters.Ticket = "ticket" -> string!
+const GSS.Authentication.CAS.Constants.Paths.Login = "/login" -> string!
+const GSS.Authentication.CAS.Constants.Paths.Logout = "/logout" -> string!
+GSS.Authentication.CAS.CasDefaults
+GSS.Authentication.CAS.CasOptions
+GSS.Authentication.CAS.CasOptions.AuthenticationType.get -> string!
+GSS.Authentication.CAS.CasOptions.AuthenticationType.set -> void
+GSS.Authentication.CAS.CasOptions.CasOptions() -> void
+GSS.Authentication.CAS.CasOptions.CasServerUrlBase.get -> string!
+GSS.Authentication.CAS.CasOptions.CasServerUrlBase.set -> void
+GSS.Authentication.CAS.Constants
+GSS.Authentication.CAS.Constants.Parameters
+GSS.Authentication.CAS.Constants.Paths
+GSS.Authentication.CAS.ICasOptions
+GSS.Authentication.CAS.ICasOptions.AuthenticationType.get -> string!
+GSS.Authentication.CAS.ICasOptions.CasServerUrlBase.get -> string!
+GSS.Authentication.CAS.PrincipalExtensions
+GSS.Authentication.CAS.Proxy.CasProxyTicketProvider
+GSS.Authentication.CAS.Proxy.CasProxyTicketProvider.CasProxyTicketProvider(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Proxy.CasProxyTicketProvider.GetProxyTicketAsync(string! proxyGrantingTicket, string! targetService, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+GSS.Authentication.CAS.Proxy.InMemoryProxyGrantingTicketStore
+GSS.Authentication.CAS.Proxy.InMemoryProxyGrantingTicketStore.GetAsync(string! proxyGrantingTicketIou, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string?>!
+GSS.Authentication.CAS.Proxy.InMemoryProxyGrantingTicketStore.InMemoryProxyGrantingTicketStore() -> void
+GSS.Authentication.CAS.Proxy.InMemoryProxyGrantingTicketStore.RemoveAsync(string! proxyGrantingTicketIou, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Proxy.InMemoryProxyGrantingTicketStore.StoreAsync(string! proxyGrantingTicketIou, string! proxyGrantingTicket, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore
+GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore.GetAsync(string! proxyGrantingTicketIou, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string?>!
+GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore.RemoveAsync(string! proxyGrantingTicketIou, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore.StoreAsync(string! proxyGrantingTicketIou, string! proxyGrantingTicket, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Proxy.IProxyTicketProvider
+GSS.Authentication.CAS.Proxy.IProxyTicketProvider.GetProxyTicketAsync(string! proxyGrantingTicket, string! targetService, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+GSS.Authentication.CAS.Security.Assertion
+GSS.Authentication.CAS.Security.Assertion.Assertion(string! principalName, System.Collections.Generic.IDictionary<string!, Microsoft.Extensions.Primitives.StringValues>? attributes = null, string? proxyGrantingTicketIou = null, System.Collections.Generic.IReadOnlyList<string!>? proxies = null) -> void
+GSS.Authentication.CAS.Security.Assertion.Attributes.get -> System.Collections.Generic.IDictionary<string!, Microsoft.Extensions.Primitives.StringValues>!
+GSS.Authentication.CAS.Security.Assertion.PrincipalName.get -> string!
+GSS.Authentication.CAS.Security.Assertion.Proxies.get -> System.Collections.Generic.IReadOnlyList<string!>!
+GSS.Authentication.CAS.Security.Assertion.ProxyGrantingTicketIou.get -> string?
+GSS.Authentication.CAS.Security.CasIdentity
+GSS.Authentication.CAS.Security.CasIdentity.Assertion.get -> GSS.Authentication.CAS.Security.Assertion!
+GSS.Authentication.CAS.Security.CasIdentity.Assertion.set -> void
+GSS.Authentication.CAS.Security.CasIdentity.CasIdentity(GSS.Authentication.CAS.Security.Assertion! assertion, string! authenticationType) -> void
+GSS.Authentication.CAS.Security.CasPrincipal
+GSS.Authentication.CAS.Security.CasPrincipal.Assertion.get -> GSS.Authentication.CAS.Security.Assertion!
+GSS.Authentication.CAS.Security.CasPrincipal.Assertion.set -> void
+GSS.Authentication.CAS.Security.CasPrincipal.CasPrincipal(GSS.Authentication.CAS.Security.Assertion! assertion, string! authenticationType) -> void
+GSS.Authentication.CAS.Security.CasPrincipal.CasPrincipal(GSS.Authentication.CAS.Security.Assertion! assertion, string! authenticationType, System.Collections.Generic.IEnumerable<string!>? roles) -> void
+GSS.Authentication.CAS.Security.CasPrincipal.roles -> System.Collections.Generic.IEnumerable<string!>?
+GSS.Authentication.CAS.Security.ICasPrincipal
+GSS.Authentication.CAS.Security.ICasPrincipal.Assertion.get -> GSS.Authentication.CAS.Security.Assertion!
+GSS.Authentication.CAS.Validation.Cas10ServiceTicketValidator
+GSS.Authentication.CAS.Validation.Cas10ServiceTicketValidator.Cas10ServiceTicketValidator(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.Cas20ProxyTicketValidator
+GSS.Authentication.CAS.Validation.Cas20ProxyTicketValidator.Cas20ProxyTicketValidator(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.Cas20ServiceTicketValidator
+GSS.Authentication.CAS.Validation.Cas20ServiceTicketValidator.Cas20ServiceTicketValidator(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.Cas20ServiceTicketValidator.Cas20ServiceTicketValidator(string! suffix, GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.Cas30ProxyTicketValidator
+GSS.Authentication.CAS.Validation.Cas30ProxyTicketValidator.Cas30ProxyTicketValidator(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.Cas30ServiceTicketValidator
+GSS.Authentication.CAS.Validation.Cas30ServiceTicketValidator.Cas30ServiceTicketValidator(GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.CasServiceTicketValidator
+GSS.Authentication.CAS.Validation.CasServiceTicketValidator.CasServiceTicketValidator(string! suffix, GSS.Authentication.CAS.ICasOptions! options, System.Net.Http.HttpClient? httpClient = null) -> void
+GSS.Authentication.CAS.Validation.CasServiceTicketValidator.Options.get -> GSS.Authentication.CAS.ICasOptions!
+GSS.Authentication.CAS.Validation.IServiceTicketValidator
+GSS.Authentication.CAS.Validation.IServiceTicketValidator.ValidateAsync(string! ticket, string! service, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken), string? proxyCallbackUrl = null) -> System.Threading.Tasks.Task<GSS.Authentication.CAS.Security.ICasPrincipal?>!
+override GSS.Authentication.CAS.Security.CasPrincipal.IsInRole(string! role) -> bool
+override GSS.Authentication.CAS.Validation.Cas10ServiceTicketValidator.BuildPrincipal(string! responseBody, string? contentType) -> GSS.Authentication.CAS.Security.ICasPrincipal?
+override GSS.Authentication.CAS.Validation.Cas20ServiceTicketValidator.BuildPrincipal(string! responseBody, string? contentType) -> GSS.Authentication.CAS.Security.ICasPrincipal?
+static GSS.Authentication.CAS.PrincipalExtensions.GetPrincipalName(this System.Security.Principal.IIdentity! identity) -> string!
+static GSS.Authentication.CAS.PrincipalExtensions.GetPrincipalName(this System.Security.Principal.IPrincipal! principal) -> string!
+virtual GSS.Authentication.CAS.Validation.CasServiceTicketValidator.ValidateAsync(string! ticket, string! service, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken), string? proxyCallbackUrl = null) -> System.Threading.Tasks.Task<GSS.Authentication.CAS.Security.ICasPrincipal?>!

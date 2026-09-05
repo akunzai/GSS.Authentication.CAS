@@ -1,0 +1,129 @@
+#nullable enable
+const GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Scheme = "CAS" -> string!
+GSS.Authentication.CAS.Owin.AuthenticationSessionStoreExtensions
+GSS.Authentication.CAS.Owin.CasAuthenticationExtensions
+GSS.Authentication.CAS.Owin.CasAuthenticationHandler
+GSS.Authentication.CAS.Owin.CasAuthenticationHandler.CasAuthenticationHandler(Microsoft.Owin.Logging.ILogger! logger) -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationMiddleware
+GSS.Authentication.CAS.Owin.CasAuthenticationMiddleware.CasAuthenticationMiddleware(Microsoft.Owin.OwinMiddleware! next, Owin.IAppBuilder! app, GSS.Authentication.CAS.Owin.CasAuthenticationOptions! options) -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelFactory.get -> System.Func<GSS.Authentication.CAS.Owin.CasAuthenticationOptions!, System.Net.Http.HttpClient!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelFactory.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelHttpHandler.get -> System.Net.Http.HttpMessageHandler?
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelHttpHandler.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelTimeout.get -> System.TimeSpan
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.BackchannelTimeout.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CallbackPath.get -> Microsoft.Owin.PathString
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CallbackPath.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Caption.get -> string!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Caption.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CasAuthenticationOptions() -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CasServerUrlBase.get -> string!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CasServerUrlBase.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CookieManager.get -> Microsoft.Owin.Infrastructure.ICookieManager!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.CookieManager.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Gateway.get -> bool
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Gateway.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Locale.get -> string?
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Locale.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Method.get -> string?
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Method.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Provider.get -> GSS.Authentication.CAS.Owin.ICasAuthenticationProvider!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Provider.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ProxyCallbackPath.get -> Microsoft.Owin.PathString
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ProxyCallbackPath.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ProxyGrantingTicketStore.get -> GSS.Authentication.CAS.Proxy.IProxyGrantingTicketStore!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ProxyGrantingTicketStore.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Renew.get -> bool
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.Renew.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SaveTokens.get -> bool
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SaveTokens.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ServiceTicketValidator.get -> GSS.Authentication.CAS.Validation.IServiceTicketValidator!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ServiceTicketValidator.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ServiceUrlBase.get -> System.Uri?
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.ServiceUrlBase.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignedOutCallbackPath.get -> Microsoft.Owin.PathString
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignedOutCallbackPath.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignedOutRedirectUri.get -> string!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignedOutRedirectUri.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignInAsAuthenticationType.get -> string?
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.SignInAsAuthenticationType.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.StateDataFormat.get -> Microsoft.Owin.Security.ISecureDataFormat<Microsoft.Owin.Security.AuthenticationProperties!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationOptions.StateDataFormat.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.CasAuthenticationProvider() -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnCreatingTicket.get -> System.Func<GSS.Authentication.CAS.Owin.CasCreatingTicketContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnCreatingTicket.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToAuthorizationEndpoint.get -> System.Func<GSS.Authentication.CAS.Owin.CasRedirectToAuthorizationEndpointContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToAuthorizationEndpoint.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToIdentityProviderForSignIn.get -> System.Func<GSS.Authentication.CAS.Owin.CasRedirectContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToIdentityProviderForSignIn.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToIdentityProviderForSignOut.get -> System.Func<GSS.Authentication.CAS.Owin.CasRedirectContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRedirectToIdentityProviderForSignOut.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRemoteFailure.get -> System.Func<GSS.Authentication.CAS.Owin.CasRemoteFailureContext!, System.Threading.Tasks.Task!>!
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.OnRemoteFailure.set -> void
+GSS.Authentication.CAS.Owin.CasAuthenticationProvider.RemoteFailure(GSS.Authentication.CAS.Owin.CasRemoteFailureContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext.CasCreatingTicketContext(Microsoft.Owin.IOwinContext! context, System.Security.Claims.ClaimsIdentity! identity, Microsoft.Owin.Security.AuthenticationProperties! properties) -> void
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext.Identity.get -> System.Security.Claims.ClaimsIdentity!
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext.Identity.set -> void
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext.Properties.get -> Microsoft.Owin.Security.AuthenticationProperties!
+GSS.Authentication.CAS.Owin.CasCreatingTicketContext.Properties.set -> void
+GSS.Authentication.CAS.Owin.CasRedirectContext
+GSS.Authentication.CAS.Owin.CasRedirectContext.CasRedirectContext(Microsoft.Owin.IOwinContext! context, Microsoft.Owin.Security.AuthenticationTicket? ticket) -> void
+GSS.Authentication.CAS.Owin.CasRedirectContext.Handled.get -> bool
+GSS.Authentication.CAS.Owin.CasRedirectContext.HandleResponse() -> void
+GSS.Authentication.CAS.Owin.CasRedirectToAuthorizationEndpointContext
+GSS.Authentication.CAS.Owin.CasRedirectToAuthorizationEndpointContext.CasRedirectToAuthorizationEndpointContext(Microsoft.Owin.IOwinContext! context, Microsoft.Owin.Security.AuthenticationTicket? ticket) -> void
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.CasRemoteFailureContext(Microsoft.Owin.IOwinContext! context, System.Exception! failure) -> void
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.Failure.get -> System.Exception!
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.Failure.set -> void
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.HandleResponse() -> void
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.Properties.get -> Microsoft.Owin.Security.AuthenticationProperties?
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.Properties.set -> void
+GSS.Authentication.CAS.Owin.CasRemoteFailureContext.SkipHandler() -> void
+GSS.Authentication.CAS.Owin.CasSingleLogoutExtensions
+GSS.Authentication.CAS.Owin.CasSingleLogoutMiddleware
+GSS.Authentication.CAS.Owin.CasSingleLogoutMiddleware.CasSingleLogoutMiddleware(Microsoft.Owin.OwinMiddleware! next, Owin.IAppBuilder! app, Microsoft.Owin.Security.Cookies.IAuthenticationSessionStore! store, GSS.Authentication.CAS.Owin.CasSingleLogoutOptions? options = null) -> void
+GSS.Authentication.CAS.Owin.CasSingleLogoutOptions
+GSS.Authentication.CAS.Owin.CasSingleLogoutOptions.CasSingleLogoutOptions() -> void
+GSS.Authentication.CAS.Owin.CasSingleLogoutOptions.IsTrustedRequest.get -> System.Func<Microsoft.Owin.IOwinContext!, bool>!
+GSS.Authentication.CAS.Owin.CasSingleLogoutOptions.IsTrustedRequest.set -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore.DistributedCacheIAuthenticationSessionStore(Microsoft.Extensions.Caching.Distributed.IDistributedCache! cache, Microsoft.Extensions.Options.IOptions<GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions!>! options) -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore.RemoveAsync(string! key) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore.RenewAsync(string! key, Microsoft.Owin.Security.AuthenticationTicket! ticket) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore.RetrieveAsync(string! key) -> System.Threading.Tasks.Task<Microsoft.Owin.Security.AuthenticationTicket?>!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStore.StoreAsync(Microsoft.Owin.Security.AuthenticationTicket! ticket) -> System.Threading.Tasks.Task<string!>!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.CacheEntryOptions.get -> Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.CacheEntryOptions.set -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.CacheKeyFactory.get -> System.Func<string!, string!>!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.CacheKeyFactory.set -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.DistributedCacheIAuthenticationSessionStoreOptions() -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.SerializerOptions.get -> System.Text.Json.JsonSerializerOptions?
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.SerializerOptions.set -> void
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.TicketIdFactory.get -> System.Func<Microsoft.Owin.Security.AuthenticationTicket!, string!>!
+GSS.Authentication.CAS.Owin.DistributedCacheIAuthenticationSessionStoreOptions.TicketIdFactory.set -> void
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider.CreatingTicket(GSS.Authentication.CAS.Owin.CasCreatingTicketContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider.RedirectToAuthorizationEndpoint(GSS.Authentication.CAS.Owin.CasRedirectToAuthorizationEndpointContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider.RedirectToIdentityProviderForSignIn(GSS.Authentication.CAS.Owin.CasRedirectContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider.RedirectToIdentityProviderForSignOut(GSS.Authentication.CAS.Owin.CasRedirectContext! context) -> System.Threading.Tasks.Task!
+GSS.Authentication.CAS.Owin.ICasAuthenticationProvider.RemoteFailure(GSS.Authentication.CAS.Owin.CasRemoteFailureContext! context) -> System.Threading.Tasks.Task!
+override GSS.Authentication.CAS.Owin.CasAuthenticationHandler.ApplyResponseChallengeAsync() -> System.Threading.Tasks.Task!
+override GSS.Authentication.CAS.Owin.CasAuthenticationHandler.ApplyResponseGrantAsync() -> System.Threading.Tasks.Task!
+override GSS.Authentication.CAS.Owin.CasAuthenticationHandler.AuthenticateCoreAsync() -> System.Threading.Tasks.Task<Microsoft.Owin.Security.AuthenticationTicket!>!
+override GSS.Authentication.CAS.Owin.CasAuthenticationHandler.InvokeAsync() -> System.Threading.Tasks.Task<bool>!
+override GSS.Authentication.CAS.Owin.CasAuthenticationMiddleware.CreateHandler() -> Microsoft.Owin.Security.Infrastructure.AuthenticationHandler<GSS.Authentication.CAS.Owin.CasAuthenticationOptions!>!
+override GSS.Authentication.CAS.Owin.CasSingleLogoutMiddleware.Invoke(Microsoft.Owin.IOwinContext! context) -> System.Threading.Tasks.Task!
+static GSS.Authentication.CAS.Owin.AuthenticationSessionStoreExtensions.GetServiceTicket(this Microsoft.Owin.Security.AuthenticationProperties! properties) -> string?
+static GSS.Authentication.CAS.Owin.AuthenticationSessionStoreExtensions.SetServiceTicket(this Microsoft.Owin.Security.AuthenticationProperties! properties, string! ticket) -> void
+static GSS.Authentication.CAS.Owin.CasAuthenticationExtensions.UseCasAuthentication(this Owin.IAppBuilder! app, GSS.Authentication.CAS.Owin.CasAuthenticationOptions! options) -> Owin.IAppBuilder!
+static GSS.Authentication.CAS.Owin.CasAuthenticationExtensions.UseCasAuthentication(this Owin.IAppBuilder! app, System.Action<GSS.Authentication.CAS.Owin.CasAuthenticationOptions!>? configureOptions = null) -> Owin.IAppBuilder!
+static GSS.Authentication.CAS.Owin.CasSingleLogoutExtensions.UseCasSingleLogout(this Owin.IAppBuilder! app, Microsoft.Owin.Security.Cookies.IAuthenticationSessionStore! store, GSS.Authentication.CAS.Owin.CasSingleLogoutOptions? options = null) -> Owin.IAppBuilder!
+virtual GSS.Authentication.CAS.Owin.CasAuthenticationProvider.CreatingTicket(GSS.Authentication.CAS.Owin.CasCreatingTicketContext! context) -> System.Threading.Tasks.Task!
+virtual GSS.Authentication.CAS.Owin.CasAuthenticationProvider.RedirectToAuthorizationEndpoint(GSS.Authentication.CAS.Owin.CasRedirectToAuthorizationEndpointContext! context) -> System.Threading.Tasks.Task!
+virtual GSS.Authentication.CAS.Owin.CasAuthenticationProvider.RedirectToIdentityProviderForSignIn(GSS.Authentication.CAS.Owin.CasRedirectContext! context) -> System.Threading.Tasks.Task!
+virtual GSS.Authentication.CAS.Owin.CasAuthenticationProvider.RedirectToIdentityProviderForSignOut(GSS.Authentication.CAS.Owin.CasRedirectContext! context) -> System.Threading.Tasks.Task!

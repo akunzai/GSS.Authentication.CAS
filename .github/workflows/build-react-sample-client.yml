@@ -23,11 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up mise (provisions aube + node from mise.toml)
-        uses: jdx/mise-action@v4
+      - name: Set up aube + node (from mise.toml)
+        uses: jdx/aube-action@v1
         with:
-          install_args: aube node
-          cache: true
+          node-version: auto
 
       - name: Get aube store path
         id: aube-store

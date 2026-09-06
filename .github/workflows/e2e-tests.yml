@@ -172,12 +172,11 @@ jobs:
           cache: true
           cache-dependency-path: '**/Directory.Packages.props'
 
-      - name: Set up mise (provisions aube + node from mise.toml)
+      - name: Set up aube + node (from mise.toml)
         if: steps.check.outputs.run == 'true'
-        uses: jdx/mise-action@v4
+        uses: jdx/aube-action@v1
         with:
-          install_args: aube node
-          cache: true
+          node-version: auto
 
       - name: Get aube store path
         if: steps.check.outputs.run == 'true'

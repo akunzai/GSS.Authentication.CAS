@@ -23,23 +23,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up mise (provisions aube + node from mise.toml)
-        uses: jdx/mise-action@v4
+      - name: Set up aube + node (from mise.toml)
+        uses: jdx/aube-action@v1
         with:
-          install_args: aube node
-          cache: true
+          node-version: auto
 
-      - name: Get aube store path
+      - name: Get aube store and cache paths
         id: aube-store
-        run: echo "path=$(aube store path)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "store-path=$(aube store path)" >> "$GITHUB_OUTPUT"
+          echo "cache-path=$(aube cache path)" >> "$GITHUB_OUTPUT"
 
       - name: Cache aube store
         uses: actions/cache@v6
         with:
-          path: ${{ steps.aube-store.outputs.path }}
+          path: ${{ steps.aube-store.outputs.store-path }}
           key: ${{ runner.os }}-aube-store-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-aube-store-
+
+      - name: Cache aube registry metadata
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.aube-store.outputs.cache-path }}
+          key: ${{ runner.os }}-aube-cache-${{ hashFiles('samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-aube-cache-
 
       - name: Install dependencies
         run: aube ci

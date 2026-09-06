@@ -172,26 +172,36 @@ jobs:
           cache: true
           cache-dependency-path: '**/Directory.Packages.props'
 
-      - name: Set up mise (provisions aube + node from mise.toml)
+      - name: Set up aube + node (from mise.toml)
         if: steps.check.outputs.run == 'true'
-        uses: jdx/mise-action@v4
+        uses: jdx/aube-action@v1
         with:
-          install_args: aube node
-          cache: true
+          node-version: auto
 
-      - name: Get aube store path
+      - name: Get aube store and cache paths
         if: steps.check.outputs.run == 'true'
         id: aube-store
-        run: echo "path=$(aube store path)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "store-path=$(aube store path)" >> "$GITHUB_OUTPUT"
+          echo "cache-path=$(aube cache path)" >> "$GITHUB_OUTPUT"
 
       - name: Cache aube store
         if: steps.check.outputs.run == 'true'
         uses: actions/cache@v6
         with:
-          path: ${{ steps.aube-store.outputs.path }}
+          path: ${{ steps.aube-store.outputs.store-path }}
           key: ${{ runner.os }}-aube-store-${{ hashFiles('e2e/pnpm-lock.yaml', 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-aube-store-
+
+      - name: Cache aube registry metadata
+        if: steps.check.outputs.run == 'true'
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.aube-store.outputs.cache-path }}
+          key: ${{ runner.os }}-aube-cache-${{ hashFiles('e2e/pnpm-lock.yaml', 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-aube-cache-
 
       - name: Install e2e dependencies
         if: steps.check.outputs.run == 'true'

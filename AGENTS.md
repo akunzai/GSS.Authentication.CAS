@@ -4,12 +4,11 @@ CAS 1.0/2.0/3.0 authentication middleware for ASP.NET Core and OWIN/Katana. NuGe
 
 ## Language
 
-All repo-facing content — code comments, commit messages, PR/issue titles and bodies, docs — MUST be written in English, regardless of the conversation language used to produce it.
+All repo-facing content — code comments, commit messages, PR/issue titles and bodies, docs — is written in English, regardless of the conversation language used to produce it.
 
 ## Commands
 
 ```shell
-dotnet build
 dotnet test --ignore-exit-code 8
 dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
 dotnet tool restore && dotnet tool run reportgenerator
@@ -47,10 +46,10 @@ Pinned in `@mise.toml`:
 
 - E2E tests require Keycloak + CAS protocol extension (`@.devcontainer/`).
 
-## Self-Reflection
+## Prevent Recurrence
 
-- **Candidate**: Distill a non-obvious gotcha into ≤ 2 context-tagged bullets. Propose it before writing.
-- **Promote**: On confirmation, put it where whoever would break it must already pass — enforce it (assert/type/test) when the fix is in hand, else a comment at that site, else an agent-facing doc (`docs/agents/<topic>.md`, else `docs/agents/lessons-learned.md`) with one `@path` line under Pointers. Never both.
+- **Candidate**: Name who hits this again, in which file, on what change. No such scenario, nothing to propose.
+- **Promote**: Offer the first tier that reaches them and only that one, pending confirmation — enforce it (assert/type/test) with its size quoted, else a comment at that site, else an agent-facing doc (`docs/agents/<topic>.md`, else `docs/agents/lessons-learned.md`) with one `@path` line under Pointers and one sentence on why the tiers above cannot hold it.
 - **Prune**: When adding to a file, audit the rest of it in the same pass. Drop entries once stale (obsolete version, now enforced, duplicated, or a transcript) — not by a fixed count.
 
 ## Claude Code Compatibility

@@ -6,18 +6,6 @@ CAS 1.0/2.0/3.0 authentication middleware for ASP.NET Core and OWIN/Katana. NuGe
 
 All repo-facing content — code comments, commit messages, PR/issue titles and bodies, docs — is written in English, regardless of the conversation language used to produce it.
 
-## Commands
-
-```shell
-dotnet test --ignore-exit-code 8
-dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
-dotnet tool restore && dotnet tool run reportgenerator
-dotnet test --filter "Cas20ServiceTicketValidationTests" --ignore-exit-code 8
-cd owin && msbuild -noLogo -verbosity:minimal -restore   # Windows + MSBuild only
-aube lint && aube build                                   # samples/AspNetCoreReactSample/ClientApp
-cd e2e && aube install && aube exec -- playwright test    # requires Keycloak + samples running, see .devcontainer/
-```
-
 ## Toolchain
 
 Pinned in `@mise.toml`:
@@ -36,6 +24,8 @@ Pinned in `@mise.toml`:
 - Conventions: Central Package Management (CPM) in `@Directory.Packages.props` (never `Version=` in `.csproj`).
 - User docs: `@docs/configuration.md`, `@docs/single-sign-out.md`, `@docs/proxy-tickets.md`
 - E2E tests (Playwright Test, Node/aube): `@e2e/playwright.config.ts` (one project per sample app), `@e2e/support/`
+- Verification: `@docs/agents/verification.md` — the gate command, what proves it ran, and what cannot be verified locally.
+- Pull requests: `@docs/agents/pull-request.md` — adds to `@.github/PULL_REQUEST_TEMPLATE.md`, which stays authoritative on structure.
 - Agent skills config: issues on GitHub (`@docs/agents/issue-tracker.md`), triage labels (`@docs/agents/triage-labels.md`), domain docs layout (`@docs/agents/domain.md`).
 - Gotchas: `@docs/agents/lessons-learned.md` (e.g. running OWIN tests locally via Mono).
 

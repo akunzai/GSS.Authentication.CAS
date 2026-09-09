@@ -1,6 +1,11 @@
 # Issue tracker: GitHub
 
+**This file is English throughout**, sample blocks included, so it reads
+one way to every model, whatever language the repo chose for its issues.
+
 Issues and specs for this repo (`akunzai/GSS.Authentication.CAS`) live as GitHub issues. Use the `gh` CLI for all operations.
+
+Write issue titles and descriptions in **English**, matching the Language rule in `AGENTS.md`.
 
 ## Conventions
 
@@ -12,6 +17,68 @@ Issues and specs for this repo (`akunzai/GSS.Authentication.CAS`) live as GitHub
 - **Close**: `gh issue close <number> --comment "..."`
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
+
+## Description shape
+
+1. Open with what a new engineer or a library consumer would observe: the symptom or the request, in plain language. Skip file paths and function names unless the reader cannot otherwise locate the issue.
+2. Add a visual GitHub renders inline — a Mermaid `sequenceDiagram` for a ticket-validation or single-sign-out flow, a screenshot for a sample-app bug. Skip formats the description editor cannot render, such as a link to an external artifact or a raw HTML or SVG file. Upload it with the repeatable `--attach` flag (`gh issue create --attach './bug.png#The error state'`); alt text follows the path after `#`. Only when capture is genuinely impossible, leave `<!-- screenshot pending: <what it should show> -->` rather than omitting it silently.
+3. Close with a collapsed technical section, so it does not push the human summary below the fold:
+
+```markdown
+<details>
+<summary>Technical details</summary>
+
+suspected cause, related code paths, repro commands, log excerpts
+
+</details>
+```
+
+**No personally identifiable information in any attachment**; use test data, masking, or cropping. CAS tickets, service URLs, and Keycloak accounts count as that data — `docs/agents/verification.md` holds the capture rules.
+
+## Spec issues
+
+An issue an agent will implement from carries a different shape, because its reader is building rather than triaging. Acceptance criteria stay above the fold; only background goes into `<details>`.
+
+```markdown
+<one paragraph: the observable outcome>
+
+## Acceptance criteria
+
+- [ ] <checkable statement about observable behaviour>
+- [ ] <one per criterion; a reviewer can tick these without reading code>
+
+## Scope
+
+- In: <paths or areas>
+- Out: <what this issue deliberately does not change>
+
+## Verification
+
+<how to prove it works, per docs/agents/verification.md; say here when this
+needs the Keycloak dev container or a Windows machine rather than the
+default `dotnet test` gate>
+
+<details>
+<summary>Technical details</summary>
+
+related code paths, prior art, log excerpts, open questions
+
+</details>
+```
+
+Use the vocabulary the project already defines for its domain, so the issue, the tests, and the code name the same things — CAS terms such as service ticket, proxy-granting ticket, and single sign-out keep their protocol meaning.
+
+An issue with unanswered open questions is not ready to implement. Say so in the issue rather than letting an agent guess.
+
+## Labels
+
+Read this repo's own labels with `gh label list --limit 100`; the CLI defaults to 30 and reports that page as the whole set, so a label past the first page reads as absent. Nothing here invents a vocabulary; when a label really is missing, that is a conversation with the maintainer, not a label to create.
+
+- **Triage roles** — `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix` — are owned by `docs/agents/triage-labels.md`. Read that file, not this list.
+- **Applied when it applies**: `bug`, `enhancement`, `documentation`, `security`, `samples`, `dependencies`. One kind label per issue.
+- **Required on every issue**: none.
+
+Pull request labels are a separate vocabulary, driven by release notes. `CONTRIBUTING.md` owns that table.
 
 ## Pull requests as a triage surface
 

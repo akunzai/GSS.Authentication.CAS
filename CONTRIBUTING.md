@@ -37,7 +37,8 @@ dotnet tool restore && dotnet tool run reportgenerator
 # E2E tests (requires Keycloak — see .devcontainer/)
 cd e2e
 aube install
-aube exec -- playwright install --with-deps chromium
+# On Linux, add --with-deps to also install the system libraries Chromium needs.
+aube exec -- playwright install chromium
 aube exec -- playwright test
 ```
 

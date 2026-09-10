@@ -28,18 +28,27 @@ dotnet build
 
 ```shell
 # Unit + integration tests (no external dependencies)
-dotnet test
+dotnet test --ignore-exit-code 8
 
 # With code coverage report
-dotnet test --coverage --coverage-output-format cobertura
+dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
 dotnet tool restore && dotnet tool run reportgenerator
 
 # E2E tests (requires Keycloak — see .devcontainer/)
 cd e2e
 aube install
-aube exec -- playwright install --with-deps chromium
+# On Linux, add --with-deps to also install the system libraries Chromium needs.
+aube exec -- playwright install chromium
 aube exec -- playwright test
 ```
+
+> **Why `--ignore-exit-code 8`?** Microsoft.Testing.Platform returns exit code
+> 8 for `Zero tests ran`. The solution has two test projects, so any `--filter`
+> naming a class that lives in only one of them makes the other report zero
+> tests and fails the run. The flag keeps one command form working filtered or
+> not. It does not hide test failures, which are exit code 2. CI adds
+> `--minimum-expected-tests 300` on top, a solution-wide floor that catches a
+> suite that collapsed to nothing; raise it when the suite grows well past it.
 
 ### Dev Container (recommended)
 
@@ -59,7 +68,7 @@ Open in VS Code with the [Dev Containers](https://marketplace.visualstudio.com/i
 
    ```shell
    dotnet build -c Release
-   dotnet test
+   dotnet test --ignore-exit-code 8
    ```
 
 4. **Apply one primary label** to your PR (required; release-drafter puts each PR in the first matching group):

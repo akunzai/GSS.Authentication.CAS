@@ -1,4 +1,6 @@
-# Pull Request
+<!-- markdownlint-disable MD041 -->
+<!-- No top-level heading: GitHub renders the PR title above this body, and an
+     agent filling the template in copies whatever heading it finds here. -->
 
 ## Description
 
@@ -18,6 +20,6 @@
 
 - [ ] I have applied an appropriate **PR label** (required for release notes)
 - [ ] `dotnet build -c Release` passes with no warnings
-- [ ] `dotnet test` passes
+- [ ] `dotnet test --ignore-exit-code 8` passes
 - [ ] Added or updated tests for behavior changes
 - [ ] Public API changes include XML documentation comments

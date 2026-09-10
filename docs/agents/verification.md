@@ -151,7 +151,12 @@ Say in the request which of these did not run, and why.
   MSBuild, or Mono elsewhere. On Apple Silicon under Mono,
   `SingleSignOut_ShouldRedirectToCasServer` fails on unmodified `main` —
   see `docs/agents/lessons-learned.md` before reading a failure as a
-  regression.
+  regression. Neither `mono` nor `msbuild` is on PATH here, so this is a
+  missing dependency rather than a check nobody tried.
+
+A gap you could have closed is not a gap. Run the check whose dependency
+you have already seen running, and report a check you skipped as untried,
+rather than recording it here as one this repo cannot run.
 
 <!-- drift:file .devcontainer/devcontainer.json -->
 <!-- drift:file .devcontainer/compose.yaml -->

@@ -1,3 +1,7 @@
+<!-- markdownlint-disable MD041 -->
+<!-- No top-level heading: GitHub renders the PR title above this body, and an
+     agent filling the template in copies whatever heading it finds here. -->
+
 ## Description
 
 <!-- What does this PR do? Link to related issue if applicable (e.g. Fixes #123) -->

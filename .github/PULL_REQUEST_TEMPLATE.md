@@ -1,5 +1,3 @@
-# Pull Request
-
 ## Description
 
 <!-- What does this PR do? Link to related issue if applicable (e.g. Fixes #123) -->

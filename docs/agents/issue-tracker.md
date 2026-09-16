@@ -21,7 +21,7 @@ Infer the repo from `git remote -v`; `gh` does this automatically when run insid
 ## Description shape
 
 1. Open with what a new engineer or a library consumer would observe: the symptom or the request, in plain language. Skip file paths and function names unless the reader cannot otherwise locate the issue.
-2. Add a visual GitHub renders inline — a Mermaid `sequenceDiagram` for a ticket-validation or single-sign-out flow, a screenshot for a sample-app bug. Skip formats the description editor cannot render, such as a link to an external artifact or a raw HTML or SVG file. Upload it with the repeatable `--attach` flag (`gh issue create --attach './bug.png#The error state'`); alt text follows the path after `#`. Only when capture is genuinely impossible, leave `<!-- screenshot pending: <what it should show> -->` rather than omitting it silently.
+2. Add a visual GitHub renders inline — a Mermaid `sequenceDiagram` for a ticket-validation or single-sign-out flow, a screenshot for a sample-app bug. In a Mermaid label, write a path parameter as `:id`, not `{id}`, and break lines with `<br/>`, not `\n`. Skip formats the description editor cannot render, such as a link to an external artifact or a raw HTML or SVG file. Upload it with the repeatable `--attach` flag (`gh issue create --attach './bug.png#The error state'`); alt text follows the path after `#`. Only when capture is genuinely impossible, leave `<!-- screenshot pending: <what it should show> -->` rather than omitting it silently.
 3. Close with a collapsed technical section, so it does not push the human summary below the fold:
 
 ```markdown

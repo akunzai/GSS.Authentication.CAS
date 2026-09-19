@@ -130,6 +130,8 @@ ports are fixed. **Only one agent runs the E2E stack at a time.**
   steps and attach a screenshot.
 - Screenshots: Playwright's own capture from `e2e/`, or the OS screenshot
   tool for a sample app.
+- UI locale: **`en`**. Sample apps ship English only. Browser automation
+  defaults to `en-US`, which matches. Captions follow English.
 
 **This document is where the capture rules live**, and
 `docs/agents/pull-request.md` points here rather than restating them. A

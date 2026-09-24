@@ -125,7 +125,7 @@ ports are fixed. **Only one agent runs the E2E stack at a time.**
 
 - Test output: paste the summary block from the gate. It is the primary
   evidence for a library change.
-- Recording: the `to-walkthrough-video` skill for a sample-app flow,
+- Recording: the `record-walkthrough` skill for a sample-app flow,
   `tcut` for a terminal session. Where neither is available, describe the
   steps and attach a screenshot.
 - Screenshots: Playwright's own capture from `e2e/`, or the OS screenshot

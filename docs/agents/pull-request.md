@@ -56,6 +56,23 @@ what it does not say.
 you end up attaching. `verification.md`'s capture rules say what that
 means here.
 
+## Merge confidence
+
+Add this section only when a plain `git revert` would not undo the change or
+an external consumer is affected; otherwise omit it. A known risk is
+mergeable when evidence and a mitigation cover it:
+
+- **Risk**: what could go wrong and who notices — which users, consumers, or
+  downstream systems — and how soon.
+- **Evidence**: the tests, CI jobs, smoke output, or staging check that
+  exercise the risky path. Confirm a CI job actually ran on this change; a
+  job skipped by a path filter is no evidence.
+- **Mitigation**: what limits the damage — a backup and restore path, a
+  feature flag, a staged rollout, or written confirmation from whoever runs
+  an external dependency.
+
+With neither evidence nor mitigation, say so and keep the request a draft.
+
 ## Tests land with the behaviour
 
 - **Product logic**: `src/GSS.Authentication.CAS.Core/`,

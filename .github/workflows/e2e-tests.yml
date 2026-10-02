@@ -5,9 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'samples/**'
       - 'e2e/**'
-      - '.devcontainer/**'
+  # Run manually for sample or dev container changes; select the sample below.
   workflow_dispatch:
     inputs:
       enable_video:

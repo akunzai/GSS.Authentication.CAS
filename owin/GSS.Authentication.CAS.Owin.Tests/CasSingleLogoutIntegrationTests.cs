@@ -46,8 +46,6 @@ namespace GSS.Authentication.CAS.Owin.Tests
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
                 app.UseCookieAuthentication(new CookieAuthenticationOptions
                 {
-                    LoginPath = CookieAuthenticationDefaults.LoginPath,
-                    LogoutPath = CookieAuthenticationDefaults.LogoutPath,
                     SessionStore = store
                 });
                 app.UseCasAuthentication(new CasAuthenticationOptions
@@ -126,11 +124,7 @@ namespace GSS.Authentication.CAS.Owin.Tests
             {
                 app.SetDataProtectionProvider(new FakeDataProtectionProvider(new AesDataProtector("test")));
                 app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-                app.UseCookieAuthentication(new CookieAuthenticationOptions
-                {
-                    LoginPath = CookieAuthenticationDefaults.LoginPath,
-                    LogoutPath = CookieAuthenticationDefaults.LogoutPath
-                });
+                app.UseCookieAuthentication(new CookieAuthenticationOptions());
                 app.UseCasAuthentication(new CasAuthenticationOptions
                 {
                     ServiceTicketValidator = ticketValidator,

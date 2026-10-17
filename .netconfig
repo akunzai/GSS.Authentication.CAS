@@ -1,5 +1,0 @@
-; https://github.com/danielpalme/ReportGenerator
-[ReportGenerator]
-	reports = "**/*.cobertura.xml"
-	targetdir = "coverage"
-	reporttypes = Cobertura,TextSummary

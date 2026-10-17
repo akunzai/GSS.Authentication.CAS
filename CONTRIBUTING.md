@@ -32,7 +32,6 @@ dotnet test --ignore-exit-code 8
 
 # With code coverage report
 dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
-dotnet tool restore && dotnet tool run reportgenerator
 
 # E2E tests (requires Keycloak — see .devcontainer/)
 cd e2e

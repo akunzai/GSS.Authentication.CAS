@@ -46,8 +46,6 @@ jobs:
         run: |
           cd owin
           dotnet test --collect:"XPlat Code Coverage"
-          dotnet tool restore
-          dotnet tool run reportgenerator
       - uses: codecov/codecov-action@v7
         with:
           flags: owin

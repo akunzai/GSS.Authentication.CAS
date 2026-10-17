@@ -44,7 +44,7 @@ build is wrong.
 | The gate | `dotnet test --ignore-exit-code 8` |
 | One test class while iterating | `dotnet test --filter "Cas20ServiceTicketValidationTests" --ignore-exit-code 8` |
 | Release build, zero warnings (`TreatWarningsAsErrors`) | `dotnet build -c Release` |
-| Coverage report | `dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8` then `dotnet tool restore && dotnet tool run reportgenerator` |
+| Coverage report | `dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8` |
 | React sample client | `aube lint && aube build` in `samples/AspNetCoreReactSample/ClientApp` |
 | OWIN targets (`net462`/`net48`) | `cd owin && msbuild -noLogo -verbosity:minimal -restore` — Windows + MSBuild only |
 | Browser E2E | See Browser E2E below; the suite needs Keycloak and a sample app already listening |

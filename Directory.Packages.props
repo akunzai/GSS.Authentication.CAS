@@ -70,7 +70,7 @@
     <PackageVersion Include="Sustainsys.Saml2.AspNetCore2" Version="$(SustainsysSaml2Version)" />
     <PackageVersion Include="Sustainsys.Saml2.Owin" Version="$(SustainsysSaml2Version)" />
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
   </ItemGroup>
 </Project>

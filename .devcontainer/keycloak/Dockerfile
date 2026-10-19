@@ -1,7 +1,7 @@
 # https://github.com/keycloak/keycloak/releases
-ARG KEYCLOAK_VERSION=26.8.0
+ARG KEYCLOAK_VERSION=26.8.1
 # https://github.com/jacekkow/keycloak-protocol-cas/releases
-ARG KEYCLOAK_CAS_VERSION=26.8.0
+ARG KEYCLOAK_CAS_VERSION=26.8.1
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
 ARG KEYCLOAK_VERSION
 ARG KEYCLOAK_CAS_VERSION

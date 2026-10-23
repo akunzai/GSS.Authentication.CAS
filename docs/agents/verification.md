@@ -45,7 +45,7 @@ build is wrong.
 | One test class while iterating | `dotnet test --filter "Cas20ServiceTicketValidationTests" --ignore-exit-code 8` |
 | Release build, zero warnings (`TreatWarningsAsErrors`) | `dotnet build -c Release` |
 | Coverage report | `dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8` |
-| React sample client | `aube lint && aube build` in `samples/AspNetCoreReactSample/ClientApp` |
+| React sample client | `bun run lint && bun run build` in `samples/AspNetCoreReactSample/ClientApp` |
 | OWIN targets (`net462`/`net48`) | `cd owin && msbuild -noLogo -verbosity:minimal -restore` — Windows + MSBuild only |
 | Browser E2E | See Browser E2E below; the suite needs Keycloak and a sample app already listening |
 
@@ -65,12 +65,12 @@ cd .devcontainer && docker compose up -d keycloak redis
 curl -sk -o /dev/null -w '%{http_code}\n' https://auth.dev.local:8443/realms/demo   # want 200
 
 # once per clone
-cd e2e && aube ci && aube exec -- playwright install chromium
-cd samples/AspNetCoreReactSample/ClientApp && aube ci   # the react project only
+cd e2e && bun install --frozen-lockfile && bun run playwright install chromium
+cd samples/AspNetCoreReactSample/ClientApp && bun install --frozen-lockfile   # the react project only
 
 # per project: start the sample, wait for it, then run that project alone
 dotnet run --project samples/AspNetCoreSample --urls https://localhost:5001 &
-cd e2e && aube exec -- playwright test --project=basic
+cd e2e && bun run test --project=basic
 ```
 
 `--with-deps` on `playwright install` is Linux-only; drop it elsewhere.
@@ -99,7 +99,7 @@ accounts in a throwaway realm. Real credentials never enter this suite.
 Run once, by a person. The commands above fail until they are done.
 
 - [ ] Install the toolchain: `mise install` (.NET 10 SDK, the net8.0
-      ASP.NET Core runtime, Node, aube).
+      ASP.NET Core runtime, Bun).
 - [ ] Install Docker and mkcert, for the Keycloak-backed E2E suite.
 - [ ] Issue the TLS certificate Keycloak mounts:
       `cd .devcontainer && mkdir -p .secrets && mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem auth.dev.local`.

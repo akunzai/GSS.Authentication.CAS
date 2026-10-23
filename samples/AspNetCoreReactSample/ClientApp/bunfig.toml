@@ -1,0 +1,11 @@
+[install]
+minimumReleaseAge = 86400
+
+[run]
+bun = true
+
+[fmt]
+singleQuote = true
+printWidth = 100
+sortPackageJson = false
+ignorePatterns = ["dist"]

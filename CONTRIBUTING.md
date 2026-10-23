@@ -13,7 +13,7 @@ Thank you for your interest in contributing! This guide covers how to report iss
 ### Prerequisites
 
 - [.NET SDK 8.0+](https://dot.net) (10.0 recommended)
-- [mise](https://mise.jdx.dev) (pins Node + [aube](https://aube.jdx.dev), for the `e2e/` suite)
+- [mise](https://mise.jdx.dev) (pins [Bun](https://bun.com), for the React sample and `e2e/` suite)
 - [Docker](https://www.docker.com/) (for E2E tests with Keycloak)
 
 ### Clone & Build
@@ -35,10 +35,10 @@ dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8
 
 # E2E tests (requires Keycloak — see .devcontainer/)
 cd e2e
-aube install
+bun install --frozen-lockfile
 # On Linux, add --with-deps to also install the system libraries Chromium needs.
-aube exec -- playwright install chromium
-aube exec -- playwright test
+bun run playwright install chromium
+bun run test
 ```
 
 > **Why `--ignore-exit-code 8`?** Microsoft.Testing.Platform returns exit code

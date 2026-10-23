@@ -2,24 +2,25 @@
 
 ## Requirement
 
-- [Node.js](https://nodejs.org)
-- [aube](https://aube.jdx.dev) (recommended via [mise](https://mise.jdx.dev): `mise install`)
+- [Bun](https://bun.com) (recommended via [mise](https://mise.jdx.dev): `mise install`)
 
-## [Getting Started](https://create-react-app.dev/docs/getting-started)
+## Getting Started
 
 ```sh
 # install npm packages
-aube install
+bun install --frozen-lockfile
 
 # watch and serve a dev server at https://localhost:3000/
-aube start
+bun run start
 
 # build the project in production mode. The build artifacts will be stored in the `dist/` directory
-aube build
+bun run build
 
-# lint (oxlint) and check formatting (oxfmt)
-aube lint
+# lint (oxlint) and check formatting (bun fmt)
+bun run lint
 
-# write oxfmt changes
-aube format
+# write formatting changes (bun fmt)
+bun run fmt
 ```
+
+`bun check` checks types before Vite builds the client. Bun also runs the Vite dev server and HTTPS setup scripts. Formatting options live in `bunfig.toml`; Oxlint keeps its `.oxlintrc.json` configuration.

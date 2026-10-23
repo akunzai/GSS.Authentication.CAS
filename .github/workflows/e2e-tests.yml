@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'e2e/**'
+      - 'mise.toml'
+      - '.github/workflows/e2e-tests.yml'
   # Run manually for sample or dev container changes; select the sample below.
   workflow_dispatch:
     inputs:
@@ -171,45 +173,25 @@ jobs:
           cache: true
           cache-dependency-path: '**/Directory.Packages.props'
 
-      - name: Set up aube + node (from mise.toml)
+      - name: Set up Bun (from mise.toml)
         if: steps.check.outputs.run == 'true'
-        uses: jdx/aube-action@v1
+        uses: jdx/mise-action@v4
         with:
-          node-version: auto
-
-      - name: Get aube store and cache paths
-        if: steps.check.outputs.run == 'true'
-        id: aube-store
-        run: |
-          echo "store-path=$(aube store path)" >> "$GITHUB_OUTPUT"
-          echo "cache-path=$(aube cache path)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache aube store
-        if: steps.check.outputs.run == 'true'
-        uses: actions/cache@v6
-        with:
-          path: ${{ steps.aube-store.outputs.store-path }}
-          key: ${{ runner.os }}-aube-store-${{ hashFiles('e2e/pnpm-lock.yaml', 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-aube-store-
-
-      - name: Cache aube registry metadata
-        if: steps.check.outputs.run == 'true'
-        uses: actions/cache@v6
-        with:
-          path: ${{ steps.aube-store.outputs.cache-path }}
-          key: ${{ runner.os }}-aube-cache-${{ hashFiles('e2e/pnpm-lock.yaml', 'samples/AspNetCoreReactSample/ClientApp/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-aube-cache-
+          install_args: bun
 
       - name: Install e2e dependencies
         if: steps.check.outputs.run == 'true'
-        run: aube ci
+        run: bun install --frozen-lockfile
+        working-directory: e2e
+
+      - name: Type check e2e tests
+        if: steps.check.outputs.run == 'true'
+        run: bun run check
         working-directory: e2e
 
       - name: Install React ClientApp dependencies
         if: steps.check.outputs.run == 'true' && matrix.name == 'React'
-        run: aube ci
+        run: bun install --frozen-lockfile
         working-directory: samples/AspNetCoreReactSample/ClientApp
 
       - name: Cache Playwright browsers
@@ -218,11 +200,11 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e/bun.lock') }}
 
       - name: Install Playwright browsers
         if: steps.check.outputs.run == 'true'
-        run: aube exec -- playwright install --with-deps chromium
+        run: bun run playwright install --with-deps chromium
         working-directory: e2e
 
       - name: Trust development certificates
@@ -249,7 +231,7 @@ jobs:
 
       - name: Run E2E Tests
         if: steps.check.outputs.run == 'true'
-        run: aube exec -- playwright test --project=${{ matrix.playwright_project }}
+        run: bun run test --project=${{ matrix.playwright_project }}
         working-directory: e2e
 
       - name: Upload Playwright report

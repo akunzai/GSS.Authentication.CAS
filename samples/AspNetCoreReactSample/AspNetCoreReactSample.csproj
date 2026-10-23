@@ -8,7 +8,7 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
-    <SpaProxyLaunchCommand>aube start</SpaProxyLaunchCommand>
+    <SpaProxyLaunchCommand>bun run start</SpaProxyLaunchCommand>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -39,20 +39,20 @@
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
-  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
-    <!-- Ensure Node.js is installed -->
-    <Exec Command="node --version" ContinueOnError="true">
+  <Target Name="DebugEnsureBunEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+    <!-- Ensure Bun is installed -->
+    <Exec Command="bun --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
-    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
-    <Message Importance="high" Text="Restoring dependencies using 'aube'. This may take several minutes..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="aube install" />
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Bun is required to build and run this project. Run mise install from the repository root, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'bun'. This may take several minutes..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun install --frozen-lockfile" />
   </Target>
 
   <Target Name="PublishClientAssets" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="aube install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="aube build" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun install --frozen-lockfile" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun run build" />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>

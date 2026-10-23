@@ -12,29 +12,23 @@ updates:
         update-types:
           - version-update:semver-minor
           - version-update:semver-patch
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /samples/AspNetCoreReactSample/ClientApp
     schedule:
       interval: weekly
     cooldown:
       default-days: 3
     groups:
-      typescript:
-        patterns:
-          - typescript
       frontend:
         patterns:
           - '*'
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /e2e
     schedule:
       interval: weekly
     cooldown:
       default-days: 3
     groups:
-      typescript:
-        patterns:
-          - typescript
       playwright:
         patterns:
           - '@playwright/*'

@@ -10,13 +10,10 @@ else
 	dotnet dev-certs https --trust
 fi
 
-# Provision aube for the React sample client via mise; the version is pinned in
-# mise.toml (single source of truth), and mise fetches a checksum-verified prebuilt
-# binary, so no untrusted npm lifecycle scripts run.
-# https://aube.jdx.dev/installation
-if ! command -v aube >/dev/null 2>&1; then
-    echo "Installing aube via mise (version from mise.toml)..."
-    (cd /workspace && mise trust && mise install aube)
+# Provision Bun for the React sample and E2E suite using the version in mise.toml.
+if ! command -v bun >/dev/null 2>&1; then
+    echo "Installing Bun via mise (version from mise.toml)..."
+    (cd /workspace && mise trust && mise install bun)
 fi
 
 # Install Playwright browsers for E2E testing

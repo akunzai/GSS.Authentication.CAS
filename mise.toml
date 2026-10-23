@@ -12,5 +12,4 @@
 # - net462/net48 (OWIN) require Windows + MSBuild and are out of mise's scope.
 [tools]
 dotnet = ["10", { version = "8.0.28", runtime = "aspnetcore" }]
-node = "lts"
-aube = "latest"
+bun = "1.4"

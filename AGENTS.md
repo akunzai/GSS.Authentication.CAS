@@ -10,7 +10,7 @@ All repo-facing content — code comments, commit messages, PR/issue titles and 
 
 Pinned in `mise.toml`:
 - **.NET**: `global.json` SDK 10.x builds all TFMs; net8.0 is runtime-only for tests/samples.
-- **Node**: React sample and `e2e/` use [aube](https://aube.jdx.dev) (`aube ci` for frozen install).
+- **Bun**: React sample and `e2e/` use Bun (`bun install --frozen-lockfile` for frozen install); keep Oxlint for linting.
 
 ## Pointers
 
@@ -23,7 +23,7 @@ Pinned in `mise.toml`:
   - `test/GSS.Authentication.CAS.AspNetCore.Tests/CasAuthenticationMiddlewareTests.cs`
 - Conventions: Central Package Management (CPM) in `Directory.Packages.props` (never `Version=` in `.csproj`).
 - User docs: `docs/configuration.md`, `docs/single-sign-out.md`, `docs/proxy-tickets.md`
-- E2E tests (Playwright Test, Node/aube): `e2e/playwright.config.ts` (one project per sample app), `e2e/support/`
+- E2E tests (Playwright Test, Bun): `e2e/playwright.config.ts` (one project per sample app), `e2e/support/`
 - Before running or reporting verification, read `docs/agents/verification.md` — the gate command, what proves it ran, and what cannot be verified locally.
 - When opening a pull request, read `docs/agents/pull-request.md` — adds to `.github/PULL_REQUEST_TEMPLATE.md`, which stays authoritative on structure.
 - When filing or triaging an issue, read `docs/agents/issue-tracker.md` (triage labels: `docs/agents/triage-labels.md`, domain docs layout: `docs/agents/domain.md`).

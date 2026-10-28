@@ -46,7 +46,7 @@ build is wrong.
 | Release build, zero warnings (`TreatWarningsAsErrors`) | `dotnet build -c Release` |
 | Coverage report | `dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8` |
 | React sample client | `bun run lint && bun run build` in `samples/AspNetCoreReactSample/ClientApp` |
-| OWIN targets (`net462`/`net48`) | `cd owin && msbuild -noLogo -verbosity:minimal -restore` — Windows + MSBuild only |
+| OWIN targets (`net48`) | `cd owin && msbuild -noLogo -verbosity:minimal -restore` — Windows + MSBuild only |
 | Browser E2E | See Browser E2E below; the suite needs Keycloak and a sample app already listening |
 
 A public API change also needs `PublicAPI.Unshipped.txt` updated, per

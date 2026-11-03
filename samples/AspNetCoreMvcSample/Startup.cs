@@ -84,6 +84,13 @@ public class Startup
                 options.ClientSecret = Configuration["OIDC:ClientSecret"];
                 options.Authority = Configuration["OIDC:Authority"];
                 options.RequireHttpsMetadata = !HostingEnvironment.IsDevelopment();
+                if (Enum.TryParse<PushedAuthorizationBehavior>(
+                    Configuration["OIDC:PushedAuthorizationBehavior"],
+                    ignoreCase: true,
+                    out var pushedAuthorizationBehavior))
+                {
+                    options.PushedAuthorizationBehavior = pushedAuthorizationBehavior;
+                }
                 // required for single logout
                 options.SaveTokens = Configuration.GetValue("OIDC:SaveTokens", false);
                 options.ResponseType = OpenIdConnectResponseType.Code;

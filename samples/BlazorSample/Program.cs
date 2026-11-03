@@ -57,6 +57,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ClientSecret = builder.Configuration["OIDC:ClientSecret"];
         options.Authority = builder.Configuration["OIDC:Authority"];
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        if (Enum.TryParse<PushedAuthorizationBehavior>(
+            builder.Configuration["OIDC:PushedAuthorizationBehavior"],
+            ignoreCase: true,
+            out var pushedAuthorizationBehavior))
+        {
+            options.PushedAuthorizationBehavior = pushedAuthorizationBehavior;
+        }
         // required for single logout
         options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
         options.ResponseType = OpenIdConnectResponseType.Code;

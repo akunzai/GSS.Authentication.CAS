@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AspNetCoreIdentitySample.Data;
 using GSS.Authentication.CAS.AspNetCore;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -57,6 +58,13 @@ builder.Services.AddAuthentication()
         options.ClientSecret = builder.Configuration["OIDC:ClientSecret"];
         options.Authority = builder.Configuration["OIDC:Authority"];
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        if (Enum.TryParse<PushedAuthorizationBehavior>(
+            builder.Configuration["OIDC:PushedAuthorizationBehavior"],
+            ignoreCase: true,
+            out var pushedAuthorizationBehavior))
+        {
+            options.PushedAuthorizationBehavior = pushedAuthorizationBehavior;
+        }
         options.SaveTokens = builder.Configuration.GetValue("OIDC:SaveTokens", false);
         options.ResponseType = OpenIdConnectResponseType.Code;
         var scope = builder.Configuration["OIDC:Scope"];

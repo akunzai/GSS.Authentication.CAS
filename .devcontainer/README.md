@@ -2,10 +2,10 @@
 
 ## Requirements
 
-- [Docker Engine](https://docs.docker.com/install/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- [Podman](https://podman.io/) (recommended) or [Docker Engine](https://docs.docker.com/install/)
+- [Podman Compose](https://github.com/containers/podman-compose) or [Docker Compose](https://docs.docker.com/compose/)
 - [mkcert](https://github.com/FiloSottile/mkcert)
-- [Visual Studio Code](https://code.visualstudio.com/)
+- DevContainer-compatible IDE (e.g. Visual Studio Code, JetBrains IDEs, Zed) or Dev Container CLI
 - Bash
 
 ## Getting Start
@@ -19,11 +19,19 @@ mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem 'auth.dev.local'
 echo "127.0.0.1 auth.dev.local" | sudo tee -a /etc/hosts
 
 # starting container
-docker compose up -d
+podman compose up -d
 
 # run the AspNetCoreSample
 dotnet run --project ../samples/AspNetCoreSample/AspNetCoreSample.csproj
 ```
+
+> [!TIP]
+> You can override local toolchain environment variables in `mise.local.toml` (git-ignored) to customize the compose engine:
+>
+> ```toml
+> [env]
+> CONTAINER_COMPOSE = "podman compose"
+> ```
 
 ## URLs
 

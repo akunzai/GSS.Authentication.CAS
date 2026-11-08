@@ -61,7 +61,7 @@ project at a time, in this order.
 
 ```sh
 # once per machine, and after a Keycloak image rebuild
-cd .devcontainer && docker compose up -d keycloak redis
+cd .devcontainer && ${CONTAINER_COMPOSE:-podman compose} up -d keycloak redis
 curl -sk -o /dev/null -w '%{http_code}\n' https://auth.dev.local:8443/realms/demo   # want 200
 
 # once per clone
@@ -86,8 +86,8 @@ cd e2e && bun run test --project=basic
 `.github/workflows/e2e-tests.yml` runs one matrix job per row and is the
 reference when this drifts.
 
-All five projects pass on macOS arm64 with Docker 29.4.0, so a failure
-here is a signal, not an environment quirk. Where a machine lacks Docker,
+All five projects pass on macOS arm64 with rootless container engines (such as Podman) and Docker, so a failure
+here is a signal, not an environment quirk. Where a machine lacks a container engine,
 mkcert, or the hosts entry, say the suite did not run rather than claiming
 a pass.
 
@@ -100,7 +100,7 @@ Run once, by a person. The commands above fail until they are done.
 
 - [ ] Install the toolchain: `mise install` (.NET 10 SDK, the net8.0
       ASP.NET Core runtime, Bun).
-- [ ] Install Docker and mkcert, for the Keycloak-backed E2E suite.
+- [ ] Install a container engine (Podman recommended, or Docker) and mkcert, for the Keycloak-backed E2E suite.
 - [ ] Issue the TLS certificate Keycloak mounts:
       `cd .devcontainer && mkdir -p .secrets && mkcert -cert-file .secrets/cert.pem -key-file .secrets/key.pem auth.dev.local`.
 - [ ] Map the Keycloak hostname:

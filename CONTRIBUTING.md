@@ -14,7 +14,7 @@ Thank you for your interest in contributing! This guide covers how to report iss
 
 - [.NET SDK 8.0+](https://dot.net) (10.0 recommended)
 - [mise](https://mise.jdx.dev) (pins [Bun](https://bun.com), for the React sample and `e2e/` suite)
-- [Docker](https://www.docker.com/) (for E2E tests with Keycloak)
+- [Podman](https://podman.io/) (recommended) or [Docker](https://www.docker.com/) (for E2E tests with Keycloak)
 
 ### Clone & Build
 

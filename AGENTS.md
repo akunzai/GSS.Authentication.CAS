@@ -9,7 +9,7 @@ All repo-facing content — code comments, commit messages, PR/issue titles and 
 ## Toolchain
 
 Pinned in `mise.toml`:
-- **.NET**: `global.json` SDK 10.x builds all TFMs; net8.0 is runtime-only for tests/samples.
+- **.NET**: `global.json` SDK 10.x+ builds all TFMs; net10.0 is runtime-only for tests/samples.
 - **Bun**: React sample and `e2e/` use Bun (`bun install --frozen-lockfile` for frozen install); keep Oxlint for linting.
 
 ## Pointers

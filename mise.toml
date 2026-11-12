@@ -2,14 +2,14 @@
 # Pins the developer toolchain so local, devcontainer, and CI environments match.
 #
 # Notes:
-# - The .NET 10 SDK builds every target framework in this repo
+# - The .NET 11 SDK builds every target framework in this repo
 #   (net10.0/net8.0/netstandard2.0/netcoreapp3.1). Only ONE SDK is needed to build.
-# - net8.0 just needs its ASP.NET Core runtime to *run* the net8 tests and samples,
-#   so it is installed runtime-only (leaner than a full net8 SDK). Wildcards/major
-#   version wildcards like "8" resolve to the latest SDK version (e.g. 8.0.422),
+# - net10.0 just needs its ASP.NET Core runtime to *run* the tests and samples,
+#   so it is installed runtime-only (leaner than a full SDK). Wildcards/major
+#   version wildcards like "10" resolve to the latest SDK version,
 #   which fails to install because dotnet-install.sh looks for a matching runtime
-#   version that does not exist. Pin a specific runtime version (e.g. "8.0.28").
+#   version that does not exist. Pin a specific runtime version (e.g. "10.0.14").
 # - net462/net48 (OWIN) require Windows + MSBuild and are out of mise's scope.
 [tools]
-dotnet = ["10", { version = "8.0.28", runtime = "aspnetcore" }]
+dotnet = ["11", { version = "10.0.14", runtime = "aspnetcore" }]
 bun = "1.4"

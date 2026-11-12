@@ -30,10 +30,12 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
-            8.0.x
             10.0.x
+            11.0.x
           cache: true
-          cache-dependency-path: '**/Directory.Packages.props'
+          cache-dependency-path: |
+            **/Directory.Packages.props
+            **/Directory.Build.props
       - name: Build
         run: |
           dotnet --info
@@ -43,7 +45,7 @@ jobs:
           # --minimum-expected-tests is a solution-wide floor (exit 9) so a
           # collapsed suite fails CI; --ignore-exit-code 8 does not mask it.
           # Raise the floor when the suite grows well past it.
-          dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8 --minimum-expected-tests 300
+          dotnet test --coverage --coverage-output-format cobertura --ignore-exit-code 8 --minimum-expected-tests 150
       - uses: codecov/codecov-action@v7
         with:
           flags: core

@@ -12,7 +12,7 @@ Thank you for your interest in contributing! This guide covers how to report iss
 
 ### Prerequisites
 
-- [.NET SDK 8.0+](https://dot.net) (10.0 recommended)
+- [.NET SDK 10.0+](https://dot.net) (11.0 recommended)
 - [mise](https://mise.jdx.dev) (pins [Bun](https://bun.com), for the React sample and `e2e/` suite)
 - [Podman](https://podman.io/) (recommended) or [Docker](https://www.docker.com/) (for E2E tests with Keycloak)
 
@@ -46,7 +46,7 @@ bun run test
 > naming a class that lives in only one of them makes the other report zero
 > tests and fails the run. The flag keeps one command form working filtered or
 > not. It does not hide test failures, which are exit code 2. CI adds
-> `--minimum-expected-tests 300` on top, a solution-wide floor that catches a
+> `--minimum-expected-tests 150` on top, a solution-wide floor that catches a
 > suite that collapsed to nothing; raise it when the suite grows well past it.
 
 ### Dev Container (recommended)

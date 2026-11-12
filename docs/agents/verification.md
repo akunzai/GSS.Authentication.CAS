@@ -23,7 +23,7 @@ Exit code 8 never means a test failed — that is exit code 2.
 
 The cost of that flag is that a suite which collapsed to nothing would
 also pass, so `.github/workflows/build.yml` adds
-`--minimum-expected-tests 300`, a solution-wide floor that fails with exit
+`--minimum-expected-tests 150`, a solution-wide floor that fails with exit
 code 9. `--ignore-exit-code 8` does not mask exit code 9. Local runs skip
 the floor; the summary line is right there to read.
 
@@ -98,7 +98,7 @@ accounts in a throwaway realm. Real credentials never enter this suite.
 
 Run once, by a person. The commands above fail until they are done.
 
-- [ ] Install the toolchain: `mise install` (.NET 10 SDK, the net8.0
+- [ ] Install the toolchain: `mise install` (.NET 11 SDK, the net10.0
       ASP.NET Core runtime, Bun).
 - [ ] Install a container engine (Podman recommended, or Docker) and mkcert, for the Keycloak-backed E2E suite.
 - [ ] Issue the TLS certificate Keycloak mounts:

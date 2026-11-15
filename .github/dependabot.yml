@@ -43,6 +43,10 @@ updates:
         update-types:
           - version-update:semver-major
           - version-update:semver-minor
+      # Sample projects target net10.0; EF Core 11+ requires net11.0.
+      - dependency-name: "Microsoft.EntityFrameworkCore.*"
+        update-types:
+          - version-update:semver-major
     groups:
       aspnetcore:
         patterns:

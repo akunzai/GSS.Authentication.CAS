@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <!-- Package Version Variables -->
-    <MicrosoftAspNetCoreVersion>10.0.9</MicrosoftAspNetCoreVersion>
+    <MicrosoftAspNetCoreVersion>10.0.15</MicrosoftAspNetCoreVersion>
     <MicrosoftExtensionsVersion>10.0.14</MicrosoftExtensionsVersion>
     <EntityFrameworkCoreVersion>10.0.14</EntityFrameworkCoreVersion>
     <SystemPackagesVersion>10.0.13</SystemPackagesVersion>
@@ -50,7 +50,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.19.1" />
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.19.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftTestSdkVersion)" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
     <PackageVersion Include="Microsoft.Owin.Host.SystemWeb" Version="$(MicrosoftOwinVersion)" />

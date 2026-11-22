@@ -8,7 +8,7 @@
     <EntityFrameworkCoreVersion>10.0.15</EntityFrameworkCoreVersion>
     <SystemPackagesVersion>10.0.13</SystemPackagesVersion>
     <MicrosoftOwinVersion>4.2.3</MicrosoftOwinVersion>
-    <SustainsysSaml2Version>2.11.0</SustainsysSaml2Version>
+    <SustainsysSaml2Version>2.11.1</SustainsysSaml2Version>
     <MicrosoftTestSdkVersion>18.12.0</MicrosoftTestSdkVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or $(TargetFramework.StartsWith('net4')) ">
